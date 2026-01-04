@@ -126,7 +126,7 @@
           <div class="panel-body">
             <div class="card-grid">
               <% exercises.slice(0, 6).forEach(ex => { %>
-                <a href="/exercises/<%= ex.id %>" class="content-card" style="text-decoration: none;">
+                <a href="<%= basePath %>/exercises/<%= ex.id %>" class="content-card" style="text-decoration: none;">
                   <div class="content-card-header">
                     <span class="exercise-type exercise-type-<%= ex.type %>"><%= ex.type.replace('_', ' ') %></span>
                     <span class="difficulty difficulty-<%= ex.difficulty %>"><%= ex.difficulty %></span>
@@ -150,7 +150,7 @@
           <div class="panel-body">
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
               <% mindmaps.forEach(mm => { %>
-                <a href="/mindmaps/<%= mm.id %>" class="btn"><%= mm.title %></a>
+                <a href="<%= basePath %>/mindmaps/<%= mm.id %>" class="btn"><%= mm.title %></a>
               <% }) %>
             </div>
           </div>

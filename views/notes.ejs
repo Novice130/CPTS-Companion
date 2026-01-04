@@ -26,7 +26,7 @@
           <p class="text-muted mb-0">Your personal notes and templates for CPTS prep.</p>
         </div>
         <div style="display: flex; gap: 0.5rem;">
-          <a href="/notes/new" class="btn btn-primary">+ New Note</a>
+          <a href="<%= basePath %>/notes/new" class="btn btn-primary">+ New Note</a>
         </div>
       </div>
       
@@ -39,7 +39,7 @@
           <div class="panel-body">
             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
               <% templates.forEach(tmpl => { %>
-                <a href="/notes/new?template=<%= tmpl.id %>" class="btn"><%= tmpl.name %></a>
+                <a href="<%= basePath %>/notes/new?template=<%= tmpl.id %>" class="btn"><%= tmpl.name %></a>
               <% }) %>
             </div>
           </div>
@@ -50,7 +50,7 @@
       <% if (notes.length > 0) { %>
         <div class="card-grid">
           <% notes.forEach(note => { %>
-            <a href="/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
+            <a href="<%= basePath %>/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
               <div class="note-card-title"><%= note.title %></div>
               <div class="note-card-preview">
                 <%= note.body_md ? note.body_md.substring(0, 150).replace(/[#*_\[\]]/g, '') : 'Empty note' %>...
@@ -67,7 +67,7 @@
           <div class="empty-state-icon">📝</div>
           <div class="empty-state-title">No notes yet</div>
           <p>Create your first note or start from a template!</p>
-          <a href="/notes/new" class="btn btn-primary">Create Note</a>
+          <a href="<%= basePath %>/notes/new" class="btn btn-primary">Create Note</a>
         </div>
       <% } %>
     </main>

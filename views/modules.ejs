@@ -32,7 +32,7 @@
           
           <div class="card-grid">
             <% categories[category].forEach(mod => { %>
-              <a href="/modules/<%= mod.id %>" class="content-card" style="text-decoration: none;">
+              <a href="<%= basePath %>/modules/<%= mod.id %>" class="content-card" style="text-decoration: none;">
                 <div class="content-card-header">
                   <h4 class="content-card-title"><%= mod.title %></h4>
                   <% if (mod.status === 'completed') { %>

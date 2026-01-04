@@ -83,11 +83,11 @@
                     <div class="activity-desc"><%= activity.description %></div>
                   </div>
                   <% if (activity.activity_type === 'module' && activity.activity_id) { %>
-                    <a href="/modules/<%= activity.activity_id %>" class="btn btn-sm">View</a>
+                    <a href="<%= basePath %>/modules/<%= activity.activity_id %>" class="btn btn-sm">View</a>
                   <% } else if (activity.activity_type === 'exercise' && activity.activity_id) { %>
-                    <a href="/exercises/<%= activity.activity_id %>" class="btn btn-sm">Start</a>
+                    <a href="<%= basePath %>/exercises/<%= activity.activity_id %>" class="btn btn-sm">Start</a>
                   <% } else if (activity.activity_type === 'flashcards') { %>
-                    <a href="/flashcards/review" class="btn btn-sm">Review</a>
+                    <a href="<%= basePath %>/flashcards/review" class="btn btn-sm">Review</a>
                   <% } else if (activity.activity_type === 'reflection') { %>
                     <button class="btn btn-sm" onclick="showReflection()">Write</button>
                   <% } %>
@@ -135,7 +135,7 @@
                 🎯 Practice Exercises
               </a>
               <% if (stats.dueFlashcards > 0) { %>
-                <a href="/flashcards/review" class="btn btn-primary" style="justify-content: flex-start;">
+                <a href="<%= basePath %>/flashcards/review" class="btn btn-primary" style="justify-content: flex-start;">
                   🃏 Review <%= stats.dueFlashcards %> Due Flashcards
                 </a>
               <% } %>
@@ -153,7 +153,7 @@
         <div class="panel">
           <div class="panel-header">
             <h3 class="panel-title"><span class="panel-title-icon">📅</span> Plan Overview</h3>
-            <a href="/settings" class="btn btn-sm">Change Plan</a>
+            <a href="<%= basePath %>/settings" class="btn btn-sm">Change Plan</a>
           </div>
           <div class="panel-body">
             <div class="plan-overview">
@@ -190,7 +190,7 @@
           <% if (recentNotes.length > 0) { %>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
               <% recentNotes.forEach(note => { %>
-                <a href="/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
+                <a href="<%= basePath %>/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
                   <div class="note-card-title"><%= note.title %></div>
                   <div class="note-card-meta">
                     <span><%= note.module_title || 'General' %></span>
@@ -204,7 +204,7 @@
               <div class="empty-state-icon">📝</div>
               <div class="empty-state-title">No notes yet</div>
               <p>Start taking notes during your studies!</p>
-              <a href="/notes/new" class="btn btn-primary">Create Note</a>
+              <a href="<%= basePath %>/notes/new" class="btn btn-primary">Create Note</a>
             </div>
           <% } %>
         </div>

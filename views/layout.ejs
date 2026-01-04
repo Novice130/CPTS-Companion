@@ -27,7 +27,7 @@
             <span class="nav-icon">⌂</span>
             Dashboard
           </a>
-          <a href="/plan" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'plan' ? 'active' : '' %>">
+          <a href="<%= basePath %>/plan" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'plan' ? 'active' : '' %>">
             <span class="nav-icon">📅</span>
             30-Day Plan
             <% if (typeof stats !== 'undefined') { %>
@@ -68,11 +68,11 @@
             <span class="nav-icon">📝</span>
             Notes
           </a>
-          <a href="/search" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'search' ? 'active' : '' %>">
+          <a href="<%= basePath %>/search" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'search' ? 'active' : '' %>">
             <span class="nav-icon">🔍</span>
             Search
           </a>
-          <a href="/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
+          <a href="<%= basePath %>/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
             <span class="nav-icon">⚙️</span>
             Settings
           </a>

@@ -25,7 +25,7 @@
       
       <div class="card-grid">
         <% mindmaps.forEach(mm => { %>
-          <a href="/mindmaps/<%= mm.id %>" class="content-card" style="text-decoration: none;">
+          <a href="<%= basePath %>/mindmaps/<%= mm.id %>" class="content-card" style="text-decoration: none;">
             <div class="content-card-header">
               <h4 class="content-card-title"><%= mm.title %></h4>
             </div>
