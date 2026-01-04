@@ -154,5 +154,95 @@
     "title": "Domain Trust Attacks",
     "description": "Attacking trust relationships",
     "mermaid_code": "graph TD\n    A[Enumerate Trusts] --> B[Get-DomainTrust]\n    B --> C{Trust Type}\n    C --> D[Parent-Child]\n    C --> E[Forest Trust]\n    C --> F[External Trust]\n    D --> G[Compromise Child Domain]\n    G --> H[Get krbtgt Hash]\n    H --> I[Golden Ticket + SID History]\n    I --> J[Enterprise Admin Access]\n    E --> K[Check SID Filtering]\n    K -->|Disabled| I\n    K -->|Enabled| L[Limited Access]\n    F --> M[Credential Reuse Attack]"
+  },
+  {
+    "module_id": 1,
+    "title": "Pentest Process Lifecycle",
+    "description": "Standard penetration testing phases",
+    "mermaid_code": "graph TD\n    A[Pre-Engagement] --> B[Information Gathering]\n    B --> C[Vulnerability Assessment]\n    C --> D[Exploitation]\n    D --> E[Post-Exploitation]\n    E --> F[Reporting]\n    A --> G[Scope & Rules]\n    B --> H[Recon & Enum]\n    C --> I[Scan & Validate]\n    D --> J[Gain Access]\n    E --> K[PrivEsc & Pivot]\n    F --> L[Document Findings]"
+  },
+  {
+    "module_id": 5,
+    "title": "Vulnerability Assessment Flow",
+    "description": "Process for identifying and validating vulnerabilities",
+    "mermaid_code": "graph TD\n    A[Asset Discovery] --> B[Service Enumeration]\n    B --> C[Automated Scanning]\n    C --> D[Manual Validation]\n    D --> E[False Positive Analysis]\n    E --> F[Risk Rating]\n    F --> G[Prioritization]\n    C --> H[Nessus/OpenVAS]\n    C --> I[Nmap Scripts]\n    D --> J[Proof of Concept]"
+  },
+  {
+    "module_id": 15,
+    "title": "Fuzzing Workflow with Ffuf",
+    "description": "Web fuzzing methodology",
+    "mermaid_code": "graph TD\n    A[Target URL] --> B{Fuzzing Type}\n    B --> C[Directory Fuzzing]\n    B --> D[Extension Fuzzing]\n    B --> E[Parameter Fuzzing]\n    B --> F[VHost Fuzzing]\n    C --> G[Wordlist Selection]\n    G --> H[Filter Responses]\n    H --> I[Analyze Results]\n    I --> J[Recursion]"
+  },
+  {
+    "module_id": 16,
+    "title": "Login Brute Force Strategy",
+    "description": "Attacking authentication mechanisms",
+    "mermaid_code": "graph TD\n    A[Login Page] --> B[Identify Tech]\n    B --> C{Attack Type}\n    C --> D[Credential Stuffing]\n    C --> E[Password Spraying]\n    C --> F[Brute Force]\n    D --> G[Known Breaches]\n    E --> H[Common Passwords]\n    F --> I[Wordlists]\n    I --> J[Hydra/Burp]\n    J --> K[Handle Rate Limits]\n    K --> L[Success]"
+  },
+  {
+    "module_id": 18,
+    "title": "SQLMap Automation",
+    "description": "Automated SQL injection workflow",
+    "mermaid_code": "graph TD\n    A[Identify Parameter] --> B[Capture Request]\n    B --> C[Run SQLMap]\n    C --> D{Vulnerable?}\n    D -->|Yes| E[Enumerate DBs]\n    E --> F[Enumerate Tables]\n    F --> G[Dump Columns]\n    G --> H[Dump Data]\n    D -->|No| I[Adjust Level/Risk]\n    I --> C\n    H --> J[Try OS Shell]"
+  },
+  {
+    "module_id": 19,
+    "title": "XSS Attack Methodology",
+    "description": "Finding and exploiting Cross-Site Scripting",
+    "mermaid_code": "graph TD\n    A[Input Vector] --> B[Inject Probe]\n    B --> C{Reflected?}\n    C -->|Yes| D[Test Filters]\n    C -->|No| E[Check Stored]\n    D --> F[Bypass Filters]\n    F --> G[Inject Payload]\n    G --> H[Cookie Stealing]\n    G --> I[Redirection]\n    G --> J[Phishing]"
+  },
+  {
+    "module_id": 21,
+    "title": "File Upload Exploitation",
+    "description": "Bypassing file upload restrictions",
+    "mermaid_code": "graph TD\n    A[Upload Form] --> B[Test Valid File]\n    B --> C[Upload Shell]\n    C --> D{Blocked?}\n    D -->|Yes| E[Bypass Techniques]\n    D -->|No| F[Locate File]\n    E --> G[Double Extension]\n    E --> H[Null Byte]\n    E --> I[MIME Type Spoof]\n    E --> J[Magic Bytes]\n    F --> K[Execute Shell]"
+  },
+  {
+    "module_id": 22,
+    "title": "Command Injection Flow",
+    "description": "Injecting OS commands",
+    "mermaid_code": "graph TD\n    A[Input Field] --> B[Test Delimiters]\n    B --> C[; | && ||]\n    C --> D{Output Visible?}\n    D -->|Yes| E[Direct Injection]\n    D -->|No| F[Blind Injection]\n    E --> G[ls / whoami]\n    F --> H[Time Based (sleep)]\n    F --> I[Out of Band (curl)]\n    G --> J[Reverse Shell]\n    H --> J"
+  },
+  {
+    "module_id": 23,
+    "title": "Web Attacks Overview",
+    "description": "Common web vulnerabilities",
+    "mermaid_code": "graph TD\n    A[Web App] --> B{Vulnerability}\n    B --> C[SSRF]\n    B --> D[XXE]\n    B --> E[IDOR]\n    C --> F[Internal Scan]\n    C --> G[Cloud Metadata]\n    D --> H[Read Files]\n    D --> I[NTLM Hash]\n    E --> J[Enumerate IDs]\n    E --> K[Access Data]"
+  },
+  {
+    "module_id": 24,
+    "title": "CMS Attack Workflow",
+    "description": "Attacking Content Management Systems",
+    "mermaid_code": "graph TD\n    A[Identify CMS] --> B[Check Version]\n    B --> C[Search Exploits]\n    C --> D{Public Exploit?}\n    D -->|Yes| E[Run Exploit]\n    D -->|No| F[Enumerate Plugins]\n    F --> G[Default Creds]\n    G --> H[Admin Panel]\n    H --> I[Upload Shell]\n    E --> J[RCE]"
+  },
+  {
+    "module_id": 27,
+    "title": "Getting Started Checklist",
+    "description": "Initial setup for penetration testing",
+    "mermaid_code": "graph TD\n    A[Start] --> B[Connect VPN]\n    B --> C[Verify IP]\n    C --> D[Update Tools]\n    D --> E[Setup Workspace]\n    E --> F[Create Notes]\n    F --> G[Start Target]\n    G --> H[Ping Check]\n    H --> I[Begin Recon]"
+  },
+  {
+    "module_id": 28,
+    "title": "Nessus Scanning",
+    "description": "Vulnerability scanning with Nessus",
+    "mermaid_code": "graph TD\n    A[Launch Nessus] --> B[Update Plugins]\n    B --> C[New Scan]\n    C --> D{Scan Type}\n    D --> E[Basic Network]\n    D --> F[Credentialed]\n    D --> G[Web App]\n    E --> H[Run Scan]\n    H --> I[Analyze Results]\n    I --> J[Validate Findings]\n    J --> K[Export Report]"
+  },
+  {
+    "module_id": 29,
+    "title": "OpenVAS Workflow",
+    "description": "Using Greenbone Vulnerability Manager",
+    "mermaid_code": "graph TD\n    A[Start GVM] --> B[Sync Feeds]\n    B --> C[Configure Target]\n    C --> D[Configure Task]\n    D --> E[Start Scan]\n    E --> F[Monitor Progress]\n    F --> G[View Report]\n    G --> H[Filter Results]\n    H --> I[Export PDF/XML]"
+  },
+  {
+    "module_id": 31,
+    "title": "Enterprise Attack Simulation",
+    "description": "Full scope enterprise penetration test",
+    "mermaid_code": "graph TD\n    A[External] --> B[Phishing/Web]\n    B --> C[Initial Access]\n    C --> D[Internal Recon]\n    D --> E[Pivot/Tunnel]\n    E --> F[AD Enumeration]\n    F --> G[Lateral Movement]\n    G --> H[Privilege Escalation]\n    H --> I[Domain Admin]\n    I --> J[Data Exfiltration]"
+  },
+  {
+    "module_id": 33,
+    "title": "Ticket & Certificate Attacks",
+    "description": "Lateral movement with Kerberos and Certificates",
+    "mermaid_code": "graph TD\n    A[Compromise] --> B{Artifact}\n    B --> C[Kerberos Ticket]\n    B --> D[Certificate]\n    C --> E[Pass the Ticket]\n    D --> F[Pass the Cert]\n    E --> G[Inject to Session]\n    F --> H[Request TGT]\n    H --> E\n    G --> I[Access Service]\n    I --> J[Lateral Move]"
   }
 ]
