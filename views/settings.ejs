@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings | CPTS Companion</title>
-  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/jpeg" href="<%= basePath %>/favicon.jpg">
+  <link rel="stylesheet" href="<%= basePath %>/css/style.css">
 </head>
 <body class="scanlines">
   <%- include('partials/sidebar', { currentPage: 'settings', stats, dueCount }) %>
@@ -130,7 +130,7 @@
   </div>
   
   <%- include('partials/command-palette') %>
-  <script src="/js/app.js"></script>
+  <script src="<%= basePath %>/js/app.js"></script>
   <script>
     async function setPlanDuration(duration) {
       if (!confirm(`Are you sure you want to switch to a ${duration}-day plan? This will reset all your progress!`)) {

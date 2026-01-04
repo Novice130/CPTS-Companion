@@ -19,6 +19,7 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const BASE_PATH = process.env.BASE_PATH || "";  // e.g., "/cpts-companion"
 
 // Middleware
 app.use(express.json());
@@ -28,6 +29,9 @@ app.use(express.static(join(__dirname, "public")));
 // View engine setup
 app.set("view engine", "ejs");
 app.set("views", join(__dirname, "views"));
+
+// Make basePath available to all templates
+app.locals.basePath = BASE_PATH;
 
 // Initialize database
 initDatabase();

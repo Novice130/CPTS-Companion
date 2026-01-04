@@ -2,7 +2,7 @@
 <aside class="sidebar">
   <a class="sidebar-logo" href="https://learnnovice.com" target="_blank" rel="noopener noreferrer">
     <div class="logo-icon logo-image">
-      <img class="logo-img" src="/img/logo.jpg" alt="Logo">
+      <img class="logo-img" src="<%= basePath %>/img/logo.jpg" alt="Logo">
     </div>
     <div class="logo-text">CPTS <span>Companion</span></div>
   </a>
@@ -10,11 +10,11 @@
   <nav class="sidebar-nav">
     <div class="nav-section">
       <div class="nav-section-title">Main</div>
-      <a href="/" class="nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+      <a href="<%= basePath %>/" class="nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
         <span class="nav-icon">⌂</span>
         Dashboard
       </a>
-      <a href="/plan" class="nav-item <%= currentPage === 'plan' ? 'active' : '' %>">
+      <a href="<%= basePath %>/plan" class="nav-item <%= currentPage === 'plan' ? 'active' : '' %>">
         <span class="nav-icon">📅</span>
         <%= settings.plan_duration %>-Day Plan
         <span class="nav-badge"><%= settings.current_day %>/<%= settings.plan_duration %></span>
@@ -23,23 +23,23 @@
     
     <div class="nav-section">
       <div class="nav-section-title">Learn</div>
-      <a href="/modules" class="nav-item <%= currentPage === 'modules' ? 'active' : '' %>">
+      <a href="<%= basePath %>/modules" class="nav-item <%= currentPage === 'modules' ? 'active' : '' %>">
         <span class="nav-icon">📚</span>
         Modules
       </a>
-      <a href="/exercises" class="nav-item <%= currentPage === 'exercises' ? 'active' : '' %>">
+      <a href="<%= basePath %>/exercises" class="nav-item <%= currentPage === 'exercises' ? 'active' : '' %>">
         <span class="nav-icon">🎯</span>
         Exercises
         <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
       </a>
-      <a href="/flashcards" class="nav-item <%= currentPage === 'flashcards' ? 'active' : '' %>">
+      <a href="<%= basePath %>/flashcards" class="nav-item <%= currentPage === 'flashcards' ? 'active' : '' %>">
         <span class="nav-icon">🃏</span>
         Flashcards
         <% if (dueCount > 0) { %>
           <span class="nav-badge"><%= dueCount %> due</span>
         <% } %>
       </a>
-      <a href="/mindmaps" class="nav-item <%= currentPage === 'mindmaps' ? 'active' : '' %>">
+      <a href="<%= basePath %>/mindmaps" class="nav-item <%= currentPage === 'mindmaps' ? 'active' : '' %>">
         <span class="nav-icon">🗺️</span>
         Mind Maps
       </a>
@@ -47,15 +47,15 @@
     
     <div class="nav-section">
       <div class="nav-section-title">Tools</div>
-      <a href="/notes" class="nav-item <%= currentPage === 'notes' ? 'active' : '' %>">
+      <a href="<%= basePath %>/notes" class="nav-item <%= currentPage === 'notes' ? 'active' : '' %>">
         <span class="nav-icon">📝</span>
         Notes
       </a>
-      <a href="/search" class="nav-item <%= currentPage === 'search' ? 'active' : '' %>">
+      <a href="<%= basePath %>/search" class="nav-item <%= currentPage === 'search' ? 'active' : '' %>">
         <span class="nav-icon">🔍</span>
         Search
       </a>
-      <a href="/settings" class="nav-item <%= currentPage === 'settings' ? 'active' : '' %>">
+      <a href="<%= basePath %>/settings" class="nav-item <%= currentPage === 'settings' ? 'active' : '' %>">
         <span class="nav-icon">⚙️</span>
         Settings
       </a>
