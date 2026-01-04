@@ -1,0 +1,158 @@
+[
+  {
+    "module_id": null,
+    "title": "CPTS Kill Chain",
+    "description": "Complete penetration testing methodology flow",
+    "mermaid_code": "graph TD\n    A[Reconnaissance] --> B[Enumeration]\n    B --> C{Vulnerability Found?}\n    C -->|Yes| D[Exploitation]\n    C -->|No| B\n    D --> E[Initial Access]\n    E --> F[Privilege Escalation]\n    F --> G[Post-Exploitation]\n    G --> H[Lateral Movement]\n    H --> I[Data Exfiltration]\n    I --> J[Reporting]"
+  },
+  {
+    "module_id": 2,
+    "title": "Nmap Scanning Workflow",
+    "description": "Systematic approach to Nmap scanning",
+    "mermaid_code": "graph TD\n    A[Start] --> B[Host Discovery]\n    B --> C[Quick Port Scan]\n    C --> D[Full Port Scan]\n    D --> E[Service Version Detection]\n    E --> F[Script Scanning]\n    F --> G[Vulnerability Scanning]\n    G --> H[Document Results]"
+  },
+  {
+    "module_id": 3,
+    "title": "Service Enumeration Flow",
+    "description": "How to approach service enumeration",
+    "mermaid_code": "graph TD\n    A[Port Scan Results] --> B{Service Type}\n    B --> C[Web Service]\n    B --> D[SMB/Windows]\n    B --> E[SSH/Linux]\n    B --> F[Database]\n    C --> G[Nikto/Dirbusting]\n    D --> H[enum4linux/smbmap]\n    E --> I[Banner Grab/Brute]\n    F --> J[Default Creds/Injection]"
+  },
+  {
+    "module_id": 7,
+    "title": "Shell Types",
+    "description": "Different types of shells and when to use them",
+    "mermaid_code": "graph TD\n    A[Shell Types] --> B[Reverse Shell]\n    A --> C[Bind Shell]\n    A --> D[Web Shell]\n    B --> E[Target connects to attacker]\n    C --> F[Attacker connects to target]\n    D --> G[HTTP-based command execution]\n    E --> H[Use when: Outbound allowed]\n    F --> I[Use when: Inbound allowed]\n    G --> J[Use when: Web server access]"
+  },
+  {
+    "module_id": 11,
+    "title": "Pivoting Techniques",
+    "description": "Methods for network pivoting",
+    "mermaid_code": "graph TD\n    A[Compromised Host] --> B{Pivot Method}\n    B --> C[SSH Tunneling]\n    B --> D[Chisel]\n    B --> E[Ligolo-ng]\n    B --> F[Metasploit]\n    C --> G[-L Local Forward]\n    C --> H[-D Dynamic SOCKS]\n    C --> I[-R Remote Forward]\n    D --> J[SOCKS Proxy]\n    E --> K[TUN Interface]\n    F --> L[autoroute/portfwd]"
+  },
+  {
+    "module_id": 12,
+    "title": "AD Enumeration Path",
+    "description": "Active Directory enumeration workflow",
+    "mermaid_code": "graph TD\n    A[Domain Access] --> B[BloodHound Collection]\n    B --> C[Identify Users]\n    C --> D[Identify Groups]\n    D --> E[Find Privileged Accounts]\n    E --> F[Map Admin Access]\n    F --> G[Find Attack Paths]\n    G --> H[Kerberoastable?]\n    G --> I[AS-REP Roastable?]\n    G --> J[Delegation?]"
+  },
+  {
+    "module_id": 13,
+    "title": "AD Attack Paths",
+    "description": "Common Active Directory attack techniques",
+    "mermaid_code": "graph TD\n    A[Initial Foothold] --> B{Attack Vector}\n    B --> C[Kerberoasting]\n    B --> D[AS-REP Roasting]\n    B --> E[Password Spraying]\n    C --> F[Crack TGS Offline]\n    D --> G[Crack AS-REP Offline]\n    E --> H[Valid Credentials]\n    F --> I[Service Account Access]\n    G --> I\n    H --> I\n    I --> J[Lateral Movement]\n    J --> K[Domain Admin]\n    K --> L[DCSync]"
+  },
+  {
+    "module_id": 17,
+    "title": "SQL Injection Types",
+    "description": "Different SQL injection techniques",
+    "mermaid_code": "graph TD\n    A[SQLi Types] --> B[In-Band]\n    A --> C[Blind]\n    A --> D[Out-of-Band]\n    B --> E[Union-Based]\n    B --> F[Error-Based]\n    C --> G[Boolean-Based]\n    C --> H[Time-Based]\n    D --> I[DNS Exfiltration]\n    E --> J[Extract data directly]\n    F --> K[Use error messages]\n    G --> L[True/False responses]\n    H --> M[SLEEP delays]"
+  },
+  {
+    "module_id": 4,
+    "title": "Web Recon Workflow",
+    "description": "Web application reconnaissance methodology",
+    "mermaid_code": "graph TD\n    A[Target URL] --> B[Technology Fingerprint]\n    B --> C[Subdomain Enum]\n    C --> D[Directory Fuzzing]\n    D --> E[Parameter Discovery]\n    E --> F[Endpoint Mapping]\n    F --> G[Authentication Testing]\n    G --> H[Vulnerability Testing]"
+  },
+  {
+    "module_id": 25,
+    "title": "Linux PrivEsc Checklist",
+    "description": "Linux privilege escalation methodology",
+    "mermaid_code": "graph TD\n    A[Initial Shell] --> B[sudo -l]\n    B --> C[SUID Binaries]\n    C --> D[Capabilities]\n    D --> E[Cron Jobs]\n    E --> F[Writable Scripts]\n    F --> G[Kernel Exploits]\n    G --> H[Passwords/Keys]\n    H --> I[NFS/Docker]\n    B -->|Found| J[GTFOBins]\n    C -->|Found| J\n    D -->|Found| J"
+  },
+  {
+    "module_id": 26,
+    "title": "Windows PrivEsc Checklist",
+    "description": "Windows privilege escalation methodology",
+    "mermaid_code": "graph TD\n    A[Initial Shell] --> B[whoami /all]\n    B --> C[Service Misconfigs]\n    C --> D[Unquoted Paths]\n    D --> E[AlwaysInstallElevated]\n    E --> F[Stored Credentials]\n    F --> G[Kernel Exploits]\n    G --> H[Token Impersonation]\n    C -->|Found| I[Replace Binary]\n    D -->|Found| J[Place Malicious EXE]\n    E -->|Found| K[MSI Installer]"
+  },
+  {
+    "module_id": 20,
+    "title": "LFI to RCE",
+    "description": "Escalating LFI to remote code execution",
+    "mermaid_code": "graph TD\n    A[LFI Found] --> B{Path to RCE}\n    B --> C[Log Poisoning]\n    B --> D[PHP Wrappers]\n    B --> E[Session Files]\n    B --> F[/proc/self/environ]\n    C --> G[Poison Apache/SSH logs]\n    D --> H[data:// or expect://]\n    E --> I[PHP session serialization]\n    G --> J[Include poisoned log]\n    H --> J\n    I --> J\n    J --> K[RCE Achieved]"
+  },
+  {
+    "module_id": 9,
+    "title": "Password Attack Flow",
+    "description": "Password cracking methodology",
+    "mermaid_code": "graph TD\n    A[Password Hash] --> B{Hash Type}\n    B --> C[MD5 = -m 0]\n    B --> D[NTLM = -m 1000]\n    B --> E[SHA512 = -m 1800]\n    B --> F[Kerberos = -m 13100]\n    C --> G[Hashcat]\n    D --> G\n    E --> G\n    F --> G\n    G --> H{Attack Mode}\n    H --> I[Dictionary]\n    H --> J[Rules]\n    H --> K[Mask]"
+  },
+  {
+    "module_id": 10,
+    "title": "Common Services Attack Map",
+    "description": "Attack vectors for common services",
+    "mermaid_code": "graph TD\n    A[Service Discovery] --> B{Port/Service}\n    B --> C[21 FTP]\n    B --> D[22 SSH]\n    B --> E[445 SMB]\n    B --> F[3389 RDP]\n    B --> G[1433 MSSQL]\n    C --> H[Anonymous/Brute]\n    D --> I[Key/Brute/Vuln]\n    E --> J[Null/Relay/Vuln]\n    F --> K[Brute/BlueKeep]\n    G --> L[Default/xp_cmdshell]"
+  },
+  {
+    "module_id": 6,
+    "title": "File Transfer Methods",
+    "description": "Ways to transfer files to targets",
+    "mermaid_code": "graph TD\n    A[Transfer Needed] --> B{Target OS}\n    B --> C[Linux]\n    B --> D[Windows]\n    C --> E[wget/curl]\n    C --> F[nc file transfer]\n    C --> G[scp/sftp]\n    D --> H[certutil]\n    D --> I[PowerShell IWR]\n    D --> J[SMB Copy]\n    D --> K[bitsadmin]"
+  },
+  {
+    "module_id": null,
+    "title": "Web Attack Checklist",
+    "description": "Common web vulnerabilities to test",
+    "mermaid_code": "graph TD\n    A[Web App Testing] --> B[Authentication]\n    A --> C[Injection]\n    A --> D[File Attacks]\n    A --> E[Access Control]\n    B --> F[Brute Force]\n    B --> G[Default Creds]\n    C --> H[SQLi]\n    C --> I[XSS]\n    C --> J[Command Injection]\n    D --> K[LFI/RFI]\n    D --> L[File Upload]\n    E --> M[IDOR]\n    E --> N[Privilege Escalation]"
+  },
+  {
+    "module_id": null,
+    "title": "Reporting Structure",
+    "description": "Penetration test report sections",
+    "mermaid_code": "graph TD\n    A[Report] --> B[Executive Summary]\n    A --> C[Scope & Methodology]\n    A --> D[Findings]\n    A --> E[Recommendations]\n    D --> F[Critical]\n    D --> G[High]\n    D --> H[Medium]\n    D --> I[Low]\n    F --> J[Description]\n    F --> K[Impact]\n    F --> L[Remediation]\n    F --> M[Evidence]"
+  },
+  {
+    "module_id": 8,
+    "title": "Metasploit Workflow",
+    "description": "Using Metasploit Framework",
+    "mermaid_code": "graph TD\n    A[msfconsole] --> B[search exploit]\n    B --> C[use module]\n    C --> D[show options]\n    D --> E[set RHOSTS]\n    E --> F[set LHOST]\n    F --> G[exploit]\n    G --> H{Result}\n    H -->|Session| I[Meterpreter]\n    H -->|Fail| B\n    I --> J[Post Exploitation]"
+  },
+  {
+    "module_id": 14,
+    "title": "Burp Suite Workflow",
+    "description": "Web testing with Burp Suite",
+    "mermaid_code": "graph TD\n    A[Burp Proxy] --> B[Intercept Request]\n    B --> C[Analyze]\n    C --> D{Action}\n    D --> E[Send to Repeater]\n    D --> F[Send to Intruder]\n    D --> G[Send to Scanner]\n    E --> H[Manual Testing]\n    F --> I[Fuzzing/Brute]\n    G --> J[Automated Scan]"
+  },
+  {
+    "module_id": null,
+    "title": "CPTS Full Attack Path",
+    "description": "Complete CPTS exam attack methodology - External to Domain Admin",
+    "mermaid_code": "graph TD\n    A[External Recon] --> B[Subdomain/OSINT]\n    B --> C[Web App Vuln]\n    C --> D[Initial Foothold]\n    D --> E[Shell Upgrade]\n    E --> F[Local PrivEsc]\n    F --> G[Pivot to Internal]\n    G --> H[AD Enumeration]\n    H --> I[LLMNR Poisoning]\n    H --> J[Kerberoasting]\n    H --> K[AS-REP Roast]\n    I --> L[Crack Hashes]\n    J --> L\n    K --> L\n    L --> M[Lateral Movement]\n    M --> N[ACL Abuse]\n    M --> O[Delegation Abuse]\n    N --> P[Domain Admin]\n    O --> P\n    P --> Q[DCSync]\n    Q --> R[Full Compromise]\n    R --> S[Documentation & Report]"
+  },
+  {
+    "module_id": 32,
+    "title": "LLMNR/NBT-NS Attack Flow",
+    "description": "Poisoning and relay attack methodology",
+    "mermaid_code": "graph TD\n    A[Network Access] --> B[Start Responder]\n    B --> C[Wait for Broadcast]\n    C --> D[Capture NTLMv2]\n    D --> E{Attack Path}\n    E --> F[Crack Offline]\n    E --> G[NTLM Relay]\n    F --> H[hashcat -m 5600]\n    H --> I[Plaintext Creds]\n    G --> J[Check SMB Signing]\n    J -->|Disabled| K[ntlmrelayx]\n    K --> L[Code Execution]\n    I --> M[Lateral Movement]\n    L --> M"
+  },
+  {
+    "module_id": 34,
+    "title": "ACL Abuse Paths",
+    "description": "Active Directory ACL attack vectors",
+    "mermaid_code": "graph TD\n    A[BloodHound ACL Analysis] --> B{Permission Type}\n    B --> C[GenericAll]\n    B --> D[GenericWrite]\n    B --> E[WriteDacl]\n    B --> F[ForceChangePassword]\n    C --> G[Full Control - Reset Pass]\n    C --> H[Add to Group]\n    C --> I[Set SPN - Kerberoast]\n    D --> I\n    D --> J[Shadow Credentials]\n    E --> K[Grant DCSync Rights]\n    F --> L[Direct Password Reset]\n    G --> M[Take Over Account]\n    H --> M\n    I --> M\n    J --> M\n    K --> N[Domain Compromise]\n    L --> M\n    M --> N"
+  },
+  {
+    "module_id": 36,
+    "title": "Delegation Attack Paths",
+    "description": "Kerberos delegation abuse",
+    "mermaid_code": "graph TD\n    A[Find Delegation] --> B{Delegation Type}\n    B --> C[Unconstrained]\n    B --> D[Constrained]\n    B --> E[Resource-Based RBCD]\n    C --> F[Coerce DC Auth]\n    F --> G[PrinterBug/PetitPotam]\n    G --> H[Capture DC TGT]\n    H --> I[DCSync]\n    D --> J[Request Ticket as Admin]\n    J --> K[getST.py impersonate]\n    K --> L[Access Target Service]\n    E --> M[Need Write on Target]\n    M --> N[Add RBCD Delegation]\n    N --> K"
+  },
+  {
+    "module_id": 37,
+    "title": "AD CS Attack Paths",
+    "description": "Certificate Services exploitation",
+    "mermaid_code": "graph TD\n    A[Enumerate AD CS] --> B[Certify/certipy find]\n    B --> C{Vulnerable Template?}\n    C -->|ESC1| D[Request as Other User]\n    C -->|ESC4| E[Modify Template ACL]\n    C -->|ESC8| F[NTLM Relay to Web Enrollment]\n    D --> G[Get Admin Certificate]\n    E --> D\n    F --> G\n    G --> H[Authenticate with Cert]\n    H --> I[Get TGT/NTLM]\n    I --> J[Domain Access]"
+  },
+  {
+    "module_id": 30,
+    "title": "Documentation Flow",
+    "description": "Proper pentest documentation methodology",
+    "mermaid_code": "graph TD\n    A[Start Engagement] --> B[Setup Note Structure]\n    B --> C[Document Every Command]\n    C --> D[Screenshot Evidence]\n    D --> E[Record Timestamps]\n    E --> F[Log Credentials Found]\n    F --> G[Map Attack Path]\n    G --> H[Draft Findings]\n    H --> I[Executive Summary]\n    I --> J[Technical Details]\n    J --> K[Remediation Steps]\n    K --> L[Final Report]\n    L --> M[Submit On Time]"
+  },
+  {
+    "module_id": 35,
+    "title": "Domain Trust Attacks",
+    "description": "Attacking trust relationships",
+    "mermaid_code": "graph TD\n    A[Enumerate Trusts] --> B[Get-DomainTrust]\n    B --> C{Trust Type}\n    C --> D[Parent-Child]\n    C --> E[Forest Trust]\n    C --> F[External Trust]\n    D --> G[Compromise Child Domain]\n    G --> H[Get krbtgt Hash]\n    H --> I[Golden Ticket + SID History]\n    I --> J[Enterprise Admin Access]\n    E --> K[Check SID Filtering]\n    K -->|Disabled| I\n    K -->|Enabled| L[Limited Access]\n    F --> M[Credential Reuse Attack]"
+  }
+]

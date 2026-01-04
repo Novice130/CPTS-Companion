@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'flashcards', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span>Flashcards</span>
+      </div>
+      
+      <h1>🃏 Flashcards</h1>
+      <p class="text-muted mb-3">Reinforce your knowledge with spaced repetition flashcards.</p>
+      
+      <!-- Review Call to Action -->
+      <% if (dueFlashcards.length > 0) { %>
+        <div class="panel" style="border-color: var(--htb-green);">
+          <div class="panel-body" style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="color: var(--htb-green); margin: 0;">🔔 <%= dueFlashcards.length %> cards due for review!</h3>
+              <p class="text-muted mb-0">Keep your knowledge fresh with spaced repetition.</p>
+            </div>
+            <a href="/flashcards/review" class="btn btn-primary btn-lg">Start Review</a>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-card">
+          <div class="stat-card-icon">📚</div>
+          <div class="stat-card-content">
+            <div class="stat-card-value"><%= flashcards.length %></div>
+            <div class="stat-card-label">Total Cards</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">⏰</div>
+          <div class="stat-card-content">
+            <div class="stat-card-value"><%= dueFlashcards.length %></div>
+            <div class="stat-card-label">Due Today</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">✅</div>
+          <div class="stat-card-content">
+            <div class="stat-card-value"><%= flashcards.filter(f => f.repetitions > 0).length %></div>
+            <div class="stat-card-label">Reviewed</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- All Flashcards -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">📋</span> All Flashcards</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Module</th>
+                  <th>Status</th>
+                  <th>Next Review</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% flashcards.slice(0, 50).forEach(fc => { %>
+                  <tr>
+                    <td><%= fc.question.substring(0, 80) %><%= fc.question.length > 80 ? '...' : '' %></td>
+                    <td><%= fc.module_title || 'General' %></td>
+                    <td>
+                      <% if (fc.repetitions === 0) { %>
+                        <span class="chip">New</span>
+                      <% } else { %>
+                        <span class="chip chip-green">Reviewed</span>
+                      <% } %>
+                    </td>
+                    <td><%= fc.next_review || 'Now' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

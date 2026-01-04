@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>CPTS Companion</title>
+  <meta name="description" content="CPTS Certification Companion - Prepare for Hack The Box CPTS in 30 days">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body class="scanlines">
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a class="sidebar-logo" href="https://learnnovice.com" target="_blank" rel="noopener noreferrer">
+        <div class="logo-icon logo-image">
+          <img class="logo-img" src="/img/logo.jpg" alt="Logo">
+        </div>
+        <div class="logo-text">CPTS <span>Companion</span></div>
+      </a>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <a href="/" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+            <span class="nav-icon">⌂</span>
+            Dashboard
+          </a>
+          <a href="/plan" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'plan' ? 'active' : '' %>">
+            <span class="nav-icon">📅</span>
+            30-Day Plan
+            <% if (typeof stats !== 'undefined') { %>
+              <span class="nav-badge"><%= stats.completedDays %>/30</span>
+            <% } %>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Learn</div>
+          <a href="/modules" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'modules' ? 'active' : '' %>">
+            <span class="nav-icon">📚</span>
+            Modules
+          </a>
+          <a href="/exercises" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'exercises' ? 'active' : '' %>">
+            <span class="nav-icon">🎯</span>
+            Exercises
+            <% if (typeof stats !== 'undefined') { %>
+              <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
+            <% } %>
+          </a>
+          <a href="/flashcards" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'flashcards' ? 'active' : '' %>">
+            <span class="nav-icon">🃏</span>
+            Flashcards
+            <% if (typeof dueCount !== 'undefined' && dueCount > 0) { %>
+              <span class="nav-badge"><%= dueCount %> due</span>
+            <% } %>
+          </a>
+          <a href="/mindmaps" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'mindmaps' ? 'active' : '' %>">
+            <span class="nav-icon">🗺️</span>
+            Mind Maps
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Tools</div>
+          <a href="/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
+            <span class="nav-icon">📝</span>
+            Notes
+          </a>
+          <a href="/search" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'search' ? 'active' : '' %>">
+            <span class="nav-icon">🔍</span>
+            Search
+          </a>
+          <a href="/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
+            <span class="nav-icon">⚙️</span>
+            Settings
+          </a>
+        </div>
+      </nav>
+      
+      <div style="padding: 1rem; border-top: 1px solid var(--htb-border); font-size: 0.75rem; color: var(--text-muted);">
+        ⚠️ Educational use only<br>
+        Authorized labs only!
+      </div>
+    </aside>
+    
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-stats">
+          <div class="stat-item">
+            <span class="stat-icon">📊</span>
+            <span class="stat-label">Progress</span>
+            <span class="stat-value"><%= typeof stats !== 'undefined' ? stats.overallProgress : 0 %>%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">✅</span>
+            <span class="stat-label">Exercises</span>
+            <span class="stat-value"><%= typeof stats !== 'undefined' ? stats.completedExercises : 0 %></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">🔄</span>
+            <span class="stat-label">Review</span>
+            <span class="stat-value"><%= typeof nextReview !== 'undefined' ? nextReview : 'None' %></span>
+          </div>
+        </div>
+        
+        <div class="topbar-actions">
+          <button class="cmd-palette-btn" onclick="openCommandPalette()">
+            <span>🔍</span>
+            Quick search...
+            <kbd>Ctrl</kbd><kbd>K</kbd>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <main class="main-content">
+        <%- body %>
+      </main>
+    </div>
+  </div>
+  
+  <!-- Command Palette -->
+  <div class="cmd-palette-overlay" id="cmdPalette">
+    <div class="cmd-palette">
+      <input type="text" class="cmd-palette-input" id="cmdPaletteInput" placeholder="Search pages, modules, exercises..." autofocus>
+      <div class="cmd-palette-results" id="cmdPaletteResults"></div>
+    </div>
+  </div>
+  
+  <script src="/js/app.js"></script>
+</body>
+</html>

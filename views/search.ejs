@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'search', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span>Search</span>
+      </div>
+      
+      <h1>🔍 Search</h1>
+      <p class="text-muted mb-3">Search across all cheatsheets, exercises, mind maps, and notes.</p>
+      
+      <form action="/search" method="GET" class="mb-3">
+        <div style="display: flex; gap: 1rem;">
+          <input type="text" name="q" class="form-input" value="<%= query || '' %>" placeholder="Search for nmap, privilege escalation, SQLi..." autofocus style="flex: 1;">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+      
+      <% if (query) { %>
+        <p class="text-muted"><%= results.length %> results for "<%= query %>"</p>
+        
+        <% if (results.length > 0) { %>
+          <% results.forEach(result => { %>
+            <a href="/<%= result.type === 'module' ? 'modules' : result.type === 'exercise' ? 'exercises' : result.type === 'flashcard' ? 'flashcards' : 'notes' %>/<%= result.item_id %>" class="search-result" style="display: block; text-decoration: none;">
+              <span class="search-result-type"><%= result.type %></span>
+              <div class="search-result-title"><%= result.title %></div>
+              <div class="search-result-content"><%= result.content ? result.content.substring(0, 200) : '' %>...</div>
+            </a>
+          <% }) %>
+        <% } else { %>
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <div class="empty-state-title">No results found</div>
+            <p>Try different keywords or check your spelling.</p>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">💡</span> Search Tips</h3>
+          </div>
+          <div class="panel-body">
+            <ul>
+              <li>Search for tool names: <code>nmap</code>, <code>ffuf</code>, <code>sqlmap</code></li>
+              <li>Search for techniques: <code>privilege escalation</code>, <code>lateral movement</code></li>
+              <li>Search for protocols: <code>SMB</code>, <code>Kerberos</code>, <code>LDAP</code></li>
+              <li>Search for attack types: <code>SQL injection</code>, <code>XSS</code>, <code>SSRF</code></li>
+            </ul>
+          </div>
+        </div>
+      <% } %>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

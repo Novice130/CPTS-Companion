@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modules | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'modules', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span>Modules</span>
+      </div>
+      
+      <h1>📚 Module Library</h1>
+      <p class="text-muted mb-3">Complete cheatsheets and learning content for each CPTS module.</p>
+      
+      <% Object.keys(categories).forEach(category => { %>
+        <div class="category-section">
+          <div class="category-header">
+            <h3 class="category-title"><%= category %></h3>
+            <span class="category-count"><%= categories[category].length %> modules</span>
+          </div>
+          
+          <div class="card-grid">
+            <% categories[category].forEach(mod => { %>
+              <a href="/modules/<%= mod.id %>" class="content-card" style="text-decoration: none;">
+                <div class="content-card-header">
+                  <h4 class="content-card-title"><%= mod.title %></h4>
+                  <% if (mod.status === 'completed') { %>
+                    <span class="content-card-badge">✓ Done</span>
+                  <% } %>
+                </div>
+                <div class="content-card-desc">
+                  <%= mod.summary ? mod.summary.substring(0, 120) + '...' : 'Click to view cheatsheet and exercises.' %>
+                </div>
+                <div class="content-card-meta">
+                  <span><span class="status-dot status-<%= mod.status %>"></span><%= mod.status.replace('_', ' ') %></span>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

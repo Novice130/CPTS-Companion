@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'exercises', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <a href="/exercises">Exercises</a>
+        <span>›</span>
+        <span>Exercise #<%= exercise.id %></span>
+      </div>
+      
+      <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <span class="exercise-type exercise-type-<%= exercise.type %>"><%= exercise.type.replace('_', ' ') %></span>
+        <span class="difficulty difficulty-<%= exercise.difficulty %>"><%= exercise.difficulty %></span>
+        <% if (exercise.module_title) { %>
+          <span class="chip"><%= exercise.module_title %></span>
+        <% } %>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">❓</span> Question</h3>
+        </div>
+        <div class="panel-body">
+          <div class="exercise-prompt">
+            <%- exercise.prompt %>
+          </div>
+          
+          <!-- Feedback area (hidden initially) -->
+          <div id="feedback" class="exercise-feedback" style="display: none;"></div>
+          
+          <!-- Multiple Choice -->
+          <% if (exercise.type === 'multiple_choice' && exercise.options) { %>
+            <div class="exercise-options" id="optionsContainer">
+              <% exercise.options.forEach((opt, idx) => { %>
+                <div class="exercise-option" data-answer="<%= opt %>" onclick="selectOption(this)">
+                  <span class="exercise-option-letter"><%= String.fromCharCode(65 + idx) %></span>
+                  <span><%= opt %></span>
+                </div>
+              <% }) %>
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="submitMultipleChoice()">Submit Answer</button>
+          <% } %>
+          
+          <!-- Fill Command -->
+          <% if (exercise.type === 'fill_command') { %>
+            <div class="command-builder">
+              <div class="form-group">
+                <label class="form-label">Enter Command:</label>
+                <input type="text" class="form-input" id="commandInput" placeholder="Type your command here..." style="font-family: var(--font-mono);">
+              </div>
+              <% if (exercise.hints) { %>
+                <div style="margin-bottom: 1rem;">
+                  <button class="btn btn-sm" onclick="showHint()">💡 Show Hint</button>
+                  <span id="hintText" style="display: none; margin-left: 1rem; color: var(--htb-amber);"></span>
+                </div>
+              <% } %>
+              <button class="btn btn-primary btn-lg" onclick="submitFillCommand()">Submit</button>
+            </div>
+          <% } %>
+          
+          <!-- Decision Tree -->
+          <% if (exercise.type === 'decision_tree' && exercise.options) { %>
+            <h4 style="margin-bottom: 1rem;">What would you do next?</h4>
+            <div class="exercise-options" id="optionsContainer">
+              <% exercise.options.forEach((opt, idx) => { %>
+                <div class="exercise-option" data-answer="<%= opt %>" onclick="selectOption(this)">
+                  <span class="exercise-option-letter"><%= idx + 1 %></span>
+                  <span><%= opt %></span>
+                </div>
+              <% }) %>
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="submitMultipleChoice()">Confirm Decision</button>
+          <% } %>
+          
+          <!-- Case File -->
+          <% if (exercise.type === 'case_file') { %>
+            <div class="terminal" style="margin-bottom: 1.5rem;">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot yellow"></span>
+                <span class="terminal-dot green"></span>
+                <span class="terminal-title">Output</span>
+              </div>
+              <pre><code><%- exercise.prompt %></code></pre>
+            </div>
+            <div class="form-group">
+              <label class="form-label">What's your analysis?</label>
+              <textarea class="form-textarea" id="analysisInput" placeholder="Enter your analysis and next steps..."></textarea>
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="submitCaseFile()">Submit Analysis</button>
+          <% } %>
+          
+          <!-- Command Builder -->
+          <% if (exercise.type === 'command_builder') { %>
+            <div class="command-builder">
+              <h4 style="margin-bottom: 1rem;">Build the Command</h4>
+              <div class="command-builder-options" id="builderOptions">
+                <!-- Dynamic options will be rendered based on exercise -->
+              </div>
+              <div class="command-builder-output" id="commandOutput">
+                <span class="prompt">$</span> <span id="generatedCommand"></span>
+              </div>
+              <input type="hidden" id="commandInput">
+              <button class="btn btn-primary btn-lg mt-2" onclick="submitFillCommand()">Submit Command</button>
+            </div>
+          <% } %>
+        </div>
+      </div>
+      
+      <!-- Explanation (shown after attempt) -->
+      <div id="explanationPanel" class="panel" style="display: none;">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">📖</span> Explanation</h3>
+        </div>
+        <div class="panel-body" id="explanationContent"></div>
+      </div>
+      
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <a href="/exercises" class="btn">← Back to Exercises</a>
+        <a href="/exercises/<%= exercise.id + 1 %>" class="btn">Next Exercise →</a>
+      </div>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+  <script>
+    const exerciseId = <%= exercise.id %>;
+    const correctAnswer = "<%= exercise.answer.replace(/"/g, '\\"') %>";
+    const hints = <%- exercise.hints ? JSON.stringify(exercise.hints) : '[]' %>;
+    let hintIndex = 0;
+    let selectedAnswer = null;
+    
+    function selectOption(el) {
+      document.querySelectorAll('.exercise-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAnswer = el.dataset.answer;
+    }
+    
+    async function submitMultipleChoice() {
+      if (!selectedAnswer) {
+        alert('Please select an answer!');
+        return;
+      }
+      await submitAnswer(selectedAnswer);
+    }
+    
+    async function submitFillCommand() {
+      const input = document.getElementById('commandInput');
+      if (!input.value.trim()) {
+        alert('Please enter a command!');
+        return;
+      }
+      await submitAnswer(input.value.trim());
+    }
+    
+    async function submitCaseFile() {
+      const input = document.getElementById('analysisInput');
+      if (!input.value.trim()) {
+        alert('Please enter your analysis!');
+        return;
+      }
+      await submitAnswer(input.value.trim());
+    }
+    
+    async function submitAnswer(answer) {
+      try {
+        const res = await fetch('/api/exercises/' + exerciseId + '/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answer })
+        });
+        const data = await res.json();
+        
+        const feedback = document.getElementById('feedback');
+        feedback.style.display = 'block';
+        
+        if (data.correct) {
+          feedback.className = 'exercise-feedback correct';
+          feedback.innerHTML = '✅ Correct! Well done.';
+          
+          if (selectedAnswer) {
+            document.querySelectorAll('.exercise-option').forEach(opt => {
+              if (opt.dataset.answer === selectedAnswer) {
+                opt.classList.add('correct');
+              }
+            });
+          }
+        } else {
+          feedback.className = 'exercise-feedback incorrect';
+          feedback.innerHTML = '❌ Incorrect. The correct answer is: <code>' + data.correctAnswer + '</code>';
+          
+          if (selectedAnswer) {
+            document.querySelectorAll('.exercise-option').forEach(opt => {
+              if (opt.dataset.answer === selectedAnswer) {
+                opt.classList.add('incorrect');
+              }
+              if (opt.dataset.answer === data.correctAnswer) {
+                opt.classList.add('correct');
+              }
+            });
+          }
+        }
+        
+        if (data.explanation) {
+          document.getElementById('explanationPanel').style.display = 'block';
+          document.getElementById('explanationContent').innerHTML = data.explanation;
+        }
+      } catch (err) {
+        console.error('Submit failed:', err);
+        alert('Failed to submit answer. Please try again.');
+      }
+    }
+    
+    function showHint() {
+      if (hints.length > 0 && hintIndex < hints.length) {
+        document.getElementById('hintText').textContent = hints[hintIndex];
+        document.getElementById('hintText').style.display = 'inline';
+        hintIndex++;
+      }
+    }
+  </script>
+</body>
+</html>

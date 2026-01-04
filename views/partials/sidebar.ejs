@@ -1,0 +1,69 @@
+<!-- Sidebar Partial -->
+<aside class="sidebar">
+  <a class="sidebar-logo" href="https://learnnovice.com" target="_blank" rel="noopener noreferrer">
+    <div class="logo-icon logo-image">
+      <img class="logo-img" src="/img/logo.jpg" alt="Logo">
+    </div>
+    <div class="logo-text">CPTS <span>Companion</span></div>
+  </a>
+  
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a href="/" class="nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <span class="nav-icon">⌂</span>
+        Dashboard
+      </a>
+      <a href="/plan" class="nav-item <%= currentPage === 'plan' ? 'active' : '' %>">
+        <span class="nav-icon">📅</span>
+        <%= settings.plan_duration %>-Day Plan
+        <span class="nav-badge"><%= settings.current_day %>/<%= settings.plan_duration %></span>
+      </a>
+    </div>
+    
+    <div class="nav-section">
+      <div class="nav-section-title">Learn</div>
+      <a href="/modules" class="nav-item <%= currentPage === 'modules' ? 'active' : '' %>">
+        <span class="nav-icon">📚</span>
+        Modules
+      </a>
+      <a href="/exercises" class="nav-item <%= currentPage === 'exercises' ? 'active' : '' %>">
+        <span class="nav-icon">🎯</span>
+        Exercises
+        <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
+      </a>
+      <a href="/flashcards" class="nav-item <%= currentPage === 'flashcards' ? 'active' : '' %>">
+        <span class="nav-icon">🃏</span>
+        Flashcards
+        <% if (dueCount > 0) { %>
+          <span class="nav-badge"><%= dueCount %> due</span>
+        <% } %>
+      </a>
+      <a href="/mindmaps" class="nav-item <%= currentPage === 'mindmaps' ? 'active' : '' %>">
+        <span class="nav-icon">🗺️</span>
+        Mind Maps
+      </a>
+    </div>
+    
+    <div class="nav-section">
+      <div class="nav-section-title">Tools</div>
+      <a href="/notes" class="nav-item <%= currentPage === 'notes' ? 'active' : '' %>">
+        <span class="nav-icon">📝</span>
+        Notes
+      </a>
+      <a href="/search" class="nav-item <%= currentPage === 'search' ? 'active' : '' %>">
+        <span class="nav-icon">🔍</span>
+        Search
+      </a>
+      <a href="/settings" class="nav-item <%= currentPage === 'settings' ? 'active' : '' %>">
+        <span class="nav-icon">⚙️</span>
+        Settings
+      </a>
+    </div>
+  </nav>
+  
+  <div style="padding: 1rem; border-top: 1px solid var(--htb-border); font-size: 0.75rem; color: var(--text-muted);">
+    ⚠️ Educational use only<br>
+    Authorized labs only!
+  </div>
+</aside>

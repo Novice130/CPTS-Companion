@@ -1,0 +1,28 @@
+<!-- Top Bar Partial -->
+<header class="topbar">
+  <div class="topbar-stats">
+    <div class="stat-item">
+      <span class="stat-icon">📊</span>
+      <span class="stat-label">Progress</span>
+      <span class="stat-value"><%= stats.overallProgress %>%</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-icon">✅</span>
+      <span class="stat-label">Exercises</span>
+      <span class="stat-value"><%= stats.completedExercises %></span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-icon">🔄</span>
+      <span class="stat-label">Review</span>
+      <span class="stat-value"><%= nextReview %></span>
+    </div>
+  </div>
+  
+  <div class="topbar-actions">
+    <button class="cmd-palette-btn" onclick="openCommandPalette()">
+      <span>🔍</span>
+      Quick search...
+      <kbd>Ctrl</kbd><kbd>K</kbd>
+    </button>
+  </div>
+</header>

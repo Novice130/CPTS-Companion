@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'settings', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span>Settings</span>
+      </div>
+      
+      <h1>⚙️ Settings</h1>
+      <p class="text-muted mb-3">Manage your study plan, progress, and app configuration.</p>
+      
+      <!-- Plan Duration -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">📅</span> Study Plan Duration</h3>
+        </div>
+        <div class="panel-body">
+          <p class="text-muted mb-3">Choose how long you want to spend preparing for CPTS. The curriculum will be adjusted accordingly.</p>
+          
+          <div class="plan-duration-grid">
+            <div class="plan-duration-option <%= settings.plan_duration === 30 ? 'active' : '' %>" onclick="setPlanDuration(30)">
+              <span class="duration">30</span>
+              <span class="label">Days</span>
+              <span class="desc">Intensive - 4-5 hrs/day</span>
+            </div>
+            <div class="plan-duration-option <%= settings.plan_duration === 60 ? 'active' : '' %>" onclick="setPlanDuration(60)">
+              <span class="duration">60</span>
+              <span class="label">Days</span>
+              <span class="desc">Moderate - 2-3 hrs/day</span>
+            </div>
+            <div class="plan-duration-option <%= settings.plan_duration === 90 ? 'active' : '' %>" onclick="setPlanDuration(90)">
+              <span class="duration">90</span>
+              <span class="label">Days</span>
+              <span class="desc">Relaxed - 1-2 hrs/day</span>
+            </div>
+            <div class="plan-duration-option <%= settings.plan_duration === 180 ? 'active' : '' %>" onclick="setPlanDuration(180)">
+              <span class="duration">180</span>
+              <span class="label">Days</span>
+              <span class="desc">Extended - 30-60 min/day</span>
+            </div>
+          </div>
+          
+          <p class="text-muted" style="margin-top: 1rem; font-size: 0.85rem;">
+            ⚠️ Changing the plan duration will reset all your progress!
+          </p>
+        </div>
+      </div>
+      
+      <!-- Current Progress -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">📊</span> Current Progress</h3>
+        </div>
+        <div class="panel-body">
+          <div class="plan-overview" style="margin-bottom: 1rem;">
+            <div class="plan-stat">
+              <strong>Day <%= settings.current_day %></strong>
+              <span>of <%= settings.plan_duration %></span>
+            </div>
+            <div class="plan-stat">
+              <strong><%= stats.completedExercises %></strong>
+              <span>Exercises Done</span>
+            </div>
+            <div class="plan-stat">
+              <strong><%= stats.overallProgress %>%</strong>
+              <span>Overall</span>
+            </div>
+          </div>
+          
+          <div class="progress-bar" style="height: 12px; margin-bottom: 1rem;">
+            <div class="progress-fill" style="width: <%= Math.round(((settings.current_day - 1) / settings.plan_duration) * 100) %>%;"></div>
+          </div>
+          
+          <button class="btn btn-danger" onclick="resetProgress()">🗑️ Reset All Progress</button>
+        </div>
+      </div>
+      
+      <!-- Export/Import -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">💾</span> Export & Import</h3>
+        </div>
+        <div class="panel-body">
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <button class="btn" onclick="exportData()">📤 Export Notes & Progress</button>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Import Data (JSON)</label>
+            <input type="file" id="importFile" accept=".json" class="form-input">
+          </div>
+          <button class="btn" onclick="importData()">📥 Import Data</button>
+        </div>
+      </div>
+      
+      <!-- About -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">ℹ️</span> About</h3>
+        </div>
+        <div class="panel-body">
+          <p><strong>CPTS Companion</strong> v1.0.0</p>
+          <p>A learning dashboard to help you prepare for the Hack The Box CPTS certification.</p>
+          <p class="text-muted">Built with Node.js, Express, SQLite, and EJS.</p>
+          
+          <div style="margin-top: 1rem; padding: 1rem; background: var(--htb-dark); border-radius: var(--border-radius);">
+            <p style="color: var(--htb-amber); margin: 0;">
+              ⚠️ <strong>Disclaimer:</strong> This app is for educational purposes only. 
+              Only use the techniques learned here on systems you have explicit authorization to test. 
+              Unauthorized access to computer systems is illegal.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+  <script>
+    async function setPlanDuration(duration) {
+      if (!confirm(`Are you sure you want to switch to a ${duration}-day plan? This will reset all your progress!`)) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/api/settings/plan-duration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ duration })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Switched to ${duration}-day plan!`);
+          setTimeout(() => location.reload(), 1000);
+        }
+      } catch (err) {
+        alert('Failed to change plan: ' + err.message);
+      }
+    }
+    
+    async function resetProgress() {
+      if (!confirm('Are you sure you want to reset ALL progress? This cannot be undone!')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/api/settings/reset-progress', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Progress reset successfully!');
+          setTimeout(() => location.reload(), 1000);
+        }
+      } catch (err) {
+        alert('Failed to reset progress: ' + err.message);
+      }
+    }
+    
+    async function exportData() {
+      try {
+        const res = await fetch('/api/export');
+        const data = await res.json();
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'cpts-companion-export-' + new Date().toISOString().split('T')[0] + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Failed to export data: ' + err.message);
+      }
+    }
+    
+    async function importData() {
+      const fileInput = document.getElementById('importFile');
+      if (!fileInput.files.length) {
+        alert('Please select a file to import.');
+        return;
+      }
+      
+      try {
+        const file = fileInput.files[0];
+        const text = await file.text();
+        const data = JSON.parse(text);
+        
+        const res = await fetch('/api/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await res.json();
+        if (result.success) {
+          showToast('Data imported successfully!');
+          setTimeout(() => location.reload(), 1000);
+        }
+      } catch (err) {
+        alert('Failed to import data: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

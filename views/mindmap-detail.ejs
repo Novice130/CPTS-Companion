@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= mindmap.title %> | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'mindmaps', stats, dueCount }) %>
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>></span>
+        <a href="/mindmaps">Mind Maps</a>
+        <span>></span>
+        <span><%= mindmap.title %></span>
+      </div>
+      <h1><%= mindmap.title %></h1>
+      <% if (mindmap.description) { %>
+        <p class="text-muted mb-3"><%= mindmap.description %></p>
+      <% } %>
+      <% if (mindmap.module_title) { %>
+        <a href="/modules/<%= mindmap.module_id %>" class="chip mb-3" style="text-decoration: none;"><%= mindmap.module_title %></a>
+      <% } %>
+      <p class="text-muted mb-2" style="font-size: 0.85rem;">Tip: Click on any node to see related information!</p>
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">MAP</span> Interactive Mind Map</h3>
+        </div>
+        <div class="panel-body">
+          <div class="mindmap-container" style="min-height: 400px;">
+            <div class="mermaid" id="mindmapDiagram"><%- mindmap.mermaid_code %></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" id="infoPanel" style="margin-top: 1.5rem; display: none;">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">INFO</span> <span id="infoPanelTitle">Node Details</span></h3>
+          <button class="btn btn-sm" onclick="closeInfoPanel()">X Close</button>
+        </div>
+        <div class="panel-body" id="infoPanelContent"></div>
+      </div>
+      <% if (relatedModules && relatedModules.length > 0) { %>
+        <div class="panel" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">MODULES</span> Related Modules</h3>
+          </div>
+          <div class="panel-body">
+            <div class="card-grid">
+              <% relatedModules.forEach(mod => { %>
+                <a href="/modules/<%= mod.id %>" class="content-card" style="text-decoration: none;">
+                  <h4 class="content-card-title"><%= mod.title %></h4>
+                  <p class="content-card-desc"><%= mod.summary ? mod.summary.substring(0, 80) + '...' : '' %></p>
+                  <span class="chip"><%= mod.category %></span>
+                </a>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      <div class="panel" style="margin-top: 1.5rem;">
+        <div class="panel-header">
+          <h3 class="panel-title"><span class="panel-title-icon">REF</span> Quick Reference</h3>
+        </div>
+        <div class="panel-body">
+          <div id="quickRefContent"><%- nodeInfo || '<p class="text-muted">Click on a node in the mind map to see quick reference information.</p>' %></div>
+        </div>
+      </div>
+      <div style="margin-top: 1.5rem;">
+        <a href="/mindmaps" class="btn">Back to Mind Maps</a>
+        <% if (mindmap.module_id) { %>
+          <a href="/modules/<%= mindmap.module_id %>" class="btn btn-primary">View Full Module</a>
+        <% } %>
+      </div>
+    </main>
+  </div>
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+  <script>
+    const nodeData = <%- JSON.stringify(nodeDataMap || {}) %>;
+    const modules = <%- JSON.stringify(allModules || []) %>;
+    mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{primaryColor:'#9FEF00',primaryTextColor:'#f8fafc',primaryBorderColor:'#2d3748',lineColor:'#6b7280',secondaryColor:'#1f2937',tertiaryColor:'#111927'},securityLevel:'loose'});
+    const bindNodeClicks=()=>{const nodes=document.querySelectorAll('.mermaid .node, .mermaid g.node');if(!nodes||nodes.length===0)return false;nodes.forEach(node=>{if(node.dataset&&node.dataset.clickBound==='1')return;node.style.cursor='pointer';node.addEventListener('click',(e)=>{e.stopPropagation();showNodeInfo(node.textContent.trim())});if(node.dataset)node.dataset.clickBound='1'});return true};
+    let bindAttempts=0;const bindInterval=setInterval(()=>{bindAttempts++;if(bindNodeClicks()||bindAttempts>=10)clearInterval(bindInterval)},250);
+    function showNodeInfo(nodeText){const panel=document.getElementById('infoPanel');const title=document.getElementById('infoPanelTitle');const content=document.getElementById('infoPanelContent');const cleanText=nodeText.replace(/[\[\]{}()]/g,'').trim();title.textContent=cleanText;content.innerHTML=nodeData[cleanText.toLowerCase()]||getDefaultInfo(cleanText);panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'nearest'})}
+    function getDefaultInfo(nodeName){const categoryModules=modules.filter(m=>(m.category||'').toLowerCase()===nodeName.toLowerCase());if(categoryModules.length>0){const top=categoryModules.slice(0,8);const listItems=top.map(m=>'<li style="margin:0.25rem 0;"><a href="/modules/'+m.id+'" style="text-decoration:none;">'+m.title+'</a></li>').join('');return '<h4 style="color:var(--htb-green);margin-bottom:0.5rem;">'+nodeName+' Modules</h4><p class="text-muted" style="margin-bottom:0.75rem;">Click a module to open its cheatsheet and details.</p><ul style="margin:0 0 1rem 1.25rem;padding:0;">'+listItems+'</ul><a href="/modules?category='+encodeURIComponent(nodeName)+'" class="btn btn-primary">View All '+nodeName+' Modules</a>'}const matchingModule=modules.find(m=>m.title.toLowerCase().includes(nodeName.toLowerCase())||nodeName.toLowerCase().includes(m.title.toLowerCase().split(' ')[0]));if(matchingModule){return '<h4 style="color:var(--htb-green);margin-bottom:0.5rem;">'+matchingModule.title+'</h4><p>'+(matchingModule.summary||'')+'</p><a href="/modules/'+matchingModule.id+'" class="btn btn-primary" style="margin-top:1rem;">View Module & Cheatsheet</a>'}return '<p>This node represents: <strong>'+nodeName+'</strong></p><p class="text-muted">This is a concept in the CPTS methodology. Explore the related modules below for detailed cheatsheets and exercises.</p><div style="margin-top:1rem;"><a href="/search?q='+encodeURIComponent(nodeName)+'" class="btn">Search for "'+nodeName+'"</a> <a href="/modules" class="btn">Browse Modules</a></div>'}
+    function closeInfoPanel(){document.getElementById('infoPanel').style.display='none'}
+  </script>
+</body>
+</html>

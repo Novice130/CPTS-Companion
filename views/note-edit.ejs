@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= note ? 'Edit Note' : 'New Note' %> | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'notes', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <a href="/notes">Notes</a>
+        <span>›</span>
+        <span><%= note ? 'Edit' : 'New Note' %></span>
+      </div>
+      
+      <h1><%= note ? 'Edit Note' : 'Create New Note' %></h1>
+      
+      <form action="<%= note ? '/notes/' + note.id : '/notes' %>" method="POST">
+        <div class="panel">
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Title</label>
+              <input type="text" name="title" class="form-input" value="<%= note ? note.title : '' %>" placeholder="Note title..." required>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label class="form-label">Module (optional)</label>
+                <select name="module_id" class="form-select">
+                  <option value="">General</option>
+                  <% modules.forEach(mod => { %>
+                    <option value="<%= mod.id %>" <%= note && note.module_id === mod.id ? 'selected' : '' %>><%= mod.title %></option>
+                  <% }) %>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Tags (comma separated)</label>
+                <input type="text" name="tags" class="form-input" value="<%= note && note.tags ? note.tags : '' %>" placeholder="enum, web, ad...">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Content (Markdown supported)</label>
+              <textarea name="body_md" class="form-textarea" style="min-height: 400px;" placeholder="Write your notes here..."><%= note ? note.body_md : (template ? template.content_md : '') %></textarea>
+            </div>
+          </div>
+          
+          <div class="panel-footer" style="display: flex; justify-content: space-between;">
+            <a href="/notes" class="btn">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Note</button>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

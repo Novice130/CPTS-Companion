@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'notes', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <span>Notes</span>
+      </div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+          <h1>📝 Notes</h1>
+          <p class="text-muted mb-0">Your personal notes and templates for CPTS prep.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <a href="/notes/new" class="btn btn-primary">+ New Note</a>
+        </div>
+      </div>
+      
+      <!-- Templates -->
+      <% if (templates.length > 0) { %>
+        <div class="panel mb-3">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">📋</span> Start from Template</h3>
+          </div>
+          <div class="panel-body">
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <% templates.forEach(tmpl => { %>
+                <a href="/notes/new?template=<%= tmpl.id %>" class="btn"><%= tmpl.name %></a>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Notes List -->
+      <% if (notes.length > 0) { %>
+        <div class="card-grid">
+          <% notes.forEach(note => { %>
+            <a href="/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
+              <div class="note-card-title"><%= note.title %></div>
+              <div class="note-card-preview">
+                <%= note.body_md ? note.body_md.substring(0, 150).replace(/[#*_\[\]]/g, '') : 'Empty note' %>...
+              </div>
+              <div class="note-card-meta">
+                <span><%= note.module_title || 'General' %></span>
+                <span><%= new Date(note.updated_at).toLocaleDateString() %></span>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon">📝</div>
+          <div class="empty-state-title">No notes yet</div>
+          <p>Create your first note or start from a template!</p>
+          <a href="/notes/new" class="btn btn-primary">Create Note</a>
+        </div>
+      <% } %>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script src="/js/app.js"></script>
+</body>
+</html>

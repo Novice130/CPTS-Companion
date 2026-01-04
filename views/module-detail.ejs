@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= module.title %> | CPTS Companion</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="scanlines">
+  <%- include('partials/sidebar', { currentPage: 'modules', stats, dueCount }) %>
+  
+  <div class="main-wrapper">
+    <%- include('partials/topbar', { stats, nextReview }) %>
+    
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="/">Dashboard</a>
+        <span>›</span>
+        <a href="/modules">Modules</a>
+        <span>›</span>
+        <span><%= module.title %></span>
+      </div>
+      
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem;">
+        <div>
+          <h1><%= module.title %></h1>
+          <div class="chip"><%= module.category %></div>
+        </div>
+      </div>
+      
+      <% if (module.summary) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">📖</span> Overview</h3>
+          </div>
+          <div class="panel-body">
+            <p><%= module.summary %></p>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Quick Stats -->
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stat-card">
+          <div class="stat-card-icon">🎯</div>
+          <div class="stat-card-content">
+            <div class="stat-card-value"><%= exercises.length %></div>
+            <div class="stat-card-label">Exercises</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🃏</div>
+          <div class="stat-card-content">
+            <div class="stat-card-value"><%= flashcards.length %></div>
+            <div class="stat-card-label">Flashcards</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🗺️</div>
+          <div class="stat-card-content">
+            <div class="stat-card-value"><%= mindmaps.length %></div>
+            <div class="stat-card-label">Mind Maps</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Cheatsheet -->
+      <% if (module.cheatsheet_md) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">📋</span> Cheatsheet</h3>
+          </div>
+          <div class="panel-body cheatsheet markdown-content">
+            <%- module.cheatsheet_md %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Command Examples (auto-generated from Cheatsheet code blocks) -->
+      <% if (module.cheatsheet_md) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">💻</span> Command Examples</h3>
+          </div>
+          <div class="panel-body markdown-content">
+            <div id="commandExamples" class="command-examples"></div>
+            <noscript>
+              <p class="text-muted">Enable JavaScript to view auto-generated command examples.</p>
+            </noscript>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Common Pitfalls -->
+      <% if (module.pitfalls_md) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">⚠️</span> Common Pitfalls</h3>
+          </div>
+          <div class="panel-body markdown-content">
+            <%- module.pitfalls_md %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Exam Tips -->
+      <% if (module.exam_tips_md) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">💡</span> Exam Survival Tips</h3>
+          </div>
+          <div class="panel-body markdown-content">
+            <%- module.exam_tips_md %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Related Exercises -->
+      <% if (exercises.length > 0) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">🎯</span> Exercises</h3>
+            <a href="/exercises?module=<%= module.id %>" class="btn btn-sm">View All</a>
+          </div>
+          <div class="panel-body">
+            <div class="card-grid">
+              <% exercises.slice(0, 6).forEach(ex => { %>
+                <a href="/exercises/<%= ex.id %>" class="content-card" style="text-decoration: none;">
+                  <div class="content-card-header">
+                    <span class="exercise-type exercise-type-<%= ex.type %>"><%= ex.type.replace('_', ' ') %></span>
+                    <span class="difficulty difficulty-<%= ex.difficulty %>"><%= ex.difficulty %></span>
+                  </div>
+                  <div class="content-card-desc">
+                    <%= ex.prompt.substring(0, 100) %>...
+                  </div>
+                </a>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Related Mind Maps -->
+      <% if (mindmaps.length > 0) { %>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-title-icon">🗺️</span> Mind Maps</h3>
+          </div>
+          <div class="panel-body">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <% mindmaps.forEach(mm => { %>
+                <a href="/mindmaps/<%= mm.id %>" class="btn"><%= mm.title %></a>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </main>
+  </div>
+  
+  <%- include('partials/command-palette') %>
+  <script>
+    (function () {
+      const container = document.getElementById('commandExamples');
+      if (!container) return;
+
+      const cheatsheet = document.querySelector('.cheatsheet');
+      if (!cheatsheet) {
+        container.innerHTML = '<p class="text-muted">No cheatsheet found for this module.</p>';
+        return;
+      }
+
+      const headingDescriptions = {
+        'phases': 'Use these examples as a quick checklist of the workflow and what to do in each phase.',
+        'key commands': 'Common commands you can run during this module. Adjust targets, ports, and wordlists to your scope.',
+        'host discovery': 'Discover which hosts are alive before you spend time scanning ports/services.',
+        'port scanning': 'Identify open TCP ports to decide what to enumerate next.',
+        'service/version': 'Confirm what is running and which versions/features are exposed.',
+        'scripts': 'Run focused script checks for quick validation and extra enumeration.',
+        'output': 'Save results so you can reference them later and avoid re-running scans.',
+        'subdomains': 'Enumerate subdomains to expand your attack surface and find hidden apps.',
+        'directory fuzzing': 'Find hidden paths, files, and endpoints that aren’t linked in the UI.',
+        'tech stack': 'Fingerprint technologies to guide what checks to try next.',
+        'virtual hosts': 'Discover name-based vhosts that only respond when the Host header matches.',
+        'dns': 'Use DNS enumeration to find records, hosts, and misconfigurations.',
+        'smb': 'Enumerate shares/access to find readable files and potential credentials.',
+        'snmp': 'Query SNMP for device/system information that may expose configuration data.',
+        'nfs': 'List exports and mount shares to inspect accessible files.',
+        'basic usage': 'A typical workflow for the tool; adapt options to the target and your scope.',
+        'reverse shells': 'Examples of common one-liners; use the one that fits the target environment.',
+        'listeners': 'Start a listener to catch a reverse connection.',
+        'shell upgrade': 'Improve shell usability once you have access.',
+        'enumeration': 'Run these to understand the host and what you can leverage next.',
+        'tools': 'Helper tools that speed up checks; use when appropriate.',
+      };
+
+      function describeHeading(heading) {
+        const key = (heading || '').toLowerCase().trim();
+        return headingDescriptions[key] || `Example commands for ${heading}. Tailor these to your target and scope.`;
+      }
+
+      const pres = Array.from(cheatsheet.querySelectorAll('pre'));
+      if (pres.length === 0) {
+        container.innerHTML = '<p class="text-muted">No command blocks found in the cheatsheet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      pres.forEach((pre, idx) => {
+        let heading = `Command Example ${idx + 1}`;
+        let cursor = pre.previousElementSibling;
+        while (cursor && cursor.tagName !== 'H3') {
+          cursor = cursor.previousElementSibling;
+        }
+        if (cursor && cursor.textContent) {
+          const text = cursor.textContent.trim();
+          if (text) heading = text;
+        }
+
+        const section = document.createElement('div');
+        section.className = 'command-group';
+        section.style.marginBottom = '1.5rem';
+
+        const h = document.createElement('h4');
+        h.style.margin = '0 0 0.5rem';
+        h.style.color = 'var(--primary-color)';
+        h.textContent = heading;
+
+        // Try to parse lines for comments
+        const lines = pre.textContent.split('\n').filter(l => l.trim());
+        const hasComments = lines.some(l => l.includes('#'));
+
+        if (hasComments) {
+            const table = document.createElement('table');
+            table.className = 'table';
+            table.style.width = '100%';
+            table.style.borderCollapse = 'collapse';
+            table.style.fontSize = '0.9rem';
+
+            lines.forEach(line => {
+                let cmd = line.trim();
+                let desc = '';
+                
+                if (line.includes('#')) {
+                    const parts = line.split('#');
+                    if (parts.length > 1) {
+                        desc = parts.pop().trim();
+                        cmd = parts.join('#').trim();
+                    }
+                }
+
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid var(--border-color)';
+                
+                const cmdCell = document.createElement('td');
+                cmdCell.style.padding = '0.5rem';
+                cmdCell.style.fontFamily = 'monospace';
+                cmdCell.style.color = 'var(--secondary-color)';
+                cmdCell.style.width = '60%';
+                cmdCell.textContent = cmd;
+                
+                const descCell = document.createElement('td');
+                descCell.style.padding = '0.5rem';
+                descCell.style.color = 'var(--text-muted)';
+                descCell.style.fontStyle = 'italic';
+                descCell.textContent = desc;
+                
+                row.appendChild(cmdCell);
+                row.appendChild(descCell);
+                table.appendChild(row);
+            });
+            
+            section.appendChild(h);
+            section.appendChild(table);
+        } else {
+            const p = document.createElement('p');
+            p.className = 'text-muted';
+            p.style.margin = '0 0 0.75rem';
+            p.textContent = describeHeading(heading);
+
+            section.appendChild(h);
+            section.appendChild(p);
+            section.appendChild(pre.cloneNode(true));
+        }
+        
+        container.appendChild(section);
+      });
+    })();
+  </script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

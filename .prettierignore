@@ -1,0 +1,2 @@
+# Ignore EJS templates - Prettier breaks EJS syntax
+views/**/*.ejs
