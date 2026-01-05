@@ -184,7 +184,7 @@
       <div class="panel" style="margin-top: 1.5rem;">
         <div class="panel-header">
           <h3 class="panel-title"><span class="panel-title-icon">📝</span> Recent Notes</h3>
-          <a href="/notes" class="btn btn-sm">View All</a>
+          <a href="<%= basePath %>/notes" class="btn btn-sm">View All</a>
         </div>
         <div class="panel-body">
           <% if (recentNotes.length > 0) { %>
@@ -215,10 +215,12 @@
   <%- include('partials/command-palette') %>
   <script src="<%= basePath %>/js/app.js"></script>
   <script>
+    const basePath = '<%= basePath %>';
+    
     // Toggle activity completion
     async function toggleActivity(activityId, completed) {
       try {
-        const res = await fetch(`/api/activities/${activityId}/toggle`, {
+        const res = await fetch(`${basePath}/api/activities/${activityId}/toggle`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ completed })
@@ -248,7 +250,7 @@
     // Advance to next day
     async function advanceToNextDay() {
       try {
-        const res = await fetch('/api/plan/advance-day', {
+        const res = await fetch(`${basePath}/api/plan/advance-day`, {
           method: 'POST'
         });
         const data = await res.json();
@@ -271,7 +273,7 @@
       status.textContent = 'Saving...';
       
       try {
-        const res = await fetch('/api/reflections/<%= currentDay %>', {
+        const res = await fetch(`${basePath}/api/reflections/<%= currentDay %>`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content })

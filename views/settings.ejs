@@ -132,13 +132,15 @@
   <%- include('partials/command-palette') %>
   <script src="<%= basePath %>/js/app.js"></script>
   <script>
+    const basePath = '<%= basePath %>';
+    
     async function setPlanDuration(duration) {
       if (!confirm(`Are you sure you want to switch to a ${duration}-day plan? This will reset all your progress!`)) {
         return;
       }
       
       try {
-        const res = await fetch('/api/settings/plan-duration', {
+        const res = await fetch(`${basePath}/api/settings/plan-duration`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ duration })

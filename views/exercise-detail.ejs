@@ -15,9 +15,9 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
-        <a href="/exercises">Exercises</a>
+        <a href="<%= basePath %>/exercises">Exercises</a>
         <span>›</span>
         <span>Exercise #<%= exercise.id %></span>
       </div>
@@ -130,7 +130,7 @@
       </div>
       
       <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-        <a href="/exercises" class="btn">← Back to Exercises</a>
+        <a href="<%= basePath %>/exercises" class="btn">← Back to Exercises</a>
         <a href="<%= basePath %>/exercises/<%= exercise.id + 1 %>" class="btn">Next Exercise →</a>
       </div>
     </main>
@@ -139,6 +139,7 @@
   <%- include('partials/command-palette') %>
   <script src="<%= basePath %>/js/app.js"></script>
   <script>
+    const basePath = '<%= basePath %>';
     const exerciseId = <%= exercise.id %>;
     const correctAnswer = "<%= exercise.answer.replace(/"/g, '\\"') %>";
     const hints = <%- exercise.hints ? JSON.stringify(exercise.hints) : '[]' %>;
@@ -179,7 +180,7 @@
     
     async function submitAnswer(answer) {
       try {
-        const res = await fetch('/api/exercises/' + exerciseId + '/submit', {
+        const res = await fetch(basePath + '/api/exercises/' + exerciseId + '/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ answer })
