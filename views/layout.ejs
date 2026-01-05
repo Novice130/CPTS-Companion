@@ -15,7 +15,7 @@
     <aside class="sidebar">
       <a class="sidebar-logo" href="https://learnnovice.com" target="_blank" rel="noopener noreferrer">
         <div class="logo-icon logo-image">
-          <img class="logo-img" src="/img/logo.jpg" alt="Logo">
+          <img class="logo-img" src="<%= basePath %>/img/logo.jpg" alt="Logo">
         </div>
         <div class="logo-text">CPTS <span>Companion</span></div>
       </a>
@@ -23,7 +23,7 @@
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">Main</div>
-          <a href="/" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+          <a href="<%= basePath %>/" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
             <span class="nav-icon">⌂</span>
             Dashboard
           </a>
@@ -38,25 +38,25 @@
         
         <div class="nav-section">
           <div class="nav-section-title">Learn</div>
-          <a href="/modules" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'modules' ? 'active' : '' %>">
+          <a href="<%= basePath %>/modules" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'modules' ? 'active' : '' %>">
             <span class="nav-icon">📚</span>
             Modules
           </a>
-          <a href="/exercises" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'exercises' ? 'active' : '' %>">
+          <a href="<%= basePath %>/exercises" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'exercises' ? 'active' : '' %>">
             <span class="nav-icon">🎯</span>
             Exercises
             <% if (typeof stats !== 'undefined') { %>
               <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
             <% } %>
           </a>
-          <a href="/flashcards" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'flashcards' ? 'active' : '' %>">
+          <a href="<%= basePath %>/flashcards" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'flashcards' ? 'active' : '' %>">
             <span class="nav-icon">🃏</span>
             Flashcards
             <% if (typeof dueCount !== 'undefined' && dueCount > 0) { %>
               <span class="nav-badge"><%= dueCount %> due</span>
             <% } %>
           </a>
-          <a href="/mindmaps" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'mindmaps' ? 'active' : '' %>">
+          <a href="<%= basePath %>/mindmaps" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'mindmaps' ? 'active' : '' %>">
             <span class="nav-icon">🗺️</span>
             Mind Maps
           </a>
@@ -64,7 +64,7 @@
         
         <div class="nav-section">
           <div class="nav-section-title">Tools</div>
-          <a href="/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
+          <a href="<%= basePath %>/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
             <span class="nav-icon">📝</span>
             Notes
           </a>

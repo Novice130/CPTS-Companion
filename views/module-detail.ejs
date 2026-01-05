@@ -15,9 +15,9 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
-        <a href="/modules">Modules</a>
+        <a href="<%= basePath %>/modules">Modules</a>
         <span>›</span>
         <span><%= module.title %></span>
       </div>
@@ -121,7 +121,7 @@
         <div class="panel">
           <div class="panel-header">
             <h3 class="panel-title"><span class="panel-title-icon">🎯</span> Exercises</h3>
-            <a href="/exercises?module=<%= module.id %>" class="btn btn-sm">View All</a>
+            <a href="<%= basePath %>/exercises?module=<%= module.id %>" class="btn btn-sm">View All</a>
           </div>
           <div class="panel-body">
             <div class="card-grid">

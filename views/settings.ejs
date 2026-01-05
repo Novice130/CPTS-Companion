@@ -15,7 +15,7 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
         <span>Settings</span>
       </div>
@@ -161,7 +161,7 @@
       }
       
       try {
-        const res = await fetch('/api/settings/reset-progress', { method: 'POST' });
+        const res = await fetch(`${basePath}/api/settings/reset-progress`, { method: 'POST' });
         const data = await res.json();
         if (data.success) {
           showToast('Progress reset successfully!');
@@ -174,7 +174,7 @@
     
     async function exportData() {
       try {
-        const res = await fetch('/api/export');
+        const res = await fetch(`${basePath}/api/export`);
         const data = await res.json();
         
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -201,7 +201,7 @@
         const text = await file.text();
         const data = JSON.parse(text);
         
-        const res = await fetch('/api/import', {
+        const res = await fetch(`${basePath}/api/import`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)

@@ -15,7 +15,7 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
         <span><%= settings.plan_duration %>-Day Plan</span>
       </div>
@@ -85,7 +85,7 @@
             </div>
             <% if (!day.isLocked) { %>
               <% if (day.isCurrent) { %>
-                <a href="/" class="btn btn-primary btn-sm" onclick="event.stopPropagation();">
+                <a href="<%= basePath %>/" class="btn btn-primary btn-sm" onclick="event.stopPropagation();">
                   Go to Activities
                 </a>
               <% } else if (day.isComplete) { %>
@@ -101,7 +101,7 @@
                 <h4>📚 Modules to Study</h4>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                   <% day.topics.forEach((topic, idx) => { %>
-                    <a href="/modules" class="chip" style="text-decoration: none;"><%= topic %></a>
+                    <a href="<%= basePath %>/modules" class="chip" style="text-decoration: none;"><%= topic %></a>
                   <% }) %>
                 </div>
               </div>

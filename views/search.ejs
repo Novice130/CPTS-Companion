@@ -15,7 +15,7 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
         <span>Search</span>
       </div>
@@ -23,7 +23,7 @@
       <h1>🔍 Search</h1>
       <p class="text-muted mb-3">Search across all cheatsheets, exercises, mind maps, and notes.</p>
       
-      <form action="/search" method="GET" class="mb-3">
+      <form action="<%= basePath %>/search" method="GET" class="mb-3">
         <div style="display: flex; gap: 1rem;">
           <input type="text" name="q" class="form-input" value="<%= query || '' %>" placeholder="Search for nmap, privilege escalation, SQLi..." autofocus style="flex: 1;">
           <button type="submit" class="btn btn-primary">Search</button>
@@ -35,7 +35,7 @@
         
         <% if (results.length > 0) { %>
           <% results.forEach(result => { %>
-            <a href="/<%= result.type === 'module' ? 'modules' : result.type === 'exercise' ? 'exercises' : result.type === 'flashcard' ? 'flashcards' : 'notes' %>/<%= result.item_id %>" class="search-result" style="display: block; text-decoration: none;">
+            <a href="<%= basePath %>/<%= result.type === 'module' ? 'modules' : result.type === 'exercise' ? 'exercises' : result.type === 'flashcard' ? 'flashcards' : 'notes' %>/<%= result.item_id %>" class="search-result" style="display: block; text-decoration: none;">
               <span class="search-result-type"><%= result.type %></span>
               <div class="search-result-title"><%= result.title %></div>
               <div class="search-result-content"><%= result.content ? result.content.substring(0, 200) : '' %>...</div>

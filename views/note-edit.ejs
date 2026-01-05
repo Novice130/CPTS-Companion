@@ -15,16 +15,16 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
-        <a href="/notes">Notes</a>
+        <a href="<%= basePath %>/notes">Notes</a>
         <span>›</span>
         <span><%= note ? 'Edit' : 'New Note' %></span>
       </div>
       
       <h1><%= note ? 'Edit Note' : 'Create New Note' %></h1>
       
-      <form action="<%= note ? '/notes/' + note.id : '/notes' %>" method="POST">
+      <form action="<%= note ? basePath + '/notes/' + note.id : basePath + '/notes' %>" method="POST">
         <div class="panel">
           <div class="panel-body">
             <div class="form-group">
@@ -56,7 +56,7 @@
           </div>
           
           <div class="panel-footer" style="display: flex; justify-content: space-between;">
-            <a href="/notes" class="btn">Cancel</a>
+            <a href="<%= basePath %>/notes" class="btn">Cancel</a>
             <button type="submit" class="btn btn-primary">Save Note</button>
           </div>
         </div>

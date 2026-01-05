@@ -14,9 +14,9 @@
     <%- include('partials/topbar', { stats, nextReview }) %>
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>></span>
-        <a href="/mindmaps">Mind Maps</a>
+        <a href="<%= basePath %>/mindmaps">Mind Maps</a>
         <span>></span>
         <span><%= mindmap.title %></span>
       </div>
@@ -72,7 +72,7 @@
         </div>
       </div>
       <div style="margin-top: 1.5rem;">
-        <a href="/mindmaps" class="btn">Back to Mind Maps</a>
+        <a href="<%= basePath %>/mindmaps" class="btn">Back to Mind Maps</a>
         <% if (mindmap.module_id) { %>
           <a href="<%= basePath %>/modules/<%= mindmap.module_id %>" class="btn btn-primary">View Full Module</a>
         <% } %>
@@ -88,7 +88,7 @@
     const bindNodeClicks=()=>{const nodes=document.querySelectorAll('.mermaid .node, .mermaid g.node');if(!nodes||nodes.length===0)return false;nodes.forEach(node=>{if(node.dataset&&node.dataset.clickBound==='1')return;node.style.cursor='pointer';node.addEventListener('click',(e)=>{e.stopPropagation();showNodeInfo(node.textContent.trim())});if(node.dataset)node.dataset.clickBound='1'});return true};
     let bindAttempts=0;const bindInterval=setInterval(()=>{bindAttempts++;if(bindNodeClicks()||bindAttempts>=10)clearInterval(bindInterval)},250);
     function showNodeInfo(nodeText){const panel=document.getElementById('infoPanel');const title=document.getElementById('infoPanelTitle');const content=document.getElementById('infoPanelContent');const cleanText=nodeText.replace(/[\[\]{}()]/g,'').trim();title.textContent=cleanText;content.innerHTML=nodeData[cleanText.toLowerCase()]||getDefaultInfo(cleanText);panel.style.display='block';panel.scrollIntoView({behavior:'smooth',block:'nearest'})}
-    function getDefaultInfo(nodeName){const categoryModules=modules.filter(m=>(m.category||'').toLowerCase()===nodeName.toLowerCase());if(categoryModules.length>0){const top=categoryModules.slice(0,8);const listItems=top.map(m=>'<li style="margin:0.25rem 0;"><a href="<%= basePath %>/modules/'+m.id+'" style="text-decoration:none;">'+m.title+'</a></li>').join('');return '<h4 style="color:var(--htb-green);margin-bottom:0.5rem;">'+nodeName+' Modules</h4><p class="text-muted" style="margin-bottom:0.75rem;">Click a module to open its cheatsheet and details.</p><ul style="margin:0 0 1rem 1.25rem;padding:0;">'+listItems+'</ul><a href="/modules?category='+encodeURIComponent(nodeName)+'" class="btn btn-primary">View All '+nodeName+' Modules</a>'}const matchingModule=modules.find(m=>m.title.toLowerCase().includes(nodeName.toLowerCase())||nodeName.toLowerCase().includes(m.title.toLowerCase().split(' ')[0]));if(matchingModule){return '<h4 style="color:var(--htb-green);margin-bottom:0.5rem;">'+matchingModule.title+'</h4><p>'+(matchingModule.summary||'')+'</p><a href="<%= basePath %>/modules/'+matchingModule.id+'" class="btn btn-primary" style="margin-top:1rem;">View Module & Cheatsheet</a>'}return '<p>This node represents: <strong>'+nodeName+'</strong></p><p class="text-muted">This is a concept in the CPTS methodology. Explore the related modules below for detailed cheatsheets and exercises.</p><div style="margin-top:1rem;"><a href="<%= basePath %>/search?q='+encodeURIComponent(nodeName)+'" class="btn">Search for "'+nodeName+'"</a> <a href="/modules" class="btn">Browse Modules</a></div>'}
+    function getDefaultInfo(nodeName){const categoryModules=modules.filter(m=>(m.category||'').toLowerCase()===nodeName.toLowerCase());if(categoryModules.length>0){const top=categoryModules.slice(0,8);const listItems=top.map(m=>'<li style="margin:0.25rem 0;"><a href="<%= basePath %>/modules/'+m.id+'" style="text-decoration:none;">'+m.title+'</a></li>').join('');return '<h4 style="color:var(--htb-green);margin-bottom:0.5rem;">'+nodeName+' Modules</h4><p class="text-muted" style="margin-bottom:0.75rem;">Click a module to open its cheatsheet and details.</p><ul style="margin:0 0 1rem 1.25rem;padding:0;">'+listItems+'</ul><a href="<%= basePath %>/modules?category='+encodeURIComponent(nodeName)+'" class="btn btn-primary">View All '+nodeName+' Modules</a>'}const matchingModule=modules.find(m=>m.title.toLowerCase().includes(nodeName.toLowerCase())||nodeName.toLowerCase().includes(m.title.toLowerCase().split(' ')[0]));if(matchingModule){return '<h4 style="color:var(--htb-green);margin-bottom:0.5rem;">'+matchingModule.title+'</h4><p>'+(matchingModule.summary||'')+'</p><a href="<%= basePath %>/modules/'+matchingModule.id+'" class="btn btn-primary" style="margin-top:1rem;">View Module & Cheatsheet</a>'}return '<p>This node represents: <strong>'+nodeName+'</strong></p><p class="text-muted">This is a concept in the CPTS methodology. Explore the related modules below for detailed cheatsheets and exercises.</p><div style="margin-top:1rem;"><a href="<%= basePath %>/search?q='+encodeURIComponent(nodeName)+'" class="btn">Search for "'+nodeName+'"</a> <a href="<%= basePath %>/modules" class="btn">Browse Modules</a></div>'}
     function closeInfoPanel(){document.getElementById('infoPanel').style.display='none'}
   </script>
 </body>

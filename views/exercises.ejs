@@ -15,7 +15,7 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
         <span>Exercises</span>
       </div>
@@ -25,7 +25,7 @@
       
       <!-- Filters -->
       <div class="filters">
-        <form method="GET" action="/exercises" style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
+        <form method="GET" action="<%= basePath %>/exercises" style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
           <div class="filter-group">
             <label>Type:</label>
             <select name="type" onchange="this.form.submit()">
@@ -57,7 +57,7 @@
           </div>
           
           <% if (filters.type || filters.module || filters.difficulty) { %>
-            <a href="/exercises" class="btn btn-sm">Clear Filters</a>
+            <a href="<%= basePath %>/exercises" class="btn btn-sm">Clear Filters</a>
           <% } %>
         </form>
       </div>

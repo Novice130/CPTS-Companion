@@ -131,7 +131,7 @@
           </div>
           <div class="panel-body">
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              <a href="/exercises" class="btn" style="justify-content: flex-start;">
+              <a href="<%= basePath %>/exercises" class="btn" style="justify-content: flex-start;">
                 🎯 Practice Exercises
               </a>
               <% if (stats.dueFlashcards > 0) { %>
@@ -139,10 +139,10 @@
                   🃏 Review <%= stats.dueFlashcards %> Due Flashcards
                 </a>
               <% } %>
-              <a href="/modules" class="btn" style="justify-content: flex-start;">
+              <a href="<%= basePath %>/modules" class="btn" style="justify-content: flex-start;">
                 📚 Browse Modules
               </a>
-              <a href="/mindmaps" class="btn" style="justify-content: flex-start;">
+              <a href="<%= basePath %>/mindmaps" class="btn" style="justify-content: flex-start;">
                 🗺️ Explore Mind Maps
               </a>
             </div>

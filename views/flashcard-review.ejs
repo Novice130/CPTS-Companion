@@ -15,9 +15,9 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="/">Dashboard</a>
+        <a href="<%= basePath %>/">Dashboard</a>
         <span>›</span>
-        <a href="/flashcards">Flashcards</a>
+        <a href="<%= basePath %>/flashcards">Flashcards</a>
         <span>›</span>
         <span>Review</span>
       </div>
@@ -53,14 +53,14 @@
           <div class="empty-state-icon">🎉</div>
           <div class="empty-state-title">All done!</div>
           <p>You've reviewed all due flashcards. Great work!</p>
-          <a href="/flashcards" class="btn btn-primary">Back to Flashcards</a>
+          <a href="<%= basePath %>/flashcards" class="btn btn-primary">Back to Flashcards</a>
         </div>
       <% } else { %>
         <div class="empty-state">
           <div class="empty-state-icon">✅</div>
           <div class="empty-state-title">No cards due!</div>
           <p>Come back later for more reviews.</p>
-          <a href="/flashcards" class="btn btn-primary">Back to Flashcards</a>
+          <a href="<%= basePath %>/flashcards" class="btn btn-primary">Back to Flashcards</a>
         </div>
       <% } %>
     </main>
@@ -103,7 +103,7 @@
       const card = cards[currentIndex];
       
       try {
-        await fetch('/api/flashcards/' + card.id + '/review', {
+        await fetch('<%= basePath %>/api/flashcards/' + card.id + '/review', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ quality })
