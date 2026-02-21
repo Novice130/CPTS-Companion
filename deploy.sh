@@ -42,12 +42,12 @@ npm install
 # Start or restart the app with PM2
 echo "Starting application..."
 pm2 delete cpts-companion 2>/dev/null || true
-pm2 start server.ts --name cpts-companion --interpreter="node" --interpreter-args="--experimental-strip-types" -- --port 3001
+BASE_PATH=/cpts-companion pm2 start server.ts --name cpts-companion --interpreter="node" --interpreter-args="--experimental-strip-types"
 
 # Save PM2 process list
 pm2 save
 
 echo ""
 echo "=== Deployment Complete ==="
-echo "App running on port 3001"
-echo "Make sure nginx is configured to proxy /cpts-companion to localhost:3001"
+echo "App running on port 3000 with BASE_PATH=/cpts-companion"
+echo "Make sure nginx is configured to proxy /cpts-companion to localhost:3000"

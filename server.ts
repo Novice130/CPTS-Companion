@@ -484,7 +484,7 @@ app.get("/mindmaps/:id", (req: Request, res: Response) => {
       <div style="margin-bottom: 1rem;">
         <span class="chip">${mod.category}</span>
       </div>
-      <a href="/modules/${
+      <a href="${BASE_PATH}/modules/${
         mod.id
       }" class="btn btn-primary">View Full Module & Cheatsheet →</a>
     `;
@@ -494,7 +494,7 @@ app.get("/mindmaps/:id", (req: Request, res: Response) => {
       nodeDataMap[catKey] = `
         <h4 style="color: var(--htb-green);">${mod.category}</h4>
         <p>This category contains modules related to ${mod.category.toLowerCase()} techniques.</p>
-        <a href="/modules?category=${encodeURIComponent(
+        <a href="${BASE_PATH}/modules?category=${encodeURIComponent(
           mod.category
         )}" class="btn">View ${mod.category} Modules</a>
       `;
@@ -504,19 +504,19 @@ app.get("/mindmaps/:id", (req: Request, res: Response) => {
   // Add common pentest phase definitions
   const phaseInfo: Record<string, string> = {
     reconnaissance:
-      '<h4>Reconnaissance Phase</h4><p>Gathering information about the target passively and actively. This includes OSINT, DNS enumeration, and identifying the attack surface.</p><a href="/modules/pentest-process" class="btn btn-primary">View Pentest Process Module →</a>',
+      `<h4>Reconnaissance Phase</h4><p>Gathering information about the target passively and actively. This includes OSINT, DNS enumeration, and identifying the attack surface.</p><a href="${BASE_PATH}/modules/pentest-process" class="btn btn-primary">View Pentest Process Module →</a>`,
     enumeration:
-      '<h4>Enumeration Phase</h4><p>Actively probing services to extract detailed information like usernames, shares, and service versions.</p><a href="/modules/nmap" class="btn btn-primary">View Nmap Module →</a>',
+      `<h4>Enumeration Phase</h4><p>Actively probing services to extract detailed information like usernames, shares, and service versions.</p><a href="${BASE_PATH}/modules/nmap" class="btn btn-primary">View Nmap Module →</a>`,
     exploitation:
-      '<h4>Exploitation Phase</h4><p>Using discovered vulnerabilities to gain initial access to the target system.</p><a href="/modules/shells-payloads" class="btn btn-primary">View Shells Module →</a>',
+      `<h4>Exploitation Phase</h4><p>Using discovered vulnerabilities to gain initial access to the target system.</p><a href="${BASE_PATH}/modules/shells-payloads" class="btn btn-primary">View Shells Module →</a>`,
     "post-exploitation":
-      '<h4>Post-Exploitation Phase</h4><p>Actions after gaining access: privilege escalation, persistence, lateral movement, and data exfiltration.</p><a href="/modules/linux-privesc" class="btn btn-primary">View Linux PrivEsc →</a> <a href="/modules/pivoting" class="btn">View Pivoting →</a>',
+      `<h4>Post-Exploitation Phase</h4><p>Actions after gaining access: privilege escalation, persistence, lateral movement, and data exfiltration.</p><a href="${BASE_PATH}/modules/linux-privesc" class="btn btn-primary">View Linux PrivEsc →</a> <a href="${BASE_PATH}/modules/pivoting" class="btn">View Pivoting →</a>`,
     "privilege escalation":
-      '<h4>Privilege Escalation</h4><p>Elevating access from a low-privileged user to root/SYSTEM. Critical for full system compromise.</p><a href="/modules/linux-privesc" class="btn btn-primary">Linux PrivEsc →</a> <a href="/modules/windows-privesc" class="btn">Windows PrivEsc →</a>',
+      `<h4>Privilege Escalation</h4><p>Elevating access from a low-privileged user to root/SYSTEM. Critical for full system compromise.</p><a href="${BASE_PATH}/modules/linux-privesc" class="btn btn-primary">Linux PrivEsc →</a> <a href="${BASE_PATH}/modules/windows-privesc" class="btn">Windows PrivEsc →</a>`,
     "lateral movement":
-      '<h4>Lateral Movement</h4><p>Moving from one compromised system to others in the network to expand access.</p><a href="/modules/pivoting" class="btn btn-primary">View Pivoting Module →</a>',
+      `<h4>Lateral Movement</h4><p>Moving from one compromised system to others in the network to expand access.</p><a href="${BASE_PATH}/modules/pivoting" class="btn btn-primary">View Pivoting Module →</a>`,
     "initial access":
-      '<h4>Initial Access</h4><p>The first foothold on the target network through exploitation of a vulnerability or misconfiguration.</p><a href="/modules/shells-payloads" class="btn btn-primary">View Shells Module →</a>',
+      `<h4>Initial Access</h4><p>The first foothold on the target network through exploitation of a vulnerability or misconfiguration.</p><a href="${BASE_PATH}/modules/shells-payloads" class="btn btn-primary">View Shells Module →</a>`,
   };
 
   Object.assign(nodeDataMap, phaseInfo);
@@ -669,7 +669,7 @@ app.post("/notes", (req: Request, res: Response) => {
 
   const lastId = (queries.createNote.lastInsertRowid as any).id;
   buildSearchIndex();
-  res.redirect(`/notes/${lastId}`);
+  res.redirect(`${BASE_PATH}/notes/${lastId}`);
 });
 
 // Update note
@@ -685,14 +685,14 @@ app.post("/notes/:id", (req: Request, res: Response) => {
   });
 
   buildSearchIndex();
-  res.redirect(`/notes/${req.params.id}`);
+  res.redirect(`${BASE_PATH}/notes/${req.params.id}`);
 });
 
 // Delete note
 app.post("/notes/:id/delete", (req: Request, res: Response) => {
   queries.deleteNote(parseInt(req.params.id));
   buildSearchIndex();
-  res.redirect("/notes");
+  res.redirect(`${BASE_PATH}/notes`);
 });
 
 // Search
@@ -847,7 +847,7 @@ app.get("/api/search-items", (req: Request, res: Response) => {
   const modules = queries.getAllModules().map((m: any) => ({
     type: "module",
     title: m.title,
-    url: `/modules/${m.id}`,
+    url: `${BASE_PATH}/modules/${m.id}`,
   }));
 
   const exercises = queries
@@ -856,31 +856,31 @@ app.get("/api/search-items", (req: Request, res: Response) => {
     .map((e: any) => ({
       type: "exercise",
       title: e.prompt.substring(0, 60) + "...",
-      url: `/exercises/${e.id}`,
+      url: `${BASE_PATH}/exercises/${e.id}`,
     }));
 
   const mindmaps = queries.getAllMindmaps().map((m: any) => ({
     type: "mindmap",
     title: m.title,
-    url: `/mindmaps/${m.id}`,
+    url: `${BASE_PATH}/mindmaps/${m.id}`,
   }));
 
   const notes = queries.getAllNotes().map((n: any) => ({
     type: "note",
     title: n.title,
-    url: `/notes/${n.id}`,
+    url: `${BASE_PATH}/notes/${n.id}`,
   }));
 
   const pages = [
-    { type: "page", title: "Dashboard", url: "/" },
-    { type: "page", title: "30-Day Plan", url: "/plan" },
-    { type: "page", title: "Modules", url: "/modules" },
-    { type: "page", title: "Exercises", url: "/exercises" },
-    { type: "page", title: "Mind Maps", url: "/mindmaps" },
-    { type: "page", title: "Flashcards", url: "/flashcards" },
-    { type: "page", title: "Notes", url: "/notes" },
-    { type: "page", title: "Search", url: "/search" },
-    { type: "page", title: "Settings", url: "/settings" },
+    { type: "page", title: "Dashboard", url: `${BASE_PATH}/` },
+    { type: "page", title: "30-Day Plan", url: `${BASE_PATH}/plan` },
+    { type: "page", title: "Modules", url: `${BASE_PATH}/modules` },
+    { type: "page", title: "Exercises", url: `${BASE_PATH}/exercises` },
+    { type: "page", title: "Mind Maps", url: `${BASE_PATH}/mindmaps` },
+    { type: "page", title: "Flashcards", url: `${BASE_PATH}/flashcards` },
+    { type: "page", title: "Notes", url: `${BASE_PATH}/notes` },
+    { type: "page", title: "Search", url: `${BASE_PATH}/search` },
+    { type: "page", title: "Settings", url: `${BASE_PATH}/settings` },
   ];
 
   res.json([...pages, ...modules, ...mindmaps, ...notes, ...exercises]);

@@ -37,18 +37,21 @@ npm run dev
 ## 🎯 Features
 
 ### 📅 30-Day Study Plan
+
 - Structured daily schedule covering all CPTS modules
 - Track completion and progress
 - Estimated time per day
 - Lab focus and review tasks
 
 ### 📚 Module Library
+
 - 26 comprehensive modules
 - Cheatsheets with commands
 - Common pitfalls
 - Exam survival tips
 
 ### 🎯 Interactive Exercises
+
 - **200+ exercises** including:
   - Multiple choice questions
   - Fill-in-the-command
@@ -58,17 +61,20 @@ npm run dev
 - Explanations for each answer
 
 ### 🃏 Flashcards with Spaced Repetition
+
 - 60+ Q&A flashcards
 - SM-2 algorithm for optimal review scheduling
 - Track learning progress
 
 ### 🗺️ Mind Maps
+
 - 19 Mermaid.js diagrams
 - CPTS Kill Chain overview
 - Attack flow visualizations
 - Module-specific concept maps
 
 ### 📝 Notes System
+
 - Personal note-taking
 - Pre-built templates:
   - Enumeration template
@@ -78,16 +84,19 @@ npm run dev
   - Reporting template
 
 ### 🔍 Full-Text Search
+
 - Search across all content
 - Find commands, concepts, techniques
 
 ### ⌨️ Command Palette
+
 - Quick navigation with `Ctrl+K`
 - Search pages, modules, exercises
 
 ## 🎨 HTB Dark Terminal Theme
 
 The app features a custom dark terminal theme inspired by Hack The Box:
+
 - Dark backgrounds (`#111927`, `#1a2332`)
 - Neon green accent (`#9FEF00`)
 - Monospace fonts
@@ -162,6 +171,7 @@ cpts-companion/
 Only use the techniques and knowledge gained from this application on systems you have explicit authorization to test. Unauthorized access to computer systems is illegal and unethical.
 
 Always practice in authorized environments such as:
+
 - Hack The Box
 - TryHackMe
 - Your own lab environment
