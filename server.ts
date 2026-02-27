@@ -2,6 +2,7 @@ import express from "express";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import "dotenv/config";
+import cookieParser from "cookie-parser";
 import {
   initDatabase,
   seedDatabase,
@@ -31,6 +32,7 @@ const PORT = process.env.PORT || 3000;
 app.all("/api/auth/*", toNodeHandler(auth));
 
 // Middleware (after auth handler to avoid conflicts)
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(join(__dirname, "public")));
@@ -106,9 +108,30 @@ async function startServer() {
   // AUTH MIDDLEWARE
   // ============================================
 
+  async function softAuth(req: Request, res: Response, next: express.NextFunction) {
+    const session = await getSession(req);
+    
+    if (session) {
+      (req as any).user = session.user;
+      return next();
+    }
+
+    // Track unauthenticated page views using a cookie
+    let views = parseInt(req.cookies?.guest_views || "0") + 1;
+    res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true });
+
+    if (views >= 3) {
+      return res.redirect("/login?reason=limit");
+    }
+
+    (req as any).user = null; // Guest user
+    next();
+  }
+
+  // Keep requireAuth for API routes that strict require it (like POSTs)
   async function requireAuth(req: Request, res: Response, next: express.NextFunction) {
     const session = await getSession(req);
-    if (!session) return res.redirect("/login");
+    if (!session) return res.status(401).json({ error: "Unauthorized" });
     (req as any).user = session.user;
     next();
   }
@@ -145,7 +168,7 @@ async function startServer() {
   // ============================================
 
   // Dashboard
-  app.get("/", requireAuth, async (req: Request, res: Response) => {
+  app.get("/", softAuth, async (req: Request, res: Response) => {
     const user = (req as any).user;
     
     // Fetch initial parallel data
@@ -184,7 +207,7 @@ async function startServer() {
   });
 
   // Study Plan
-  app.get("/plan", requireAuth, async (req: Request, res: Response) => {
+  app.get("/plan", softAuth, async (req: Request, res: Response) => {
     const user = (req as any).user;
     const [common, modulesRaw] = await Promise.all([
       getCommonData(),
@@ -238,7 +261,7 @@ async function startServer() {
   });
 
   // Modules list
-  app.get("/modules", requireAuth, async (req: Request, res: Response) => {
+  app.get("/modules", softAuth, async (req: Request, res: Response) => {
     const [common, modulesRaw, progress] = await Promise.all([
       getCommonData(),
       queries.getAllModules(),
@@ -281,7 +304,7 @@ async function startServer() {
   });
 
   // Module detail
-  app.get("/modules/:id", requireAuth, async (req: Request, res: Response) => {
+  app.get("/modules/:id", softAuth, async (req: Request, res: Response) => {
     const [common, moduleRaw] = await Promise.all([
       getCommonData(),
       queries.getModuleById(parseInt(req.params.id)).then(m => m || queries.getModuleBySlug(req.params.id))
@@ -420,7 +443,7 @@ async function startServer() {
   });
 
   // Exercises list
-  app.get("/exercises", requireAuth, async (req: Request, res: Response) => {
+  app.get("/exercises", softAuth, async (req: Request, res: Response) => {
     const [common, exercisesRaw, progress, modules] = await Promise.all([
       getCommonData(),
       queries.getAllExercises(),
@@ -472,7 +495,7 @@ async function startServer() {
   });
 
   // Exercise detail
-  app.get("/exercises/:id", requireAuth, async (req: Request, res: Response) => {
+  app.get("/exercises/:id", softAuth, async (req: Request, res: Response) => {
     const [common, exerciseRaw] = await Promise.all([
       getCommonData(),
       queries.getExerciseById(parseInt(req.params.id))
@@ -541,7 +564,7 @@ async function startServer() {
   });
 
   // Mind maps list
-  app.get("/mindmaps", requireAuth, async (req: Request, res: Response) => {
+  app.get("/mindmaps", softAuth, async (req: Request, res: Response) => {
     const [common, mindmaps, modules] = await Promise.all([
       getCommonData(),
       queries.getAllMindmaps(),
@@ -552,7 +575,7 @@ async function startServer() {
   });
 
   // Mind map detail
-  app.get("/mindmaps/:id", requireAuth, async (req: Request, res: Response) => {
+  app.get("/mindmaps/:id", softAuth, async (req: Request, res: Response) => {
     const common = await getCommonData();
     const mindmap = (await queries.getMindmapById(parseInt(req.params.id))) as any;
 
@@ -649,7 +672,7 @@ async function startServer() {
   });
 
   // Flashcards
-  app.get("/flashcards", requireAuth, async (req: Request, res: Response) => {
+  app.get("/flashcards", softAuth, async (req: Request, res: Response) => {
     const [common, flashcards, dueFlashcards, modules] = await Promise.all([
       getCommonData(),
       queries.getAllFlashcards(),
@@ -661,7 +684,7 @@ async function startServer() {
   });
 
   // Flashcard review
-  app.get("/flashcards/review", requireAuth, async (req: Request, res: Response) => {
+  app.get("/flashcards/review", softAuth, async (req: Request, res: Response) => {
     const [common, dueFlashcards] = await Promise.all([
       getCommonData(),
       queries.getDueFlashcards()
@@ -690,7 +713,7 @@ async function startServer() {
   });
 
   // Notes
-  app.get("/notes", requireAuth, async (req: Request, res: Response) => {
+  app.get("/notes", softAuth, async (req: Request, res: Response) => {
     const [common, notes, templates, modules] = await Promise.all([
       getCommonData(),
       queries.getAllNotes(),
@@ -743,7 +766,7 @@ async function startServer() {
   });
 
   // View note
-  app.get("/notes/:id", requireAuth, async (req: Request, res: Response) => {
+  app.get("/notes/:id", softAuth, async (req: Request, res: Response) => {
     const common = await getCommonData();
     const note = await queries.getNoteById(parseInt(req.params.id));
 

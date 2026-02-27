@@ -19,11 +19,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.21.0",
-    "ejs": "^3.1.10",
-    "pg": "^8.13.0",
-    "dotenv": "^16.4.5",
     "better-auth": "^1.2.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
     "resend": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10"
   }
 }

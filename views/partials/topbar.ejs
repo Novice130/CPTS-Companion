@@ -38,3 +38,37 @@
     <% } %>
   </div>
 </header>
+
+<% if (typeof user === 'undefined' || !user) { %>
+  <!-- Soft Login Curtain -->
+  <div id="loginCurtain" style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(8px); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);">
+    <div style="background: var(--surface); border: 1px solid var(--htb-border); padding: 3rem; border-radius: 12px; max-width: 450px; text-align: center; transform: translateY(-30px); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);" id="loginCurtainContent">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">👋</div>
+      <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Save Your Progress!</h2>
+      <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+        You are currently exploring as a guest. To save your daily activities, study plans, and flashcard reviews, please log in with your account.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button onclick="document.getElementById('loginCurtain').style.opacity='0'; document.getElementById('loginCurtain').style.pointerEvents='none'; document.getElementById('loginCurtainContent').style.transform='translateY(-30px)';" style="background: transparent; color: var(--text-muted); border: 1px solid var(--htb-border); padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s;">
+          Maybe Later
+        </button>
+        <a href="/login" style="background: var(--htb-green); color: #000; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; transition: all 0.2s; box-shadow: 0 0 15px rgba(159, 239, 0, 0.2);">
+          Login Now
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Trigger the curtain animation shortly after page load
+    setTimeout(() => {
+      const curtain = document.getElementById('loginCurtain');
+      const content = document.getElementById('loginCurtainContent');
+      if (curtain && content) {
+        curtain.style.opacity = '1';
+        curtain.style.pointerEvents = 'all';
+        content.style.transform = 'translateY(0)';
+      }
+    }, 1500); // Wait 1.5s before showing
+  </script>
+<% } %>
