@@ -1,6 +1,6 @@
 #!/bin/bash
 # CPTS Companion Deployment Script
-# Run this on your Google Cloud VM
+# Deploy to cpts.learnnovice.com via Dokploy
 
 set -e
 
@@ -42,12 +42,13 @@ npm install
 # Start or restart the app with PM2
 echo "Starting application..."
 pm2 delete cpts-companion 2>/dev/null || true
-BASE_PATH=/cpts-companion pm2 start server.ts --name cpts-companion --interpreter="node" --interpreter-args="--experimental-strip-types"
+pm2 start server.ts --name cpts-companion --interpreter="node" --interpreter-args="--experimental-strip-types"
 
 # Save PM2 process list
 pm2 save
 
 echo ""
 echo "=== Deployment Complete ==="
-echo "App running on port 3000 with BASE_PATH=/cpts-companion"
-echo "Make sure nginx is configured to proxy /cpts-companion to localhost:3000"
+echo "App running on port 3000"
+echo "Make sure DNS for cpts.learnnovice.com points to this server"
+echo "Make sure nginx is configured to proxy cpts.learnnovice.com to localhost:3000"

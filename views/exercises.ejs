@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercises | CPTS Companion</title>
-  <link rel="icon" type="image/jpeg" href="<%= basePath %>/favicon.jpg">
-  <link rel="stylesheet" href="<%= basePath %>/css/style.css">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="scanlines">
   <%- include('partials/sidebar', { currentPage: 'exercises', stats, dueCount }) %>
@@ -15,7 +15,7 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="<%= basePath %>/">Dashboard</a>
+        <a href="/">Dashboard</a>
         <span>›</span>
         <span>Exercises</span>
       </div>
@@ -25,7 +25,7 @@
       
       <!-- Filters -->
       <div class="filters">
-        <form method="GET" action="<%= basePath %>/exercises" style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
+        <form method="GET" action="/exercises" style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%;">
           <div class="filter-group">
             <label>Type:</label>
             <select name="type" onchange="this.form.submit()">
@@ -57,7 +57,7 @@
           </div>
           
           <% if (filters.type || filters.module || filters.difficulty) { %>
-            <a href="<%= basePath %>/exercises" class="btn btn-sm">Clear Filters</a>
+            <a href="/exercises" class="btn btn-sm">Clear Filters</a>
           <% } %>
         </form>
       </div>
@@ -85,7 +85,7 @@
       <% if (exercises.length > 0) { %>
         <div class="card-grid">
           <% exercises.forEach(ex => { %>
-            <a href="<%= basePath %>/exercises/<%= ex.id %>" class="content-card" style="text-decoration: none;">
+            <a href="/exercises/<%= ex.id %>" class="content-card" style="text-decoration: none;">
               <div class="content-card-header">
                 <span class="exercise-type exercise-type-<%= ex.type %>"><%= ex.type.replace('_', ' ') %></span>
                 <span class="difficulty difficulty-<%= ex.difficulty %>"><%= ex.difficulty %></span>
@@ -114,6 +114,6 @@
   </div>
   
   <%- include('partials/command-palette') %>
-  <script src="<%= basePath %>/js/app.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>CPTS Companion</title>
   <meta name="description" content="CPTS Certification Companion - Prepare for Hack The Box CPTS in 30 days">
-  <link rel="icon" type="image/jpeg" href="<%= basePath %>/favicon.jpg">
-  <link rel="stylesheet" href="<%= basePath %>/css/style.css">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body class="scanlines">
@@ -15,7 +15,7 @@
     <aside class="sidebar">
       <a class="sidebar-logo" href="https://learnnovice.com" target="_blank" rel="noopener noreferrer">
         <div class="logo-icon logo-image">
-          <img class="logo-img" src="<%= basePath %>/img/logo.jpg" alt="Logo">
+          <img class="logo-img" src="/img/logo.jpg" alt="Logo">
         </div>
         <div class="logo-text">CPTS <span>Companion</span></div>
       </a>
@@ -23,11 +23,11 @@
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">Main</div>
-          <a href="<%= basePath %>/" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+          <a href="/" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
             <span class="nav-icon">⌂</span>
             Dashboard
           </a>
-          <a href="<%= basePath %>/plan" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'plan' ? 'active' : '' %>">
+          <a href="/plan" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'plan' ? 'active' : '' %>">
             <span class="nav-icon">📅</span>
             30-Day Plan
             <% if (typeof stats !== 'undefined') { %>
@@ -38,25 +38,25 @@
         
         <div class="nav-section">
           <div class="nav-section-title">Learn</div>
-          <a href="<%= basePath %>/modules" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'modules' ? 'active' : '' %>">
+          <a href="/modules" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'modules' ? 'active' : '' %>">
             <span class="nav-icon">📚</span>
             Modules
           </a>
-          <a href="<%= basePath %>/exercises" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'exercises' ? 'active' : '' %>">
+          <a href="/exercises" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'exercises' ? 'active' : '' %>">
             <span class="nav-icon">🎯</span>
             Exercises
             <% if (typeof stats !== 'undefined') { %>
               <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
             <% } %>
           </a>
-          <a href="<%= basePath %>/flashcards" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'flashcards' ? 'active' : '' %>">
+          <a href="/flashcards" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'flashcards' ? 'active' : '' %>">
             <span class="nav-icon">🃏</span>
             Flashcards
             <% if (typeof dueCount !== 'undefined' && dueCount > 0) { %>
               <span class="nav-badge"><%= dueCount %> due</span>
             <% } %>
           </a>
-          <a href="<%= basePath %>/mindmaps" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'mindmaps' ? 'active' : '' %>">
+          <a href="/mindmaps" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'mindmaps' ? 'active' : '' %>">
             <span class="nav-icon">🗺️</span>
             Mind Maps
           </a>
@@ -64,15 +64,15 @@
         
         <div class="nav-section">
           <div class="nav-section-title">Tools</div>
-          <a href="<%= basePath %>/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
+          <a href="/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
             <span class="nav-icon">📝</span>
             Notes
           </a>
-          <a href="<%= basePath %>/search" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'search' ? 'active' : '' %>">
+          <a href="/search" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'search' ? 'active' : '' %>">
             <span class="nav-icon">🔍</span>
             Search
           </a>
-          <a href="<%= basePath %>/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
+          <a href="/settings" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'settings' ? 'active' : '' %>">
             <span class="nav-icon">⚙️</span>
             Settings
           </a>
@@ -113,6 +113,14 @@
             Quick search...
             <kbd>Ctrl</kbd><kbd>K</kbd>
           </button>
+          <% if (typeof user !== 'undefined' && user) { %>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--htb-border);">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">
+                👤 <span style="color: var(--htb-green); font-weight: 600;"><%= user.name || user.email %></span>
+              </span>
+              <a href="/logout" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; padding: 4px 10px; border: 1px solid var(--htb-border); border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--htb-red)';this.style.color='var(--htb-red)'" onmouseout="this.style.borderColor='var(--htb-border)';this.style.color='var(--text-muted)'" >Logout</a>
+            </div>
+          <% } %>
         </div>
       </header>
       
@@ -131,6 +139,6 @@
     </div>
   </div>
   
-  <script src="<%= basePath %>/js/app.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>

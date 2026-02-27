@@ -1,7 +1,7 @@
 {
   "name": "cpts-companion",
-  "version": "1.0.0",
-  "description": "CPTS Certification Companion App - HTB Dark Terminal Theme",
+  "version": "2.0.0",
+  "description": "CPTS Certification Companion App - Full-Stack with Auth & Postgres",
   "main": "server.ts",
   "type": "module",
   "scripts": {
@@ -21,6 +21,9 @@
   "dependencies": {
     "express": "^4.21.0",
     "ejs": "^3.1.10",
-    "better-sqlite3": "^11.3.0"
+    "pg": "^8.13.0",
+    "dotenv": "^16.4.5",
+    "better-auth": "^1.2.0",
+    "resend": "^4.0.0"
   }
 }

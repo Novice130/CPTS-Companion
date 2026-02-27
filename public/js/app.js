@@ -7,21 +7,10 @@
 let searchItems = [];
 let selectedIndex = 0;
 
-// Detect basePath from the stylesheet link in the HTML
-const basePath = (() => {
-  const link = document.querySelector('link[rel="stylesheet"]');
-  if (link) {
-    const href = link.getAttribute('href') || '';
-    const idx = href.indexOf('/css/style.css');
-    if (idx > 0) return href.substring(0, idx);
-  }
-  return '';
-})();
-
 // Fetch searchable items
 async function loadSearchItems() {
   try {
-    const res = await fetch(`${basePath}/api/search-items`);
+    const res = await fetch('/api/search-items');
     searchItems = await res.json();
   } catch (err) {
     console.error('Failed to load search items:', err);

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercise | CPTS Companion</title>
-  <link rel="icon" type="image/jpeg" href="<%= basePath %>/favicon.jpg">
-  <link rel="stylesheet" href="<%= basePath %>/css/style.css">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="scanlines">
   <%- include('partials/sidebar', { currentPage: 'exercises', stats, dueCount }) %>
@@ -15,9 +15,9 @@
     
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="<%= basePath %>/">Dashboard</a>
+        <a href="/">Dashboard</a>
         <span>›</span>
-        <a href="<%= basePath %>/exercises">Exercises</a>
+        <a href="/exercises">Exercises</a>
         <span>›</span>
         <span>Exercise #<%= exercise.id %></span>
       </div>
@@ -36,7 +36,7 @@
         </div>
         <div class="panel-body">
           <div class="exercise-prompt">
-            <%- exercise.prompt %>
+            <%- sanitize(exercise.prompt) %>
           </div>
           
           <!-- Feedback area (hidden initially) -->
@@ -95,7 +95,7 @@
                 <span class="terminal-dot green"></span>
                 <span class="terminal-title">Output</span>
               </div>
-              <pre><code><%- exercise.prompt %></code></pre>
+              <pre><code><%- sanitize(exercise.prompt) %></code></pre>
             </div>
             <div class="form-group">
               <label class="form-label">What's your analysis?</label>
@@ -130,16 +130,16 @@
       </div>
       
       <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-        <a href="<%= basePath %>/exercises" class="btn">← Back to Exercises</a>
-        <a href="<%= basePath %>/exercises/<%= exercise.id + 1 %>" class="btn">Next Exercise →</a>
+        <a href="/exercises" class="btn">← Back to Exercises</a>
+        <a href="/exercises/<%= exercise.id + 1 %>" class="btn">Next Exercise →</a>
       </div>
     </main>
   </div>
   
   <%- include('partials/command-palette') %>
-  <script src="<%= basePath %>/js/app.js"></script>
+  <script src="/js/app.js"></script>
   <script>
-    const basePath = '<%= basePath %>';
+    const basePath = '';
     const exerciseId = <%= exercise.id %>;
     const correctAnswer = "<%= exercise.answer.replace(/"/g, '\\"') %>";
     const hints = <%- exercise.hints ? JSON.stringify(exercise.hints) : '[]' %>;

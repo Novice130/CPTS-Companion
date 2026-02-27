@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard | CPTS Companion</title>
-  <link rel="icon" type="image/jpeg" href="<%= basePath %>/favicon.jpg">
-  <link rel="stylesheet" href="<%= basePath %>/css/style.css">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="scanlines">
   <%- include('partials/sidebar', { currentPage: 'dashboard', stats, dueCount }) %>
@@ -83,11 +83,11 @@
                     <div class="activity-desc"><%= activity.description %></div>
                   </div>
                   <% if (activity.activity_type === 'module' && activity.activity_id) { %>
-                    <a href="<%= basePath %>/modules/<%= activity.activity_id %>" class="btn btn-sm">View</a>
+                    <a href="/modules/<%= activity.activity_id %>" class="btn btn-sm">View</a>
                   <% } else if (activity.activity_type === 'exercise' && activity.activity_id) { %>
-                    <a href="<%= basePath %>/exercises/<%= activity.activity_id %>" class="btn btn-sm">Start</a>
+                    <a href="/exercises/<%= activity.activity_id %>" class="btn btn-sm">Start</a>
                   <% } else if (activity.activity_type === 'flashcards') { %>
-                    <a href="<%= basePath %>/flashcards/review" class="btn btn-sm">Review</a>
+                    <a href="/flashcards/review" class="btn btn-sm">Review</a>
                   <% } else if (activity.activity_type === 'reflection') { %>
                     <button class="btn btn-sm" onclick="showReflection()">Write</button>
                   <% } %>
@@ -131,18 +131,18 @@
           </div>
           <div class="panel-body">
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              <a href="<%= basePath %>/exercises" class="btn" style="justify-content: flex-start;">
+              <a href="/exercises" class="btn" style="justify-content: flex-start;">
                 🎯 Practice Exercises
               </a>
               <% if (stats.dueFlashcards > 0) { %>
-                <a href="<%= basePath %>/flashcards/review" class="btn btn-primary" style="justify-content: flex-start;">
+                <a href="/flashcards/review" class="btn btn-primary" style="justify-content: flex-start;">
                   🃏 Review <%= stats.dueFlashcards %> Due Flashcards
                 </a>
               <% } %>
-              <a href="<%= basePath %>/modules" class="btn" style="justify-content: flex-start;">
+              <a href="/modules" class="btn" style="justify-content: flex-start;">
                 📚 Browse Modules
               </a>
-              <a href="<%= basePath %>/mindmaps" class="btn" style="justify-content: flex-start;">
+              <a href="/mindmaps" class="btn" style="justify-content: flex-start;">
                 🗺️ Explore Mind Maps
               </a>
             </div>
@@ -153,7 +153,7 @@
         <div class="panel">
           <div class="panel-header">
             <h3 class="panel-title"><span class="panel-title-icon">📅</span> Plan Overview</h3>
-            <a href="<%= basePath %>/settings" class="btn btn-sm">Change Plan</a>
+            <a href="/settings" class="btn btn-sm">Change Plan</a>
           </div>
           <div class="panel-body">
             <div class="plan-overview">
@@ -184,13 +184,13 @@
       <div class="panel" style="margin-top: 1.5rem;">
         <div class="panel-header">
           <h3 class="panel-title"><span class="panel-title-icon">📝</span> Recent Notes</h3>
-          <a href="<%= basePath %>/notes" class="btn btn-sm">View All</a>
+          <a href="/notes" class="btn btn-sm">View All</a>
         </div>
         <div class="panel-body">
           <% if (recentNotes.length > 0) { %>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
               <% recentNotes.forEach(note => { %>
-                <a href="<%= basePath %>/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
+                <a href="/notes/<%= note.id %>" class="note-card" style="text-decoration: none;">
                   <div class="note-card-title"><%= note.title %></div>
                   <div class="note-card-meta">
                     <span><%= note.module_title || 'General' %></span>
@@ -204,7 +204,7 @@
               <div class="empty-state-icon">📝</div>
               <div class="empty-state-title">No notes yet</div>
               <p>Start taking notes during your studies!</p>
-              <a href="<%= basePath %>/notes/new" class="btn btn-primary">Create Note</a>
+              <a href="/notes/new" class="btn btn-primary">Create Note</a>
             </div>
           <% } %>
         </div>
@@ -213,9 +213,11 @@
   </div>
   
   <%- include('partials/command-palette') %>
-  <script src="<%= basePath %>/js/app.js"></script>
+  <!-- Confetti Library for Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="/js/app.js"></script>
   <script>
-    const basePath = '<%= basePath %>';
+    const basePath = '';
     
     // Toggle activity completion
     async function toggleActivity(activityId, completed) {
@@ -238,9 +240,37 @@
           
           // Refresh page to update progress
           if (data.dayComplete) {
-            showToast('🎉 Day complete! You can now proceed to the next day.');
+            // FIRE CONFETTI CELEBRATION
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+              confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#9fef00', '#ffffff', '#222222']
+              });
+              confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#9fef00', '#ffffff', '#222222']
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
+            
+            showToast('🎉 Well done! You have completed all tasks for today!');
+            // Delay reload so they can actually see the confetti
+            setTimeout(() => location.reload(), 3500);
+          } else {
+            setTimeout(() => location.reload(), 500);
           }
-          setTimeout(() => location.reload(), 500);
         }
       } catch (err) {
         console.error('Error toggling activity:', err);

@@ -1,14 +1,11 @@
-FROM node:23
+FROM node:23-slim
 
 WORKDIR /app
-
-# Install build dependencies for better-sqlite3
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (no native build tools needed — no more sqlite3)
 RUN npm install
 
 # Copy app source

@@ -9,7 +9,11 @@ A comprehensive learning dashboard to help you prepare for the **Hack The Box CP
 
 ## ⚡ Quick Start
 
-### With Docker (Recommended)
+### Deployed Application
+
+CPTS Companion is now accessible at [cpts.learnnovice.com](https://cpts.learnnovice.com).
+
+### Running Locally (With Docker)
 
 ```bash
 # Build the image
@@ -130,7 +134,10 @@ cpts-companion/
 
 - **Runtime**: Node.js 23 with `--experimental-strip-types`
 - **Server**: Express.js
-- **Database**: SQLite (better-sqlite3)
+- **Database**: Neon Postgres (Serverless) + Drizzle ORM
+- **Authentication**: Better Auth (Google Sign-in)
+- **Emails**: Resend API
+- **Deployment**: Dokploy (GitHub integrated, HTTPS)
 - **Templates**: EJS
 - **Styling**: Vanilla CSS (no build required)
 - **Diagrams**: Mermaid.js (client-side)
