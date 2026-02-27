@@ -29,6 +29,7 @@ export const auth = betterAuth({
   advanced: {
     disableTablesCheck: true,       // Our tables are created by initDatabase()
   },
+  trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [],
 });
 
 // Middleware to get current user from session
