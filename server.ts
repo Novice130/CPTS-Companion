@@ -109,18 +109,28 @@ async function startServer() {
   // ============================================
 
   async function softAuth(req: Request, res: Response, next: express.NextFunction) {
-    const session = await getSession(req);
+    console.log(`[softAuth] Checking session for ${req.path}`);
+    console.log(`[softAuth] Cookies from express parser:`, req.cookies);
     
-    if (session) {
-      (req as any).user = session.user;
-      return next();
+    try {
+      const session = await getSession(req);
+      console.log(`[softAuth] Session result:`, session ? `Valid for ${session.user.email}` : "null");
+      
+      if (session) {
+        (req as any).user = session.user;
+        return next();
+      }
+    } catch (e) {
+      console.error(`[softAuth] Error getting session:`, e);
     }
 
     // Track unauthenticated page views using a cookie
     let views = parseInt(req.cookies?.guest_views || "0") + 1;
+    console.log(`[softAuth] Guest view count:`, views);
     res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true });
 
     if (views >= 3) {
+      console.log(`[softAuth] Redirecting to login due to limit (views: ${views})`);
       return res.redirect("/login?reason=limit");
     }
 

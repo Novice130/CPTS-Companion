@@ -33,10 +33,12 @@ export const auth = betterAuth({
 });
 
 // Middleware to get current user from session
+import { fromNodeHeaders } from "better-auth/node";
+
 export async function getSession(req: any) {
   try {
     const session = await auth.api.getSession({
-      headers: new Headers(req.headers),
+      headers: fromNodeHeaders(req.headers),
     });
     return session;
   } catch {
