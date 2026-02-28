@@ -71,7 +71,38 @@ export async function getSession(req: any) {
 
 ---
 
-## 4. Dockerfile Case Sensitivity
+## 4. The "Path-Isolated Session" Bug (Cross-Route Persistent Logout)
+**The Problem:** Navigating to `cpts.learnnovice.com/` (Dashboard) worked fine, but if the user navigated to `cpts.learnnovice.com/exercises` or another sub-route, the server thought they were totally logged out and the "Save Your Progress" curtain would trigger. Returning to the dashboard showed they were still logged in.
+**The Cause:** Modern browsers restrict cookies strictly by `path`, `domain`, and `sameSite` policies. If Better Auth sets the session path ambiguously during login, the browser may refuse to send the session cookie to deeper sub-routes.
+**The Fix:**
+Explicitly force Better Auth's `defaultCookieAttributes` to enforce the absolute root path `/`.
+
+```typescript
+// auth.ts
+export const auth = betterAuth({
+  session: { /* ... */ },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/", // <--- CRITICAL FIX: Forces cookie to work across ALL sub-routes
+    },
+    useSecureCookies: process.env.NODE_ENV === "production",
+  }
+});
+```
+
+---
+
+## 5. View Templates Losing Global Themes (White Background Bug)
+**The Problem:** The `/login` page was completely white and generic, dropping the entire CPTS Companion dark-mode Hacker Theme, despite using CSS Custom Properties like `var(--bg)` and `var(--surface)`.
+**The Cause:** The `login.ejs` view file lacked standard `<html>`, `<head>`, and `<body>` tags. Express simply spat out raw `<div>`s to the browser. As a result, the `<link rel="stylesheet" href="/css/style.css">` was completely missing from the HTML document.
+**The Fix:**
+Ensure every standalone `.ejs` view template either `include()`s a layout/header partial or explicitly defines the HTML boilerplate at the very top.
+
+---
+
+## 6. Dockerfile Case Sensitivity
 **The Problem:** Dokploy failed to deploy the application completely, throwing errors that it couldn't locate the Docker container build file.
 **The Cause:** File systems on Linux servers (where Dokploy runs) are strictly case-sensitive. The Git repository had standard capitalization `Dockerfile`, but Dokploy's build settings looked for `dockerfile` by default.
 **The Fix:**
@@ -79,7 +110,7 @@ In Dokploy's **General Setup** tab, change the `Dockerfile Path` to explicitly m
 
 ---
 
-## 5. Security: Weak Better Auth Secrets
+## 7. Security: Weak Better Auth Secrets
 **The Problem:** Using simple words or phrases for `BETTER_AUTH_SECRET` can lead to session hijacking.
 **The Cause:** Better Auth uses this secret to cryptographically sign session cookies. If guessed, attackers can forge admin sessions.
 **The Fix:**
@@ -98,3 +129,5 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - [ ] Set `trust proxy` in Express.
 - [ ] Add deployment domain to `trustedOrigins` for Better Auth.
 - [ ] Use `fromNodeHeaders` for ALL session fetching on the server.
+- [ ] Explicitly configure `advanced.defaultCookieAttributes.path = "/"` in Better Auth.
+- [ ] Verify HTML `<head>` and stylesheet link injection on standalone .ejs files.
