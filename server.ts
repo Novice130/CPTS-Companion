@@ -129,7 +129,7 @@ async function startServer() {
     console.log(`[softAuth] Guest view count:`, views);
     res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true });
 
-    if (views >= 3) {
+    if (views >= 5) {
       console.log(`[softAuth] Redirecting to login due to limit (views: ${views})`);
       return res.redirect("/login?reason=limit");
     }
@@ -154,6 +154,11 @@ async function startServer() {
   app.get("/login", async (req: Request, res: Response) => {
     const session = await getSession(req);
     if (session) return res.redirect("/");
+    
+    // Clear the guest views cookie when they visit the login page 
+    // so if they login successfully, the counter is reset.
+    res.clearCookie("guest_views");
+    
     const common = await getCommonData();
     res.render("login", { ...common, currentPage: "login", user: null });
   });
