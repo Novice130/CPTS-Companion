@@ -193,6 +193,17 @@ Always ensure the Express request object successfully negotiates the session aut
 
 ---
 
+## 11. Google OAuth `redirect_uri_mismatch` in Production
+**The Problem:** Google returned a 400 `redirect_uri_mismatch` on the production deployed app, even though the production URI was explicitly whitelisted in Google Cloud Console.
+**The Cause:** In `auth.ts`, the `baseURL` property was originally conditioned on `NODE_ENV === "production" ? process.env.BETTER_AUTH_URL : "http://localhost:3000"`. If Dokploy did not explicitly define `NODE_ENV="production"` in the environment variables, the backend falsely assumed it was running locally. It then instructed Google to use `http://localhost:3000/api/auth/callback/google` as the redirect, triggering Google's security block because the request originated from `cpts.learnnovice.com`.
+**The Fix:**
+Never rely on `NODE_ENV` as a strict gate for generating URLs. Bind directly to the provided origin variable.
+```typescript
+baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+```
+
+---
+
 ## Summary Stack Checklist for Future Deployments:
 - [ ] Connect Neon Postgres URI correctly without local SSL overrides if required.
 - [ ] Generate secure, random `BETTER_AUTH_SECRET`.
@@ -200,7 +211,8 @@ Always ensure the Express request object successfully negotiates the session aut
 - [ ] Set `trust proxy` in Express.
 - [ ] Add deployment domain to `trustedOrigins` for Better Auth.
 - [ ] Use `fromNodeHeaders` for ALL session fetching on the server.
-- [ ] Explicitly configure `advanced.defaultCookieAttributes.path = "/"` in Better Auth.
+- [ ] Explicitly configure `advanced.defaultCookieAttributes` to `path: "/"` and `secure: !!process.env.BETTER_AUTH_URL` in Better Auth.
 - [ ] Verify HTML `<head>` and stylesheet link injection on standalone .ejs files.
 - [ ] Ensure `user_id` Foreign Keys are scoped on all non-global entity tables.
 - [ ] Validate unhandled Promise Rejections are caught in POST routes to prevent hard server crashing.
+- [ ] Do not condition Better Auth's `baseURL` strictly on `NODE_ENV`; fallback gracefully.
