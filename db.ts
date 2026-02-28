@@ -146,6 +146,7 @@ export async function initDatabase(): Promise<void> {
       -- Progress tracking
       CREATE TABLE IF NOT EXISTS progress (
         id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
         item_type TEXT NOT NULL,
         item_id INTEGER NOT NULL,
         status TEXT DEFAULT 'not_started',
@@ -153,12 +154,13 @@ export async function initDatabase(): Promise<void> {
         score INTEGER,
         last_seen TEXT,
         due_at TEXT,
-        UNIQUE(item_type, item_id)
+        UNIQUE(user_id, item_type, item_id)
       );
 
       -- Notes table
       CREATE TABLE IF NOT EXISTS notes (
         id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
         title TEXT NOT NULL,
         body_md TEXT,
         tags TEXT,
@@ -178,7 +180,7 @@ export async function initDatabase(): Promise<void> {
 
       -- User settings
       CREATE TABLE IF NOT EXISTS user_settings (
-        id INTEGER PRIMARY KEY DEFAULT 1,
+        user_id TEXT PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
         plan_duration INTEGER DEFAULT 30,
         start_date TEXT,
         current_day INTEGER DEFAULT 1
@@ -187,15 +189,18 @@ export async function initDatabase(): Promise<void> {
       -- Reflections
       CREATE TABLE IF NOT EXISTS reflections (
         id SERIAL PRIMARY KEY,
-        day_number INTEGER NOT NULL UNIQUE,
+        user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+        day_number INTEGER NOT NULL,
         content TEXT,
         created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(user_id, day_number)
       );
 
       -- Daily activities
       CREATE TABLE IF NOT EXISTS daily_activities (
         id SERIAL PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
         day_number INTEGER NOT NULL,
         activity_type TEXT NOT NULL,
         activity_id INTEGER,
@@ -205,10 +210,8 @@ export async function initDatabase(): Promise<void> {
         completed_at TEXT
       );
 
-      -- Initialize default user settings
-      INSERT INTO user_settings (id, plan_duration, current_day)
-      VALUES (1, 30, 1)
-      ON CONFLICT (id) DO NOTHING;
+      -- Initialize default user settings is now handled on demand
+
     `);
 
     console.log("Database schema initialized");
@@ -323,7 +326,7 @@ export async function seedDatabase(): Promise<void> {
   await buildSearchIndex();
 
   // Generate initial activities for day 1
-  await generateActivitiesForDay(1, 30);
+  // Disabled global activity generation on boot; it's now per-user on demand.
 
   console.log("Database seeding complete!");
 }
@@ -332,8 +335,8 @@ export async function seedDatabase(): Promise<void> {
 // Activity Generation
 // ============================================
 
-export async function generateActivitiesForDay(dayNumber: number, planDuration: number): Promise<void> {
-  await pool.query("DELETE FROM daily_activities WHERE day_number = $1", [dayNumber]);
+export async function generateActivitiesForDay(userId: string, dayNumber: number, planDuration: number): Promise<void> {
+  await pool.query("DELETE FROM daily_activities WHERE user_id = $1 AND day_number = $2", [userId, dayNumber]);
 
   const modules = (await pool.query("SELECT * FROM modules ORDER BY order_index, id")).rows;
   const exercises = (await pool.query("SELECT * FROM exercises")).rows;
@@ -350,9 +353,9 @@ export async function generateActivitiesForDay(dayNumber: number, planDuration: 
 
   const insertActivity = async (act: any) => {
     await pool.query(
-      `INSERT INTO daily_activities (day_number, activity_type, activity_id, title, description)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [act.day_number, act.activity_type, act.activity_id, act.title, act.description]
+      `INSERT INTO daily_activities (user_id, day_number, activity_type, activity_id, title, description)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [userId, act.day_number, act.activity_type, act.activity_id, act.title, act.description]
     );
   };
 
@@ -437,13 +440,13 @@ export async function generateActivitiesForDay(dayNumber: number, planDuration: 
   });
 
   const totalActivities = todayModules.length + allExercises.length + relevantMindmaps.length + 3;
-  console.log(`Generated ${totalActivities} activities for day ${dayNumber}`);
+  console.log(`Generated ${totalActivities} activities for user ${userId} on day ${dayNumber}`);
 }
 
-export async function regenerateAllActivities(planDuration: number): Promise<void> {
-  await pool.query("DELETE FROM daily_activities");
+export async function regenerateAllActivities(userId: string, planDuration: number): Promise<void> {
+  await pool.query("DELETE FROM daily_activities WHERE user_id = $1", [userId]);
   for (let day = 1; day <= planDuration; day++) {
-    await generateActivitiesForDay(day, planDuration);
+    await generateActivitiesForDay(userId, day, planDuration);
   }
   console.log(`Regenerated activities for ${planDuration}-day plan`);
 }
@@ -580,39 +583,39 @@ export const queries = {
     (await pool.query("SELECT * FROM plan_days WHERE day_number = $1", [dayNumber])).rows[0],
 
   // Progress
-  getProgress: async (itemType: string, itemId: number) =>
-    (await pool.query("SELECT * FROM progress WHERE item_type = $1 AND item_id = $2", [itemType, itemId])).rows[0],
-  getAllProgress: async () =>
-    (await pool.query("SELECT * FROM progress")).rows,
-  upsertProgress: async (params: any) =>
+  getProgress: async (userId: string, itemType: string, itemId: number) =>
+    (await pool.query("SELECT * FROM progress WHERE user_id = $1 AND item_type = $2 AND item_id = $3", [userId, itemType, itemId])).rows[0],
+  getAllProgress: async (userId: string) =>
+    (await pool.query("SELECT * FROM progress WHERE user_id = $1", [userId])).rows,
+  upsertProgress: async (userId: string, params: any) =>
     await pool.query(
-      `INSERT INTO progress (item_type, item_id, status, completed_at, score, last_seen)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT(item_type, item_id) DO UPDATE SET
-         status = $3, completed_at = $4, score = $5, last_seen = $6`,
-      [params.item_type, params.item_id, params.status, params.completed_at, params.score, params.last_seen]
+      `INSERT INTO progress (user_id, item_type, item_id, status, completed_at, score, last_seen)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT(user_id, item_type, item_id) DO UPDATE SET
+         status = $4, completed_at = $5, score = $6, last_seen = $7`,
+      [userId, params.item_type, params.item_id, params.status, params.completed_at, params.score, params.last_seen]
     ),
-  resetProgress: async () => await pool.query("DELETE FROM progress"),
+  resetProgress: async (userId: string) => await pool.query("DELETE FROM progress WHERE user_id = $1", [userId]),
 
   // Notes
-  getAllNotes: async () =>
-    (await pool.query("SELECT n.*, m.title as module_title FROM notes n LEFT JOIN modules m ON n.module_id = m.id ORDER BY updated_at DESC")).rows,
-  getNoteById: async (id: number) =>
-    (await pool.query("SELECT * FROM notes WHERE id = $1", [id])).rows[0],
-  createNote: async (params: any) => {
+  getAllNotes: async (userId: string) =>
+    (await pool.query("SELECT n.*, m.title as module_title FROM notes n LEFT JOIN modules m ON n.module_id = m.id WHERE n.user_id = $1 ORDER BY updated_at DESC", [userId])).rows,
+  getNoteById: async (userId: string, id: number) =>
+    (await pool.query("SELECT * FROM notes WHERE user_id = $1 AND id = $2", [userId, id])).rows[0],
+  createNote: async (userId: string, params: any) => {
     const result = await pool.query(
-      "INSERT INTO notes (title, body_md, tags, module_id, template_type) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-      [params.title, params.body_md, params.tags, params.module_id, params.template_type]
+      "INSERT INTO notes (user_id, title, body_md, tags, module_id, template_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+      [userId, params.title, params.body_md, params.tags, params.module_id, params.template_type]
     );
     return result.rows[0].id;
   },
-  updateNote: async (params: any) =>
+  updateNote: async (userId: string, params: any) =>
     await pool.query(
-      "UPDATE notes SET title = $1, body_md = $2, tags = $3, module_id = $4, updated_at = NOW() WHERE id = $5",
-      [params.title, params.body_md, params.tags, params.module_id, params.id]
+      "UPDATE notes SET title = $1, body_md = $2, tags = $3, module_id = $4, updated_at = NOW() WHERE user_id = $5 AND id = $6",
+      [params.title, params.body_md, params.tags, params.module_id, userId, params.id]
     ),
-  deleteNote: async (id: number) =>
-    await pool.query("DELETE FROM notes WHERE id = $1", [id]),
+  deleteNote: async (userId: string, id: number) =>
+    await pool.query("DELETE FROM notes WHERE user_id = $1 AND id = $2", [userId, id]),
 
   // Templates
   getAllTemplates: async () => (await pool.query("SELECT * FROM templates")).rows,
@@ -627,29 +630,25 @@ export const queries = {
     )).rows,
 
   // Stats
-  getStats: async () => {
-    const [
-      totalModulesRes,
-      totalExercisesRes,
-      totalFlashcardsRes,
-      completedExercisesRes,
-      completedDaysRes,
-      dueFlashcardsRes
-    ] = await Promise.all([
-      pool.query("SELECT COUNT(*)::int as count FROM modules"),
-      pool.query("SELECT COUNT(*)::int as count FROM exercises"),
-      pool.query("SELECT COUNT(*)::int as count FROM flashcards"),
-      pool.query("SELECT COUNT(*)::int as count FROM progress WHERE item_type = 'exercise' AND status = 'completed'"),
-      pool.query("SELECT COUNT(*)::int as count FROM progress WHERE item_type = 'plan_day' AND status = 'completed'"),
-      pool.query("SELECT COUNT(*)::int as count FROM flashcards WHERE next_review IS NULL OR next_review <= CURRENT_DATE::text")
-    ]);
+  getStats: async (userId: string) => {
+    const query = `
+      SELECT 
+        (SELECT COUNT(*)::int FROM modules) as total_modules,
+        (SELECT COUNT(*)::int FROM exercises) as total_exercises,
+        (SELECT COUNT(*)::int FROM flashcards) as total_flashcards,
+        (SELECT COUNT(*)::int FROM progress WHERE user_id = $1 AND item_type = 'exercise' AND status = 'completed') as completed_exercises,
+        (SELECT COUNT(*)::int FROM progress WHERE user_id = $1 AND item_type = 'plan_day' AND status = 'completed') as completed_days,
+        (SELECT COUNT(*)::int FROM flashcards WHERE next_review IS NULL OR next_review <= CURRENT_DATE::text) as due_flashcards
+    `;
+    const res = await pool.query(query, [userId]);
+    const row = res.rows[0];
 
-    const totalModules = totalModulesRes.rows[0].count;
-    const totalExercises = totalExercisesRes.rows[0].count;
-    const totalFlashcards = totalFlashcardsRes.rows[0].count;
-    const completedExercises = completedExercisesRes.rows[0].count;
-    const completedDays = completedDaysRes.rows[0].count;
-    const dueFlashcards = dueFlashcardsRes.rows[0].count;
+    const totalModules = row.total_modules || 0;
+    const totalExercises = row.total_exercises || 0;
+    const totalFlashcards = row.total_flashcards || 0;
+    const completedExercises = row.completed_exercises || 0;
+    const completedDays = row.completed_days || 0;
+    const dueFlashcards = row.due_flashcards || 0;
 
     return {
       totalModules,
@@ -670,61 +669,68 @@ export const queries = {
       console.log("No session table to truncate yet.");
     }
   },
-  getUserSettings: async () =>
-    (await pool.query("SELECT * FROM user_settings WHERE id = 1")).rows[0] || { plan_duration: 30, current_day: 1 },
-  updateUserSettings: async (params: any) =>
+  getUserSettings: async (userId: string) => {
+    const res = await pool.query("SELECT * FROM user_settings WHERE user_id = $1", [userId]);
+    // Create default settings row if it doesn't exist
+    if (res.rows.length === 0) {
+      await pool.query("INSERT INTO user_settings (user_id, plan_duration, current_day) VALUES ($1, 30, 1) ON CONFLICT(user_id) DO NOTHING", [userId]);
+      return { plan_duration: 30, current_day: 1 };
+    }
+    return res.rows[0];
+  },
+  updateUserSettings: async (userId: string, params: any) =>
     await pool.query(
-      "UPDATE user_settings SET plan_duration = $1, start_date = $2, current_day = $3 WHERE id = 1",
-      [params.plan_duration, params.start_date, params.current_day]
+      "UPDATE user_settings SET plan_duration = $1, start_date = $2, current_day = $3 WHERE user_id = $4",
+      [params.plan_duration, params.start_date, params.current_day, userId]
     ),
-  advanceDay: async () =>
-    await pool.query("UPDATE user_settings SET current_day = current_day + 1 WHERE id = 1"),
-  resetPlan: async (duration: number) => {
-    await pool.query("UPDATE user_settings SET plan_duration = $1, current_day = 1, start_date = $2 WHERE id = 1",
-      [duration, new Date().toISOString().split("T")[0]]);
-    await pool.query("DELETE FROM daily_activities");
-    await pool.query("DELETE FROM reflections");
-    await pool.query("DELETE FROM progress");
+  advanceDay: async (userId: string) =>
+    await pool.query("UPDATE user_settings SET current_day = current_day + 1 WHERE user_id = $1", [userId]),
+  resetPlan: async (userId: string, duration: number) => {
+    await pool.query("UPDATE user_settings SET plan_duration = $1, current_day = 1, start_date = $2 WHERE user_id = $3",
+      [duration, new Date().toISOString().split("T")[0], userId]);
+    await pool.query("DELETE FROM daily_activities WHERE user_id = $1", [userId]);
+    await pool.query("DELETE FROM reflections WHERE user_id = $1", [userId]);
+    await pool.query("DELETE FROM progress WHERE user_id = $1", [userId]);
   },
 
   // Reflections
-  getReflection: async (dayNumber: number) =>
-    (await pool.query("SELECT * FROM reflections WHERE day_number = $1", [dayNumber])).rows[0],
-  getAllReflections: async () =>
-    (await pool.query("SELECT * FROM reflections ORDER BY day_number")).rows,
-  upsertReflection: async (params: any) =>
+  getReflection: async (userId: string, dayNumber: number) =>
+    (await pool.query("SELECT * FROM reflections WHERE user_id = $1 AND day_number = $2", [userId, dayNumber])).rows[0],
+  getAllReflections: async (userId: string) =>
+    (await pool.query("SELECT * FROM reflections WHERE user_id = $1 ORDER BY day_number", [userId])).rows,
+  upsertReflection: async (userId: string, params: any) =>
     await pool.query(
-      `INSERT INTO reflections (day_number, content, updated_at)
-       VALUES ($1, $2, NOW())
-       ON CONFLICT(day_number) DO UPDATE SET content = $2, updated_at = NOW()`,
-      [params.day_number, params.content]
+      `INSERT INTO reflections (user_id, day_number, content, updated_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT(user_id, day_number) DO UPDATE SET content = $3, updated_at = NOW()`,
+      [userId, params.day_number, params.content]
     ),
 
   // Daily Activities
-  getActivitiesForDay: async (dayNumber: number) =>
-    (await pool.query("SELECT * FROM daily_activities WHERE day_number = $1 ORDER BY id", [dayNumber])).rows,
-  getAllActivities: async () =>
-    (await pool.query("SELECT * FROM daily_activities ORDER BY day_number, id")).rows,
-  createActivity: async (params: any) =>
+  getActivitiesForDay: async (userId: string, dayNumber: number) =>
+    (await pool.query("SELECT * FROM daily_activities WHERE user_id = $1 AND day_number = $2 ORDER BY id", [userId, dayNumber])).rows,
+  getAllActivities: async (userId: string) =>
+    (await pool.query("SELECT * FROM daily_activities WHERE user_id = $1 ORDER BY day_number, id", [userId])).rows,
+  createActivity: async (userId: string, params: any) =>
     await pool.query(
-      "INSERT INTO daily_activities (day_number, activity_type, activity_id, title, description) VALUES ($1, $2, $3, $4, $5)",
-      [params.day_number, params.activity_type, params.activity_id, params.title, params.description]
+      "INSERT INTO daily_activities (user_id, day_number, activity_type, activity_id, title, description) VALUES ($1, $2, $3, $4, $5, $6)",
+      [userId, params.day_number, params.activity_type, params.activity_id, params.title, params.description]
     ),
-  completeActivity: async (id: number) =>
-    await pool.query("UPDATE daily_activities SET completed = 1, completed_at = $1 WHERE id = $2",
-      [new Date().toISOString(), id]),
-  uncompleteActivity: async (id: number) =>
-    await pool.query("UPDATE daily_activities SET completed = 0, completed_at = NULL WHERE id = $1", [id]),
-  getDayProgress: async (dayNumber: number) => {
-    const total = (await pool.query("SELECT COUNT(*)::int as count FROM daily_activities WHERE day_number = $1", [dayNumber])).rows[0].count;
-    const completed = (await pool.query("SELECT COUNT(*)::int as count FROM daily_activities WHERE day_number = $1 AND completed = 1", [dayNumber])).rows[0].count;
+  completeActivity: async (userId: string, id: number) =>
+    await pool.query("UPDATE daily_activities SET completed = 1, completed_at = $1 WHERE user_id = $2 AND id = $3",
+      [new Date().toISOString(), userId, id]),
+  uncompleteActivity: async (userId: string, id: number) =>
+    await pool.query("UPDATE daily_activities SET completed = 0, completed_at = NULL WHERE user_id = $1 AND id = $2", [userId, id]),
+  getDayProgress: async (userId: string, dayNumber: number) => {
+    const total = (await pool.query("SELECT COUNT(*)::int as count FROM daily_activities WHERE user_id = $1 AND day_number = $2", [userId, dayNumber])).rows[0].count;
+    const completed = (await pool.query("SELECT COUNT(*)::int as count FROM daily_activities WHERE user_id = $1 AND day_number = $2 AND completed = 1", [userId, dayNumber])).rows[0].count;
     return { total, completed, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 };
   },
-  isDayComplete: async (dayNumber: number) => {
-    const progress = await queries.getDayProgress(dayNumber);
+  isDayComplete: async (userId: string, dayNumber: number) => {
+    const progress = await queries.getDayProgress(userId, dayNumber);
     return progress.total > 0 && progress.completed === progress.total;
   },
-  clearActivities: async () => await pool.query("DELETE FROM daily_activities"),
+  clearActivities: async (userId: string) => await pool.query("DELETE FROM daily_activities WHERE user_id = $1", [userId]),
 };
 
 export default pool;

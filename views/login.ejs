@@ -238,7 +238,10 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
     
     const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Origin': window.location.origin
+      },
       body: JSON.stringify(body),
     });
 

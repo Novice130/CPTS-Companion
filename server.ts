@@ -90,11 +90,19 @@ async function startServer() {
   await queries.clearAllSessions();
 
   // Helper to get common template data
-  async function getCommonData() {
+  async function getCommonData(userId?: string) {
+    if (!userId) {
+      return {
+        stats: { totalModules: 0, totalExercises: 0, totalFlashcards: 0, completedExercises: 0, completedDays: 0, dueFlashcards: 0, overallProgress: 0 },
+        dueCount: 0,
+        nextReview: "None due",
+        settings: { plan_duration: 30, current_day: 1 }
+      };
+    }
     const [stats, dueFlashcards, settings] = await Promise.all([
-      queries.getStats(),
+      queries.getStats(userId),
       queries.getDueFlashcards(),
-      queries.getUserSettings()
+      queries.getUserSettings(userId)
     ]);
     return {
       stats,
@@ -109,25 +117,25 @@ async function startServer() {
   // ============================================
 
   async function softAuth(req: Request, res: Response, next: express.NextFunction) {
-    console.log(`[softAuth] Checking session for ${req.path}`);
-    console.log(`[softAuth] Cookies from express parser:`, req.cookies);
+    console.log(`\n[softAuth] --- Checking session for ${req.path} ---`);
+    console.log(`[softAuth] Raw Cookie Header:`, req.headers.cookie);
     
     try {
       const session = await getSession(req);
-      console.log(`[softAuth] Session result:`, session ? `Valid for ${session.user.email}` : "null");
+      console.log(`[softAuth] getSession() Result:`, session ? `Valid for ${session.user.email}` : "NULL returned");
       
       if (session) {
         (req as any).user = session.user;
         return next();
       }
     } catch (e) {
-      console.error(`[softAuth] Error getting session:`, e);
+      console.error(`[softAuth] ERROR getting session:`, e);
     }
 
     // Track unauthenticated page views using a cookie
     let views = parseInt(req.cookies?.guest_views || "0") + 1;
     console.log(`[softAuth] Guest view count:`, views);
-    res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true });
+    res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true, path: "/" });
 
     if (views >= 5) {
       console.log(`[softAuth] Redirecting to login due to limit (views: ${views})`);
@@ -159,7 +167,7 @@ async function startServer() {
     // so if they login successfully, the counter is reset.
     res.clearCookie("guest_views");
     
-    const common = await getCommonData();
+    const common = await getCommonData(session?.user?.id);
     res.render("login", { ...common, currentPage: "login", user: null });
   });
 
@@ -188,25 +196,25 @@ async function startServer() {
     
     // Fetch initial parallel data
     const [common, modules, allNotes] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllModules(),
-      queries.getAllNotes()
+      user ? queries.getAllNotes(user.id) : Promise.resolve([])
     ]);
     const recentNotes = allNotes.slice(0, 5);
     const settings = common.settings;
 
     const currentDay = settings.current_day || 1;
-    let todayActivities = await queries.getActivitiesForDay(currentDay);
+    let todayActivities = user ? await queries.getActivitiesForDay(user.id, currentDay) : [];
 
-    if ((todayActivities as any[]).length === 0) {
-      await generateActivitiesForDay(currentDay, settings.plan_duration || 30);
-      todayActivities = await queries.getActivitiesForDay(currentDay);
+    if (user && (todayActivities as any[]).length === 0) {
+      await generateActivitiesForDay(user.id, currentDay, settings.plan_duration || 30);
+      todayActivities = await queries.getActivitiesForDay(user.id, currentDay);
     }
 
-    const [dayProgress, reflection] = await Promise.all([
-      queries.getDayProgress(currentDay),
-      queries.getReflection(currentDay)
-    ]);
+    const [dayProgress, reflection] = user ? await Promise.all([
+      queries.getDayProgress(user.id, currentDay),
+      queries.getReflection(user.id, currentDay)
+    ]) : [ { total: 0, completed: 0, percentage: 0 }, null ];
 
     res.render("dashboard", {
       ...common,
@@ -225,7 +233,7 @@ async function startServer() {
   app.get("/plan", softAuth, async (req: Request, res: Response) => {
     const user = (req as any).user;
     const [common, modulesRaw] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllModules()
     ]);
     const settings = common.settings || { plan_duration: 30, current_day: 1 };
@@ -243,10 +251,10 @@ async function startServer() {
         const endModuleIndex = Math.min(startModuleIndex + modulesPerDay, totalModules);
         const todayModules = modules.slice(startModuleIndex, endModuleIndex);
 
-        const [activities, dayProgress] = await Promise.all([
-          queries.getActivitiesForDay(day),
-          queries.getDayProgress(day)
-        ]);
+        const [activities, dayProgress] = user ? await Promise.all([
+          queries.getActivitiesForDay(user.id, day),
+          queries.getDayProgress(user.id, day)
+        ]) : [ [], { total: 0, completed: 0, percentage: 0 } ];
 
         return {
           id: day,
@@ -277,10 +285,11 @@ async function startServer() {
 
   // Modules list
   app.get("/modules", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, modulesRaw, progress] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllModules(),
-      queries.getAllProgress()
+      user ? queries.getAllProgress(user.id) : Promise.resolve([])
     ]);
     let modules = modulesRaw as any[];
 
@@ -320,8 +329,9 @@ async function startServer() {
 
   // Module detail
   app.get("/modules/:id", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, moduleRaw] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getModuleById(parseInt(req.params.id)).then(m => m || queries.getModuleBySlug(req.params.id))
     ]);
     const module = moduleRaw as any;
@@ -337,15 +347,15 @@ async function startServer() {
       queries.getExercisesByModule(module.id),
       queries.getFlashcardsByModule(module.id),
       queries.getMindmapsByModule(module.id),
-      queries.getActivitiesForDay(currentDay)
+      user ? queries.getActivitiesForDay(user.id, currentDay) : Promise.resolve([])
     ]);
     const activities = activitiesRaw as any[];
 
     const moduleActivity = activities.find(
       (a) => a.activity_type === "module" && a.activity_id === module.id
     );
-    if (moduleActivity && !moduleActivity.completed) {
-      await queries.completeActivity(moduleActivity.id);
+    if (user && moduleActivity && !moduleActivity.completed) {
+      await queries.completeActivity(user.id, moduleActivity.id);
     }
 
     function stripHtml(input: string): string {
@@ -459,10 +469,11 @@ async function startServer() {
 
   // Exercises list
   app.get("/exercises", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, exercisesRaw, progress, modules] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllExercises(),
-      queries.getAllProgress(),
+      user ? queries.getAllProgress(user.id) : Promise.resolve([]),
       queries.getAllModules()
     ]);
     let exercises = exercisesRaw as any[];
@@ -506,15 +517,21 @@ async function startServer() {
       modules,
       types,
       filters: { type, module, difficulty },
+      user: (req as any).user,
     });
   });
 
   // Exercise detail
   app.get("/exercises/:id", softAuth, async (req: Request, res: Response) => {
-    const [common, exerciseRaw] = await Promise.all([
-      getCommonData(),
-      queries.getExerciseById(parseInt(req.params.id))
+    const user = (req as any).user;
+    const exerciseId = parseInt(req.params.id);
+    
+    const [common, exerciseRaw, progress] = await Promise.all([
+      getCommonData(user?.id),
+      queries.getExerciseById(exerciseId),
+      user ? queries.getProgress(user.id, "exercise", exerciseId) : Promise.resolve(null)
     ]);
+    
     const exercise = exerciseRaw as any;
 
     if (!exercise) {
@@ -526,9 +543,7 @@ async function startServer() {
     exercise.options = exercise.options ? JSON.parse(exercise.options) : null;
     exercise.hints = exercise.hints ? JSON.parse(exercise.hints) : null;
 
-    const progress = await queries.getProgress("exercise", exercise.id);
-
-    res.render("exercise-detail", { ...common, exercise, progress });
+    res.render("exercise-detail", { ...common, exercise, progress, user });
   });
 
   // Submit exercise answer
@@ -550,48 +565,65 @@ async function startServer() {
         answer.toLowerCase().trim() === exercise.answer.toLowerCase().trim();
     }
 
-    await queries.upsertProgress({
-      item_type: "exercise",
-      item_id: exercise.id,
-      status: isCorrect ? "completed" : "attempted",
-      completed_at: isCorrect ? new Date().toISOString() : null,
-      score: isCorrect ? 100 : 0,
-      last_seen: new Date().toISOString(),
-    });
-
-    if (isCorrect) {
-      const settings = (await queries.getUserSettings()) as any;
-      const currentDay = settings.current_day || 1;
-      const activities = (await queries.getActivitiesForDay(currentDay)) as any[];
-      const exerciseActivity = activities.find(
-        (a) => a.activity_type === "exercise" && a.activity_id === exercise.id
-      );
-      if (exerciseActivity && !exerciseActivity.completed) {
-        await queries.completeActivity(exerciseActivity.id);
-      }
-    }
-
     res.json({
       correct: isCorrect,
       explanation: exercise.explanation,
       correctAnswer: exercise.answer,
     });
+
+    const userId = (req as any).user.id;
+    
+    // Background the database updates to prevent slow Postgres UI blocking
+    (async () => {
+      try {
+        const updateTask = queries.upsertProgress(userId, {
+          item_type: "exercise",
+          item_id: exercise.id,
+          status: isCorrect ? "completed" : "attempted",
+          completed_at: isCorrect ? new Date().toISOString() : null,
+          score: isCorrect ? 100 : 0,
+          last_seen: new Date().toISOString(),
+        });
+
+        if (isCorrect) {
+          // Run the settings/activity lookups concurrently with the upsert
+          const [_, settings] = await Promise.all([
+            updateTask,
+            queries.getUserSettings(userId)
+          ]);
+          const currentDay = (settings as any).current_day || 1;
+          const activities = (await queries.getActivitiesForDay(userId, currentDay)) as any[];
+          const exerciseActivity = activities.find(
+            (a) => a.activity_type === "exercise" && a.activity_id === exercise.id
+          );
+          if (exerciseActivity && !exerciseActivity.completed) {
+            await queries.completeActivity(userId, exerciseActivity.id);
+          }
+        } else {
+          await updateTask;
+        }
+      } catch (err) {
+        console.error("Async exercise progress update failed:", err);
+      }
+    })();
   });
 
   // Mind maps list
   app.get("/mindmaps", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, mindmaps, modules] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllMindmaps(),
       queries.getAllModules()
     ]);
 
-    res.render("mindmaps", { ...common, mindmaps, modules });
+    res.render("mindmaps", { ...common, mindmaps, modules, user: (req as any).user });
   });
 
   // Mind map detail
   app.get("/mindmaps/:id", softAuth, async (req: Request, res: Response) => {
-    const common = await getCommonData();
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
     const mindmap = (await queries.getMindmapById(parseInt(req.params.id))) as any;
 
     if (!mindmap) {
@@ -666,14 +698,16 @@ async function startServer() {
     }
 
     // Auto-complete activity
-    const settings = (await queries.getUserSettings()) as any;
-    const currentDay = settings.current_day || 1;
-    const activities = (await queries.getActivitiesForDay(currentDay)) as any[];
-    const mindmapActivity = activities.find(
-      (a) => a.activity_type === "mindmap" && a.activity_id === mindmap.id
-    );
-    if (mindmapActivity && !mindmapActivity.completed) {
-      await queries.completeActivity(mindmapActivity.id);
+    if (user) {
+      const settings = (await queries.getUserSettings(user.id)) as any;
+      const currentDay = settings.current_day || 1;
+      const activities = (await queries.getActivitiesForDay(user.id, currentDay)) as any[];
+      const mindmapActivity = activities.find(
+        (a) => a.activity_type === "mindmap" && a.activity_id === mindmap.id
+      );
+      if (mindmapActivity && !mindmapActivity.completed) {
+        await queries.completeActivity(user.id, mindmapActivity.id);
+      }
     }
 
     res.render("mindmap-detail", {
@@ -683,29 +717,32 @@ async function startServer() {
       allModules,
       nodeDataMap,
       nodeInfo,
+      user: (req as any).user,
     });
   });
 
   // Flashcards
   app.get("/flashcards", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, flashcards, dueFlashcards, modules] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllFlashcards(),
       queries.getDueFlashcards(),
       queries.getAllModules()
     ]);
 
-    res.render("flashcards", { ...common, flashcards, dueFlashcards, modules });
+    res.render("flashcards", { ...common, flashcards, dueFlashcards, modules, user: (req as any).user });
   });
 
   // Flashcard review
   app.get("/flashcards/review", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, dueFlashcards] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getDueFlashcards()
     ]);
 
-    res.render("flashcard-review", { ...common, flashcards: dueFlashcards });
+    res.render("flashcard-review", { ...common, flashcards: dueFlashcards, user: (req as any).user });
   });
 
   // Submit flashcard review
@@ -729,21 +766,23 @@ async function startServer() {
 
   // Notes
   app.get("/notes", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const [common, notes, templates, modules] = await Promise.all([
-      getCommonData(),
-      queries.getAllNotes(),
+      getCommonData(user?.id),
+      user ? queries.getAllNotes(user.id) : Promise.resolve([]),
       queries.getAllTemplates(),
       queries.getAllModules()
     ]);
 
-    res.render("notes", { ...common, notes, templates, modules });
+    res.render("notes", { ...common, notes, templates, modules, user });
   });
 
   // New note form
   app.get("/notes/new", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const templateId = req.query.template;
     const [common, templates, modules, template] = await Promise.all([
-      getCommonData(),
+      getCommonData(user?.id),
       queries.getAllTemplates(),
       queries.getAllModules(),
       templateId ? queries.getTemplateById(parseInt(templateId as string)) : Promise.resolve(null)
@@ -755,13 +794,15 @@ async function startServer() {
       templates,
       modules,
       template,
+      user,
     });
   });
 
   // Edit note
   app.get("/notes/:id/edit", requireAuth, async (req: Request, res: Response) => {
-    const common = await getCommonData();
-    const note = await queries.getNoteById(parseInt(req.params.id));
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    const note = await queries.getNoteById(user.id, parseInt(req.params.id));
     const templates = await queries.getAllTemplates();
     const modules = await queries.getAllModules();
 
@@ -777,13 +818,15 @@ async function startServer() {
       templates,
       modules,
       template: null,
+      user,
     });
   });
 
   // View note
   app.get("/notes/:id", softAuth, async (req: Request, res: Response) => {
-    const common = await getCommonData();
-    const note = await queries.getNoteById(parseInt(req.params.id));
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    const note = user ? await queries.getNoteById(user.id, parseInt(req.params.id)) : null;
 
     if (!note) {
       return res
@@ -791,18 +834,19 @@ async function startServer() {
         .render("error", { ...common, message: "Note not found" });
     }
 
-    res.render("note-view", { ...common, note });
+    res.render("note-view", { ...common, note, user });
   });
 
   // Create note
   app.post("/notes", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const { title, body_md, tags, module_id, template_type } = req.body;
 
     if (!title || typeof title !== 'string' || title.trim() === '') {
       return res.status(400).send("Bad Request: Title is required.");
     }
 
-    const lastId = await queries.createNote({
+    const lastId = await queries.createNote(user.id, {
       title: title.substring(0, 200), // sanitize max length
       body_md,
       tags: tags ? String(tags).substring(0, 100) : null,
@@ -816,13 +860,14 @@ async function startServer() {
 
   // Update note
   app.post("/notes/:id", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const { title, body_md, tags, module_id } = req.body;
 
     if (!title || typeof title !== 'string' || title.trim() === '') {
       return res.status(400).send("Bad Request: Title is required.");
     }
 
-    await queries.updateNote({
+    await queries.updateNote(user.id, {
       id: parseInt(req.params.id),
       title: title.substring(0, 200), // sanitize max length
       body_md,
@@ -836,14 +881,16 @@ async function startServer() {
 
   // Delete note
   app.post("/notes/:id/delete", requireAuth, async (req: Request, res: Response) => {
-    await queries.deleteNote(parseInt(req.params.id));
+    const user = (req as any).user;
+    await queries.deleteNote(user.id, parseInt(req.params.id));
     await buildSearchIndex();
     res.redirect(`/notes`);
   });
 
   // Search
-  app.get("/search", requireAuth, async (req: Request, res: Response) => {
-    const common = await getCommonData();
+  app.get("/search", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
     const query = req.query.q as string;
 
     let results: any[] = [];
@@ -855,36 +902,40 @@ async function startServer() {
       }
     }
 
-    res.render("search", { ...common, query, results });
+    res.render("search", { ...common, query, results, user });
   });
 
   // Settings
   app.get("/settings", requireAuth, async (req: Request, res: Response) => {
-    const common = await getCommonData();
-    const settings = await queries.getUserSettings();
-    res.render("settings", { ...common, settings });
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    const settings = await queries.getUserSettings(user.id);
+    res.render("settings", { ...common, settings, user });
   });
 
   // Reset progress
   app.post("/api/settings/reset-progress", requireAuth, async (req: Request, res: Response) => {
-    await queries.resetProgress();
+    const user = (req as any).user;
+    await queries.resetProgress(user.id);
     res.json({ success: true });
   });
 
   // Export data
   app.get("/api/export", requireAuth, async (req: Request, res: Response) => {
-    const notes = await queries.getAllNotes();
-    const progress = await queries.getAllProgress();
+    const user = (req as any).user;
+    const notes = await queries.getAllNotes(user.id);
+    const progress = await queries.getAllProgress(user.id);
     res.json({ notes, progress, exportedAt: new Date().toISOString() });
   });
 
   // Import data
   app.post("/api/import", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const { notes, progress } = req.body;
 
     if (notes && Array.isArray(notes)) {
       for (const note of notes) {
-        await queries.createNote({
+        await queries.createNote(user.id, {
           title: note.title,
           body_md: note.body_md,
           tags: note.tags,
@@ -900,13 +951,14 @@ async function startServer() {
 
   // Mark plan day complete
   app.post("/api/plan/:dayId/toggle", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const dayId = parseInt(req.params.dayId);
-    const current = (await queries.getProgress("plan_day", dayId)) as any;
+    const current = (await queries.getProgress(user.id, "plan_day", dayId)) as any;
 
     const newStatus =
       current?.status === "completed" ? "not_started" : "completed";
 
-    await queries.upsertProgress({
+    await queries.upsertProgress(user.id, {
       item_type: "plan_day",
       item_id: dayId,
       status: newStatus,
@@ -920,31 +972,33 @@ async function startServer() {
 
   // Toggle activity completion
   app.post("/api/activities/:id/toggle", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const activityId = parseInt(req.params.id);
     const { completed } = req.body;
 
     if (completed) {
-      await queries.completeActivity(activityId);
+      await queries.completeActivity(user.id, activityId);
     } else {
-      await queries.uncompleteActivity(activityId);
+      await queries.uncompleteActivity(user.id, activityId);
     }
 
-    const settings = (await queries.getUserSettings()) as any;
-    const dayComplete = await queries.isDayComplete(settings.current_day);
+    const settings = (await queries.getUserSettings(user.id)) as any;
+    const dayComplete = await queries.isDayComplete(user.id, settings.current_day);
 
     res.json({ success: true, dayComplete });
   });
 
   // Advance to next day
   app.post("/api/plan/advance-day", requireAuth, async (req: Request, res: Response) => {
-    const settings = (await queries.getUserSettings()) as any;
+    const user = (req as any).user;
+    const settings = (await queries.getUserSettings(user.id)) as any;
     const currentDay = settings.current_day || 1;
     const planDuration = settings.plan_duration || 30;
 
     if (currentDay < planDuration) {
       const newDay = currentDay + 1;
-      await queries.advanceDay();
-      await generateActivitiesForDay(newDay, planDuration);
+      await queries.advanceDay(user.id);
+      await generateActivitiesForDay(user.id, newDay, planDuration);
       res.json({ success: true, newDay });
     } else {
       res.json({ success: false, message: "Plan completed!" });
@@ -953,10 +1007,11 @@ async function startServer() {
 
   // Save reflection
   app.post("/api/reflections/:day", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const dayNumber = parseInt(req.params.day);
     const { content } = req.body;
 
-    await queries.upsertReflection({
+    await queries.upsertReflection(user.id, {
       day_number: dayNumber,
       content: content || "",
     });
@@ -966,20 +1021,22 @@ async function startServer() {
 
   // Change plan duration
   app.post("/api/settings/plan-duration", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const { duration } = req.body;
 
     if (![30, 60, 90, 180].includes(duration)) {
       return res.status(400).json({ error: "Invalid duration" });
     }
 
-    await queries.resetPlan(duration);
-    await generateActivitiesForDay(1, duration);
+    await queries.resetPlan(user.id, duration);
+    await generateActivitiesForDay(user.id, 1, duration);
 
     res.json({ success: true, duration });
   });
 
   // API: Searchable items for command palette
   app.get("/api/search-items", requireAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
     const modules = (await queries.getAllModules()).map((m: any) => ({
       type: "module",
       title: m.title,
@@ -1000,7 +1057,7 @@ async function startServer() {
       url: `/mindmaps/${m.id}`,
     }));
 
-    const notes = (await queries.getAllNotes()).map((n: any) => ({
+    const notes = (await queries.getAllNotes(user.id)).map((n: any) => ({
       type: "note",
       title: n.title,
       url: `/notes/${n.id}`,
@@ -1023,8 +1080,9 @@ async function startServer() {
 
   // Error handling
   app.use(async (req: Request, res: Response) => {
-    const common = await getCommonData();
-    res.status(404).render("error", { ...common, message: "Page not found" });
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.status(404).render("error", { ...common, message: "Page not found", user });
   });
 
   // Start server

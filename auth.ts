@@ -35,6 +35,7 @@ export const auth = betterAuth({
     useSecureCookies: process.env.NODE_ENV === "production",
   },
   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [],
+  baseURL: process.env.NODE_ENV === "production" ? process.env.BETTER_AUTH_URL : "http://localhost:3000",
 });
 
 // Middleware to get current user from session

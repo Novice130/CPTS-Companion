@@ -47,7 +47,49 @@ export const auth = betterAuth({
 
 ---
 
-## 3. The "Infinite Login Loop" (Session Cookie Parsing)
+### 2. EJS Template Rendering Masking Valid Sessions ("Ghost Logouts")
+**Problem:** Users would successfully log in, see their identity on the Dashboard, but immediately appear "logged out" (shown a guest login prompt curtain) when navigating to `/exercises` or `/mindmaps`. Navigating back to the Dashboard instantly "restored" the session without requiring a re-login. Extensive debugging suspected cookie path dropping or `fetch` credentials overriding the session.
+**Root Cause:** The `better-auth` session was perfectly valid and persisting in the browser. However, on specific Express routes like `app.get("/exercises")`, the route handler compiled data using a generic `getCommonData()` helper and completely forgot to inject `user: req.user` into the `res.render()` context object. Because EJS templates strictly check `if (user)` to display the authenticated header, the UI assumed the user was a guest simply because the backend forgot to tell the frontend who was logged in.
+**Fix:** We audited `server.ts` and injected `user: (req as any).user` into every single `res.render()` pipeline (Exercises, Mindmaps, Notes, Search, Settings, Flashcards, and Error routes), ensuring the sidebar and topbar always receive the session state.
+**Lesson:** Visual "logout" bugs in monolithic template apps are not always authentication failures. If a session instantly "restores" on another page, verify that the active route handler is actually passing the `user` context down to the view engine.
+
+### 3. Path-Isolated Cookie Scope Default
+**Problem:** The session cookie wasn't automatically propagating to all nested URL paths `(/exercises/123)` resulting in 401s on initial testing.
+**The Cause:** Modern browsers restrict cookies strictly by `path`, `domain`, and `sameSite` policies. If Better Auth sets the session path ambiguously during login, the browser may refuse to send the session cookie to deeper sub-routes.
+**The Fix:**
+Explicitly force Better Auth's `defaultCookieAttributes` to enforce the absolute root path `/`.
+
+```typescript
+// auth.ts
+export const auth = betterAuth({
+  session: { /* ... */ },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/", // <--- CRITICAL FIX: Forces cookie to work across ALL sub-routes
+    },
+    useSecureCookies: process.env.NODE_ENV === "production",
+  }
+});
+```
+
+---
+
+### 4. Google OAuth `redirect_uri_mismatch` (Local vs. Production)
+**The Problem:** Google Login fails with an "Access blocked" screen and Error 400: `redirect_uri_mismatch` when testing on `localhost:3000`.
+**The Cause:** Better Auth generates a specific callback URL (e.g., `http://localhost:3000/api/auth/callback/google`). If this exact string is not whitelisted in the Google Cloud Console "Authorized redirect URIs" for the Client ID, Google will reject the request.
+**The Fix:**
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Select your project and navigate to **APIs & Services > Credentials**.
+3. Edit your OAuth 2.0 Client ID.
+4. Add `http://localhost:3000/api/auth/callback/google` to the **Authorized redirect URIs** list.
+5. Save changes (might take a few minutes to propagate).
+**Lesson:** Always maintain separate whitelists for local (`localhost:3000`) and production (`cpts.learnnovice.com`) within the same Google project or use separate projects for dev/prod.
+
+---
+
+## 5. The "Infinite Login Loop" (Session Cookie Parsing)
 **The Problem:** Even after successful authentication via Google, the server would forget the user session immediately. Navigating to any protected page resulted in being kicked back to the login screen over and over.
 **The Cause:** Express's `req.headers` object acts differently than standard Web APIs. Using the native Web `new Headers(req.headers)` in Node.js strips or incorrectly parses the `cookie` header. Better Auth could not see the session token cookie we just set.
 **The Fix:**
@@ -122,6 +164,35 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ---
 
+## 8. Multi-Tenant Data Isolation & Query Scoping
+**The Problem:** Newly registered test users were seeing the progress, notes, and reflections of previously active accounts. The application functioned essentially as a global shared whiteboard.
+**The Cause:** While Better Auth successfully provisioned separate `user` accounts, the underlying core domain tables (`progress`, `notes`, `daily_activities`, `user_settings`) lacked a `user_id` foreign key. Furthermore, the `db.ts` queries did not accept or filter by a specific user.
+**The Fix:** 
+1. `ALTER TABLE` to add `user_id TEXT REFERENCES "user"(id) ON DELETE CASCADE` to all user-configurable tables.
+2. Update all queries in `db.ts` to demand a `userId: string` parameter and filter via `WHERE user_id = $1`.
+3. Read the `user.id` from the active session (`req.user.id`) in the Express route handlers and pass it down to the database operations.
+**Lesson:** When migrating a single-player SQLite application to a multi-tenant PostgreSQL cloud architecture, strictly scoping the database queries via a Foreign Key is an absolute baseline requirement.
+
+---
+
+## 9. Silent Backend Crashes (`ERR_CONNECTION_REFUSED`)
+**The Problem:** Checking off an exercise answer completely crashed the backend server, forcing a `localhost refused to connect` screen upon the next click.
+**The Cause:** During the multi-tenant refactor, replacing the local single-user query with the scoped query (`queries.upsertProgress(userId, ...)`) was missed in the `POST /api/exercises/:id/submit` router handler. Because an expected variable was undefined, Node's database driver threw an unhandled Promise Rejection, which fatally killed the entire `ts-node` instance.
+**The Fix:**
+Always ensure the Express request object successfully negotiates the session authentication and extracts the valid ID (`const userId = req.user.id;`) before attempting to write to PostgreSQL. 
+
+---
+
+## 10. The Perceived "Latency" Problem and SPA Routing
+**The Problem:** Pressing "Next Question" felt sluggish because each press sequentially fired 6 distinct `COUNT()` queries to Postgres over the network, wait to compile the EJS template, and reload the browser DOM completely.
+**The Cause:** Standard monolithic SSR (Server-Side Rendered) HTML templates destroy and re-download identical layout components (sidebars, CSS) upon every route change.
+**The Fix:**
+1. **Query Consolidation:** Combined 6 distinct `pool.query` reads in `getStats()` down to a single compound `SELECT` query utilizing nested subqueries.
+2. **Transparent SPA Prefetching:** Injected a PJAX script that quietly pre-fetches the subsequent exercise URLs in the background and hot-swaps the core `<main>` element using `DOMParser()` and `history.pushState()`.
+**Lesson:** Don't rebuild SPA functionality strictly with React; vanilla JS fetch swapping (`PJAX`) is incredibly fast and preserves backend server-side templating infrastructure while granting zero-latency transitions.
+
+---
+
 ## Summary Stack Checklist for Future Deployments:
 - [ ] Connect Neon Postgres URI correctly without local SSL overrides if required.
 - [ ] Generate secure, random `BETTER_AUTH_SECRET`.
@@ -131,3 +202,5 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - [ ] Use `fromNodeHeaders` for ALL session fetching on the server.
 - [ ] Explicitly configure `advanced.defaultCookieAttributes.path = "/"` in Better Auth.
 - [ ] Verify HTML `<head>` and stylesheet link injection on standalone .ejs files.
+- [ ] Ensure `user_id` Foreign Keys are scoped on all non-global entity tables.
+- [ ] Validate unhandled Promise Rejections are caught in POST routes to prevent hard server crashing.

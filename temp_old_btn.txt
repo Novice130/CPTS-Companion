@@ -1,0 +1,2 @@
+    <a href="#" id="google-signin-btn"
+       onclick="event.preventDefault(); fetch('/api/auth/sign-in/social', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: 'google', callbackURL: window.location.origin + '/' }) }).then(r => r.json()).then(d => { if(d.url) window.location.href = d.url; else alert('Google login failed'); }).catch(e => alert('Network error'));"

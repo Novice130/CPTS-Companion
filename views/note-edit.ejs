@@ -23,8 +23,7 @@
       </div>
       
       <h1><%= note ? 'Edit Note' : 'Create New Note' %></h1>
-      
-      <form action="<%= note ? basePath + '/notes/' + note.id : basePath + '/notes' %>" method="POST">
+      <form action="<%= note ? '/notes/' + note.id : '/notes' %>" method="POST">
         <div class="panel">
           <div class="panel-body">
             <div class="form-group">

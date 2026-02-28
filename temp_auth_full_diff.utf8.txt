@@ -1,0 +1,125 @@
+﻿commit f5e4e7a4a81fd02fc6b278147a0ab4b93a1efd38
+Author: Novice <learnnovice130@gmail.com>
+Date:   Sat Feb 28 17:44:40 2026 +0530
+
+    feat(auth): fix cross-route session isolation and completely redesign login page
+
+diff --git a/auth.ts b/auth.ts
+index ac6b673..2abd87b 100644
+--- a/auth.ts
++++ b/auth.ts
+@@ -27,7 +27,12 @@ export const auth = betterAuth({
+     updateAge: 60 * 60 * 24,     // refresh every 24h
+   },
+   advanced: {
+-    disableTablesCheck: true,       // Our tables are created by initDatabase()
++    defaultCookieAttributes: {
++      sameSite: "lax",
++      secure: process.env.NODE_ENV === "production",
++      path: "/",
++    },
++    useSecureCookies: process.env.NODE_ENV === "production",
+   },
+   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [],
+ });
+
+commit a234f8cdd7ca9b36eb9793db6e136198eef5fcd3
+Author: Novice <learnnovice130@gmail.com>
+Date:   Sat Feb 28 16:36:16 2026 +0530
+
+    fix(auth): use fromNodeHeaders for reliable session parsing in Express
+
+diff --git a/auth.ts b/auth.ts
+index 42b5807..ac6b673 100644
+--- a/auth.ts
++++ b/auth.ts
+@@ -33,10 +33,12 @@ export const auth = betterAuth({
+ });
+ 
+ // Middleware to get current user from session
++import { fromNodeHeaders } from "better-auth/node";
++
+ export async function getSession(req: any) {
+   try {
+     const session = await auth.api.getSession({
+-      headers: new Headers(req.headers),
++      headers: fromNodeHeaders(req.headers),
+     });
+     return session;
+   } catch {
+
+commit bc7ecb7ae7b8cbe471e5c5cb5f4b664f0b6f968a
+Author: Novice <learnnovice130@gmail.com>
+Date:   Fri Feb 27 12:25:39 2026 +0530
+
+    fix: add trust proxy and trusted origins for dokploy deployment
+
+diff --git a/auth.ts b/auth.ts
+index 953cc48..42b5807 100644
+--- a/auth.ts
++++ b/auth.ts
+@@ -29,6 +29,7 @@ export const auth = betterAuth({
+   advanced: {
+     disableTablesCheck: true,       // Our tables are created by initDatabase()
+   },
++  trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [],
+ });
+ 
+ // Middleware to get current user from session
+
+commit 0be152fd12c3af32007db8c45dcceeeca1df5d2a
+Author: Novice <learnnovice130@gmail.com>
+Date:   Fri Feb 27 10:37:48 2026 +0530
+
+    converting from page to sub domain and also betterauth, neon
+
+diff --git a/auth.ts b/auth.ts
+new file mode 100644
+index 0000000..953cc48
+--- /dev/null
++++ b/auth.ts
+@@ -0,0 +1,44 @@
++import "dotenv/config";
++import { betterAuth } from "better-auth";
++import pg from "pg";
++
++// We create the pool once and reuse it
++const authPool = new pg.Pool({
++  connectionString: process.env.DATABASE_URL,
++  ssl: { rejectUnauthorized: false },
++  max: 5,
++});
++
++// Better Auth configuration
++// Docs: https://www.better-auth.com/docs
++export const auth = betterAuth({
++  database: authPool,
++  emailAndPassword: {
++    enabled: true,
++  },
++  socialProviders: {
++    google: {
++      clientId: process.env.GOOGLE_CLIENT_ID || "",
++      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
++    },
++  },
++  session: {
++    expiresIn: 60 * 60 * 24 * 7, // 7 days
++    updateAge: 60 * 60 * 24,     // refresh every 24h
++  },
++  advanced: {
++    disableTablesCheck: true,       // Our tables are created by initDatabase()
++  },
++});
++
++// Middleware to get current user from session
++export async function getSession(req: any) {
++  try {
++    const session = await auth.api.getSession({
++      headers: new Headers(req.headers),
++    });
++    return session;
++  } catch {
++    return null;
++  }
++}

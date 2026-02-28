@@ -10,7 +10,7 @@ let selectedIndex = 0;
 // Fetch searchable items
 async function loadSearchItems() {
   try {
-    const res = await fetch('/api/search-items');
+    const res = await fetch('/api/search-items', { credentials: 'include' });
     searchItems = await res.json();
   } catch (err) {
     console.error('Failed to load search items:', err);
