@@ -29,13 +29,13 @@ export const auth = betterAuth({
   advanced: {
     defaultCookieAttributes: {
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: !!process.env.BETTER_AUTH_URL && process.env.BETTER_AUTH_URL.startsWith("https"),
       path: "/",
     },
-    useSecureCookies: process.env.NODE_ENV === "production",
+    useSecureCookies: !!process.env.BETTER_AUTH_URL && process.env.BETTER_AUTH_URL.startsWith("https"),
   },
   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [],
-  baseURL: process.env.NODE_ENV === "production" ? process.env.BETTER_AUTH_URL : "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 });
 
 // Middleware to get current user from session
