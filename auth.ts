@@ -27,7 +27,12 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,     // refresh every 24h
   },
   advanced: {
-    disableTablesCheck: true,       // Our tables are created by initDatabase()
+    defaultCookieAttributes: {
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    },
+    useSecureCookies: process.env.NODE_ENV === "production",
   },
   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [],
 });
