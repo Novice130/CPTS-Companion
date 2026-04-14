@@ -1,0 +1,137 @@
+<% const pageTitle = 'CPTS Learning Path'; %>
+<%- contentFor('body') %>
+
+<style>
+.path-header { margin-bottom: 2rem; }
+.path-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.path-progress-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.path-progress-ring svg { transform: rotate(-90deg); }
+.path-progress-center { position: absolute; text-align: center; }
+.path-progress-pct { font-size: 1.5rem; font-weight: 700; font-family: var(--font-mono); color: var(--htb-green); display: block; }
+.path-progress-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.path-share-bar { display: flex; gap: 0.75rem; margin-top: 1rem; }
+.path-category { margin-bottom: 2rem; }
+.path-cat-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 6px; }
+.path-cat-name { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-primary); font-weight: 600; flex: 1; }
+.path-cat-progress { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
+.path-cat-bar { width: 100px; height: 4px; background: var(--htb-border); border-radius: 2px; overflow: hidden; }
+.path-cat-fill { height: 100%; background: var(--htb-green); border-radius: 2px; transition: width 1s ease; }
+.path-modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.6rem; }
+.path-module { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 8px; transition: border-color 0.15s; text-decoration: none; }
+.path-module:hover { border-color: var(--htb-green); }
+.path-module.completed { border-color: var(--htb-green); background: rgba(127,209,100,0.04); }
+.path-module.in-progress { border-color: #f59e0b; background: rgba(245,158,11,0.04); }
+.path-module-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
+.path-module-icon.done { background: var(--htb-green); color: #000; }
+.path-module-icon.active { background: #f59e0b; color: #000; }
+.path-module-icon.todo { background: var(--htb-border); color: var(--text-muted); }
+.path-module-text { flex: 1; min-width: 0; }
+.path-module-title { font-size: 0.8rem; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.path-module-cat { font-size: 0.65rem; color: var(--text-muted); font-family: var(--font-mono); }
+.path-module-order { font-size: 0.65rem; color: var(--text-muted); font-family: var(--font-mono); flex-shrink: 0; }
+.share-card { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; }
+.share-preview { background: var(--htb-bg); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1.25rem; font-family: var(--font-mono); font-size: 0.8rem; margin: 1rem 0; }
+.share-preview .sp-title { color: var(--htb-green); font-size: 1rem; margin-bottom: 0.5rem; }
+.share-preview .sp-bar { height: 8px; background: var(--htb-border); border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+.share-preview .sp-fill { height: 100%; background: var(--htb-green); border-radius: 4px; }
+.share-preview .sp-stat { color: var(--text-muted); margin-top: 0.5rem; }
+</style>
+
+<div class="path-header">
+  <div class="path-hero">
+    <div>
+      <h1 class="page-title"><span style="color:var(--htb-green)">></span> CPTS Learning Path</h1>
+      <p class="page-subtitle">Your complete journey through all <%= modules ? modules.length : 40 %> CPTS modules.</p>
+    </div>
+    <div class="path-progress-ring">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--htb-border)" stroke-width="6"/>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--htb-green)" stroke-width="6"
+          stroke-dasharray="<%= Math.round(2 * Math.PI * 42) %>"
+          stroke-dashoffset="<%= Math.round(2 * Math.PI * 42 * (1 - (stats ? stats.overallProgress : 0) / 100)) %>"
+          stroke-linecap="round"/>
+      </svg>
+      <div class="path-progress-center">
+        <span class="path-progress-pct"><%= stats ? stats.overallProgress : 0 %>%</span>
+        <span class="path-progress-label">Done</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (user) { %>
+<div class="share-card">
+  <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--htb-green); margin-bottom:0.5rem;">// SHARE YOUR PROGRESS</div>
+  <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.75rem;">Copy this shareable card to Twitter/X, Discord, or LinkedIn to show your CPTS progress.</p>
+  <div class="share-preview">
+    <div class="sp-title">CPTS Companion Progress — <%= user.name || user.email %></div>
+    <div style="color:var(--text-muted); font-size:0.75rem;">Modules: <%= stats ? stats.completedModules : 0 %>/<%= modules ? modules.length : 40 %> completed</div>
+    <div class="sp-bar"><div class="sp-fill" style="width:<%= stats ? stats.overallProgress : 0 %>%"></div></div>
+    <div class="sp-stat">Exercises: <%= stats ? stats.completedExercises : 0 %> solved | Progress: <%= stats ? stats.overallProgress : 0 %>%</div>
+    <div style="color:var(--htb-green); margin-top:0.5rem; font-size:0.7rem;">cpts.learnnovice.com — Study smarter, pass CPTS.</div>
+  </div>
+  <button class="btn btn-sm" onclick="copyShareText()">Copy Share Text</button>
+</div>
+<% } %>
+
+<%
+// Group modules by category
+const categoryOrder = ['Fundamentals','Enumeration','Web','Exploitation','Post-Exploitation','Active Directory','Privilege Escalation','Assessments'];
+const grouped = {};
+if (modules) {
+  modules.forEach(m => {
+    const cat = m.category || 'Other';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(m);
+  });
+}
+const progressMap = {};
+if (progress) {
+  progress.forEach(p => { progressMap[p.item_id] = p; });
+}
+%>
+
+<% categoryOrder.forEach(cat => {
+  if (!grouped[cat]) return;
+  const catMods = grouped[cat];
+  const completed = catMods.filter(m => progressMap[m.id] && progressMap[m.id].completed).length;
+  const pct = catMods.length ? Math.round(completed / catMods.length * 100) : 0;
+%>
+<div class="path-category">
+  <div class="path-cat-header">
+    <span class="path-cat-name">// <%= cat %></span>
+    <div class="path-cat-bar">
+      <div class="path-cat-fill" style="width:<%= pct %>%"></div>
+    </div>
+    <span class="path-cat-progress"><%= completed %>/<%= catMods.length %></span>
+  </div>
+  <div class="path-modules">
+    <% catMods.sort((a,b) => (a.order_index||0) - (b.order_index||0)).forEach(m => {
+      const prog = progressMap[m.id];
+      const isComplete = prog && prog.completed;
+      const isStarted = prog && !prog.completed;
+    %>
+    <a href="/modules/<%= m.slug || m.id %>" class="path-module <%= isComplete ? 'completed' : isStarted ? 'in-progress' : '' %>">
+      <div class="path-module-icon <%= isComplete ? 'done' : isStarted ? 'active' : 'todo' %>">
+        <%= isComplete ? '✓' : isStarted ? '▶' : (m.order_index || '') %>
+      </div>
+      <div class="path-module-text">
+        <div class="path-module-title"><%= m.title %></div>
+        <div class="path-module-cat"><%= m.slug %></div>
+      </div>
+    </a>
+    <% }) %>
+  </div>
+</div>
+<% }) %>
+
+<script>
+function copyShareText() {
+  const text = `🎯 CPTS Companion Progress Update\n\nModules: <%= stats ? stats.completedModules : 0 %>/<%= modules ? modules.length : 40 %> completed\nProgress: <%= stats ? stats.overallProgress : 0 %>%\nExercises solved: <%= stats ? stats.completedExercises : 0 %>\n\nStudying for HTB CPTS at cpts.learnnovice.com\n#CPTS #HTB #CyberSecurity #PenTest`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('[onclick="copyShareText()"]');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Share Text', 2000);
+  });
+}
+</script>

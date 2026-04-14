@@ -1,0 +1,322 @@
+<% const pageTitle = module.title + ' — Learn'; %>
+<link rel="stylesheet" href="/css/module-learn.css">
+
+<!-- Learning Flow Progress Bar -->
+<div class="learn-progress" id="learnProgress">
+  <div class="learn-progress-steps">
+    <button class="learn-step active" data-step="1" id="stepBtn1">
+      <span class="step-num">1</span>
+      <span class="step-label">Concept</span>
+    </button>
+    <div class="step-connector"><div class="step-connector-fill" id="conn12"></div></div>
+    <button class="learn-step" data-step="2" id="stepBtn2">
+      <span class="step-num">2</span>
+      <span class="step-label">Cheatsheet</span>
+    </button>
+    <div class="step-connector"><div class="step-connector-fill" id="conn23"></div></div>
+    <button class="learn-step" data-step="3" id="stepBtn3">
+      <span class="step-num">3</span>
+      <span class="step-label">Exercise</span>
+    </button>
+    <div class="step-connector"><div class="step-connector-fill" id="conn34"></div></div>
+    <button class="learn-step" data-step="4" id="stepBtn4">
+      <span class="step-num">4</span>
+      <span class="step-label">Flashcards</span>
+    </button>
+    <div class="step-connector"><div class="step-connector-fill" id="conn45"></div></div>
+    <button class="learn-step" data-step="5" id="stepBtn5">
+      <span class="step-num">5</span>
+      <span class="step-label">Complete</span>
+    </button>
+  </div>
+</div>
+
+<!-- All 5 step panels -->
+<div class="learn-steps-container" id="learnSteps">
+
+  <!-- ========== STEP 1: Concept Introduction (Animated Explainer) ========== -->
+  <div class="learn-panel active" id="step1" data-step="1">
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title"><span class="panel-title-icon">></span> <%= module.title %></h3>
+        <span class="chip"><%= module.category %></span>
+      </div>
+      <div class="panel-body">
+        <!-- Animated Visual -->
+        <div class="concept-animation" id="conceptAnimation">
+          <div class="anim-viewport" id="animViewport">
+            <!-- Category-specific animation rendered by JS -->
+            <svg class="concept-svg" id="conceptSvg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <filter id="termGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <g id="animGroup"></g>
+            </svg>
+            <div class="anim-controls">
+              <button class="anim-btn" id="animPlayPause" title="Play/Pause">
+                <span id="animPlayIcon">||</span>
+              </button>
+              <div class="anim-progress-track">
+                <div class="anim-progress-bar" id="animProgressBar"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Narration text synced to animation -->
+          <div class="anim-narration" id="animNarration">
+            <p id="narrationText">Loading concept animation...</p>
+          </div>
+        </div>
+
+        <!-- Concept explanation text -->
+        <div class="concept-text" id="conceptText">
+          <% if (module.summary) { %>
+            <p><%= module.summary %></p>
+          <% } %>
+        </div>
+
+        <div class="step-nav">
+          <div></div>
+          <button class="btn btn-primary" id="toStep2" onclick="goToStep(2)">
+            I understand, show me the commands <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 2: Interactive Cheatsheet ========== -->
+  <div class="learn-panel" id="step2" data-step="2">
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title"><span class="panel-title-icon">$</span> Command Reference</h3>
+      </div>
+      <div class="panel-body">
+        <% if (module.cheatsheet_md) { %>
+          <div class="interactive-cheatsheet" id="interactiveCheatsheet">
+            <!-- JS will parse cheatsheet_md and render interactive command blocks -->
+          </div>
+          <!-- Raw cheatsheet data for JS parsing -->
+          <script type="text/template" id="cheatsheetRaw"><%- module.cheatsheet_md %></script>
+        <% } else { %>
+          <div class="empty-state">
+            <p>No cheatsheet available for this module yet.</p>
+          </div>
+        <% } %>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToStep(1)"><span class="btn-arrow"><-</span> Back to Concept</button>
+          <button class="btn btn-primary" onclick="goToStep(3)">
+            Practice with exercises <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 3: Guided Exercise (Terminal Emulator) ========== -->
+  <div class="learn-panel" id="step3" data-step="3">
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title"><span class="panel-title-icon">#</span> Guided Exercise</h3>
+        <div class="exercise-progress-mini">
+          Step <span id="exerciseStepCurrent">1</span> of <span id="exerciseStepTotal"><%= exercises.length || 5 %></span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <!-- Exercise progress bar -->
+        <div class="exercise-bar">
+          <div class="exercise-bar-fill" id="exerciseBarFill" style="width: 0%"></div>
+        </div>
+
+        <!-- Scenario description -->
+        <div class="scenario-box" id="scenarioBox">
+          <% if (exercises.length > 0) { %>
+            <p class="scenario-text" id="scenarioText"><%- sanitize(exercises[0].prompt) %></p>
+          <% } else { %>
+            <p class="scenario-text">No exercises available for this module yet. Skip to flashcards.</p>
+          <% } %>
+        </div>
+
+        <!-- Terminal Emulator -->
+        <div class="fake-terminal" id="fakeTerminal">
+          <div class="terminal-chrome">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">student@cpts-lab:~</span>
+          </div>
+          <div class="terminal-output" id="terminalOutput">
+            <div class="term-line"><span class="term-prompt">$</span> <span class="term-comment"># Type your command below</span></div>
+          </div>
+          <div class="terminal-input-row">
+            <span class="term-prompt">$</span>
+            <input type="text" class="terminal-input" id="terminalInput" placeholder="Enter command..." autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+
+        <!-- Hint area -->
+        <div class="hint-area" id="hintArea">
+          <button class="btn btn-sm hint-btn" id="hintBtn" onclick="showExerciseHint()">Show Hint (0/3)</button>
+          <p class="hint-text" id="hintText" style="display:none"></p>
+        </div>
+
+        <!-- Wrong attempt counter / solution reveal -->
+        <div class="solution-area" id="solutionArea" style="display:none">
+          <button class="btn btn-sm" onclick="showSolution()">Show Full Solution</button>
+          <div class="solution-content" id="solutionContent" style="display:none"></div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToStep(2)"><span class="btn-arrow"><-</span> Back to Cheatsheet</button>
+          <button class="btn btn-primary" id="toStep4" onclick="goToStep(4)">
+            Continue to Flashcards <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 4: Flashcard Review ========== -->
+  <div class="learn-panel" id="step4" data-step="4">
+    <div class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title"><span class="panel-title-icon">?</span> Flashcard Review</h3>
+        <span class="flash-counter" id="flashCounter"><%= flashcards.length %> cards</span>
+      </div>
+      <div class="panel-body">
+        <% if (flashcards.length > 0) { %>
+          <div class="flashcard-arena" id="flashcardArena">
+            <div class="flash-remaining">Card <span id="flashCurrentIdx">1</span> of <span id="flashTotalCount"><%= flashcards.length > 5 ? 5 : flashcards.length %></span></div>
+
+            <div class="learn-flashcard" id="learnFlashcard" onclick="flipLearnCard()">
+              <div class="learn-flashcard-inner" id="flashcardInner">
+                <div class="learn-flashcard-front">
+                  <p id="flashQuestion"></p>
+                </div>
+                <div class="learn-flashcard-back">
+                  <p id="flashAnswer"></p>
+                </div>
+              </div>
+            </div>
+
+            <p class="flash-instruction" id="flashInstruction">Click card or press Space to flip</p>
+
+            <div class="flash-ratings" id="flashRatings" style="display:none">
+              <button class="flash-rate-btn rate-again" onclick="rateLearnCard(1)">Again</button>
+              <button class="flash-rate-btn rate-hard" onclick="rateLearnCard(2)">Hard</button>
+              <button class="flash-rate-btn rate-good" onclick="rateLearnCard(3)">Good</button>
+              <button class="flash-rate-btn rate-easy" onclick="rateLearnCard(4)">Easy</button>
+            </div>
+          </div>
+
+          <div class="flash-done" id="flashDone" style="display:none">
+            <div class="flash-done-icon">+</div>
+            <h3>All cards reviewed!</h3>
+            <p>Your spaced repetition schedule has been updated.</p>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <p>No flashcards available for this module yet.</p>
+          </div>
+        <% } %>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToStep(3)"><span class="btn-arrow"><-</span> Back to Exercises</button>
+          <button class="btn btn-primary" id="toStep5" onclick="goToStep(5)">
+            Complete Module <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 5: Module Completion ========== -->
+  <div class="learn-panel" id="step5" data-step="5">
+    <div class="completion-screen" id="completionScreen">
+      <!-- Confetti canvas -->
+      <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+      <div class="completion-content" id="completionContent">
+        <div class="completion-badge" id="completionBadge">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+            <circle cx="60" cy="60" r="54" stroke="var(--htb-green)" stroke-width="3" fill="none" opacity="0.3"/>
+            <circle cx="60" cy="60" r="42" stroke="var(--htb-green)" stroke-width="2" fill="rgba(159,239,0,0.05)"/>
+            <text x="60" y="55" text-anchor="middle" fill="var(--htb-green)" font-size="36" font-family="monospace" font-weight="700">+</text>
+            <text x="60" y="78" text-anchor="middle" fill="var(--htb-green)" font-size="10" font-family="monospace">COMPLETED</text>
+          </svg>
+        </div>
+
+        <div class="completion-terminal" id="completionTerminal">
+          <div class="terminal-chrome">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+          </div>
+          <div class="terminal-body" id="completionTermBody">
+            <div class="term-line"><span class="term-prompt">[+]</span> <span style="color:var(--htb-green)">Module complete: <%= module.title %></span></div>
+          </div>
+        </div>
+
+        <h2 class="completion-title"><%= module.title %> — Completed</h2>
+        <p class="completion-subtitle">You've reviewed the concept, practiced commands, solved exercises, and reinforced with flashcards.</p>
+
+        <div class="completion-stats" id="completionStats">
+          <div class="comp-stat">
+            <span class="comp-stat-val" id="compExCount">0</span>
+            <span class="comp-stat-lbl">Exercises Done</span>
+          </div>
+          <div class="comp-stat">
+            <span class="comp-stat-val" id="compFlashCount">0</span>
+            <span class="comp-stat-lbl">Cards Reviewed</span>
+          </div>
+          <div class="comp-stat">
+            <span class="comp-stat-val" id="compAccuracy">0%</span>
+            <span class="comp-stat-lbl">Accuracy</span>
+          </div>
+        </div>
+
+        <div class="completion-actions">
+          <%
+            // Find next module
+            const currentIdx = modules.findIndex(m => m.id === module.id);
+            const nextModule = currentIdx >= 0 && currentIdx < modules.length - 1 ? modules[currentIdx + 1] : null;
+          %>
+          <% if (nextModule) { %>
+            <a href="/modules/<%= nextModule.slug || nextModule.id %>/learn" class="btn btn-primary btn-lg">
+              Next Module: <%= nextModule.title %> <span class="btn-arrow">-></span>
+            </a>
+          <% } %>
+          <a href="/modules/<%= module.slug || module.id %>" class="btn">View Full Module Page</a>
+          <a href="/modules" class="btn">Back to All Modules</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data for JS -->
+<script>
+  window.__learnData = {
+    moduleId: <%= module.id %>,
+    moduleSlug: '<%= module.slug || '' %>',
+    moduleTitle: '<%= module.title.replace(/'/g, "\\'") %>',
+    moduleCategory: '<%= module.category %>',
+    exercises: <%- JSON.stringify(exercises.slice(0, 5).map(e => ({
+      id: e.id,
+      type: e.type,
+      prompt: e.prompt,
+      options: e.options || [],
+      answer: e.answer,
+      hints: e.hints || [],
+      explanation: e.explanation || ''
+    }))) %>,
+    flashcards: <%- JSON.stringify(flashcards.slice(0, 5).map(f => ({
+      id: f.id,
+      question: f.question,
+      answer: f.answer
+    }))) %>,
+    userId: '<%= user ? user.id : '' %>'
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="/js/module-learn.js"></script>

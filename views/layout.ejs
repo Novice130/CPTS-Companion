@@ -3,8 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>CPTS Companion</title>
-  <meta name="description" content="CPTS Certification Companion - Prepare for Hack The Box CPTS in 30 days">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : (typeof title !== 'undefined' ? title + ' | ' : '') %>CPTS Companion</title>
+  <meta name="description" content="<%= typeof metaDesc !== 'undefined' ? metaDesc : 'The definitive HTB CPTS study companion — 40 modules, interactive exercises, flashcards, mind maps, and a full report writing course. Pass CPTS in 30 days.' %>">
+  <meta name="keywords" content="CPTS, HTB CPTS, HackTheBox, penetration testing, cybersecurity certification, CPTS study guide, Active Directory, privilege escalation">
+  <meta name="author" content="CPTS Companion — cpts.learnnovice.com">
+  <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cpts.learnnovice.com<%= typeof ogPath !== 'undefined' ? ogPath : '' %>">
+  <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle + ' | CPTS Companion' : 'CPTS Companion — HTB CPTS Study Platform' %>">
+  <meta property="og:description" content="<%= typeof metaDesc !== 'undefined' ? metaDesc : 'The definitive HTB CPTS study companion. Interactive exercises, flashcards, mind maps, and gamified learning for penetration testing certification.' %>">
+  <meta property="og:image" content="https://cpts.learnnovice.com/img/og-card.jpg">
+  <meta property="og:site_name" content="CPTS Companion">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@learnnovice">
+  <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle + ' | CPTS Companion' : 'CPTS Companion' %>">
+  <meta name="twitter:description" content="<%= typeof metaDesc !== 'undefined' ? metaDesc : 'Study for HTB CPTS with interactive exercises, flashcards, and gamified modules.' %>">
+  <meta name="twitter:image" content="https://cpts.learnnovice.com/img/og-card.jpg">
+  <!-- Canonical -->
+  <link rel="canonical" href="https://cpts.learnnovice.com<%= typeof ogPath !== 'undefined' ? ogPath : '' %>">
   <link rel="icon" type="image/jpeg" href="/favicon.jpg">
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -60,8 +78,48 @@
             <span class="nav-icon">🗺️</span>
             Mind Maps
           </a>
+          <a href="/explore" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'explore' ? 'active' : '' %>">
+            <span class="nav-icon">🧭</span>
+            Explore Map
+          </a>
+          <a href="/report-course" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'report-course' ? 'active' : '' %>">
+            <span class="nav-icon">📝</span>
+            Report Course
+          </a>
+          <a href="/path" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'path' ? 'active' : '' %>">
+            <span class="nav-icon">🗺️</span>
+            CPTS Path
+          </a>
         </div>
-        
+
+        <div class="nav-section">
+          <div class="nav-section-title">Practice</div>
+          <a href="/challenges" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'challenges' ? 'active' : '' %>">
+            <span class="nav-icon">⚔️</span>
+            Boss Challenges
+          </a>
+          <a href="/mock-exam" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'mock-exam' ? 'active' : '' %>">
+            <span class="nav-icon">🎓</span>
+            Mock Exam
+          </a>
+          <a href="/research" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'research' ? 'active' : '' %>">
+            <span class="nav-icon">🔬</span>
+            Research Hub
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Community</div>
+          <a href="/exam-tips" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'exam-tips' ? 'active' : '' %>">
+            <span class="nav-icon">💡</span>
+            Exam Tips
+          </a>
+          <a href="/hall-of-fame" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'hall-of-fame' ? 'active' : '' %>">
+            <span class="nav-icon">🏆</span>
+            Hall of Fame
+          </a>
+        </div>
+
         <div class="nav-section">
           <div class="nav-section-title">Tools</div>
           <a href="/notes" class="nav-item <%= typeof currentPage !== 'undefined' && currentPage === 'notes' ? 'active' : '' %>">
@@ -119,6 +177,13 @@
                 👤 <span style="color: var(--htb-green); font-weight: 600;"><%= user.name || user.email %></span>
               </span>
               <a href="/logout" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; padding: 4px 10px; border: 1px solid var(--htb-border); border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--htb-red)';this.style.color='var(--htb-red)'" onmouseout="this.style.borderColor='var(--htb-border)';this.style.color='var(--text-muted)'" >Logout</a>
+            </div>
+          <% } else { %>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--htb-border);">
+              <span style="color: var(--htb-red); font-size: 0.85rem; font-weight: 500;">
+                ⚠️ Login to save your work
+              </span>
+              <a href="/login" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; padding: 4px 10px; border: 1px solid var(--htb-border); border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--htb-green)';this.style.color='var(--htb-green)'" onmouseout="this.style.borderColor='var(--htb-border)';this.style.color='var(--text-muted)'" >Login</a>
             </div>
           <% } %>
         </div>

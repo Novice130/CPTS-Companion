@@ -1,0 +1,585 @@
+<% const pageTitle = 'Report Writing Course'; %>
+<link rel="stylesheet" href="/css/report-course.css">
+
+<!-- Course Progress -->
+<div class="rc-progress" id="rcProgress">
+  <div class="rc-progress-bar">
+    <div class="rc-progress-fill" id="rcProgressFill"></div>
+  </div>
+  <div class="rc-stages">
+    <button class="rc-stage active" data-stage="1" id="rcStage1">
+      <span class="rc-stage-num">1</span>
+      <span class="rc-stage-label">Why Reports Matter</span>
+    </button>
+    <button class="rc-stage" data-stage="2" id="rcStage2">
+      <span class="rc-stage-num">2</span>
+      <span class="rc-stage-label">Report Structure</span>
+    </button>
+    <button class="rc-stage" data-stage="3" id="rcStage3">
+      <span class="rc-stage-num">3</span>
+      <span class="rc-stage-label">Writing a Finding</span>
+    </button>
+    <button class="rc-stage" data-stage="4" id="rcStage4">
+      <span class="rc-stage-num">4</span>
+      <span class="rc-stage-label">Executive Summary</span>
+    </button>
+    <button class="rc-stage" data-stage="5" id="rcStage5">
+      <span class="rc-stage-num">5</span>
+      <span class="rc-stage-label">Report Assembly</span>
+    </button>
+    <button class="rc-stage" data-stage="6" id="rcStage6">
+      <span class="rc-stage-num">6</span>
+      <span class="rc-stage-label">Report Tools</span>
+    </button>
+  </div>
+</div>
+
+<div class="rc-container" id="rcContainer">
+
+  <!-- ========== STAGE 1: Why Reports Matter ========== -->
+  <div class="rc-panel active" id="rcPanel1" data-stage="1">
+    <div class="panel">
+      <div class="panel-header"><h3 class="panel-title"><span class="panel-title-icon">!</span> Why Reports Matter</h3></div>
+      <div class="panel-body">
+        <div class="comic-strip" id="comicStrip">
+          <!-- Panel 1 -->
+          <div class="comic-panel" id="comic1">
+            <div class="comic-scene comic-scene-exploit">
+              <div class="comic-icon">$_</div>
+              <p class="comic-text">The pentester discovers a critical RCE vulnerability and achieves Domain Admin access.</p>
+            </div>
+          </div>
+          <!-- Panel 2: Path A -->
+          <div class="comic-panel" id="comic2">
+            <div class="comic-scene comic-scene-bad">
+              <div class="comic-label">Path A: Bad Report</div>
+              <div class="comic-report-bad">
+                <p>"Found some issues. Recommend fixing them."</p>
+              </div>
+              <p class="comic-text">The client is confused. Nothing gets patched. Three months later, the same vulnerability is exploited by a real attacker.</p>
+            </div>
+          </div>
+          <!-- Panel 3: Path B -->
+          <div class="comic-panel" id="comic3">
+            <div class="comic-scene comic-scene-good">
+              <div class="comic-label">Path B: Professional Report</div>
+              <div class="comic-report-good">
+                <p>"Critical: Unauthenticated RCE via deserialization in /api/upload (CVSS 9.8). Remediation: Update to v2.1.4, implement input validation."</p>
+              </div>
+              <p class="comic-text">The client understands exactly what to fix. All vulnerabilities patched. The pentester gets repeat business.</p>
+            </div>
+          </div>
+          <!-- Panel 4: Lesson -->
+          <div class="comic-panel" id="comic4">
+            <div class="comic-scene comic-scene-lesson">
+              <div class="comic-quote">"The exploit gets you in. The report gets you paid and respected."</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <div></div>
+          <button class="btn btn-primary" onclick="goToRcStage(2)">
+            Learn Report Structure <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STAGE 2: Report Structure ========== -->
+  <div class="rc-panel" id="rcPanel2" data-stage="2">
+    <div class="panel">
+      <div class="panel-header"><h3 class="panel-title"><span class="panel-title-icon">@</span> Report Structure</h3></div>
+      <div class="panel-body">
+        <p class="rc-intro">Click each section to learn its purpose. Then click "See Example" to see a real filled-in version.</p>
+
+        <div class="report-sections" id="reportSections">
+          <div class="report-section" data-section="cover" onclick="selectSection(this)">
+            <div class="section-header">
+              <span class="section-num">1</span>
+              <h4>Cover Page</h4>
+            </div>
+            <div class="section-detail">
+              <p class="section-desc">The first impression. Contains: client name, assessment type, date range, classification level (Confidential), report version, and pentester contact info.</p>
+              <button class="btn btn-sm" onclick="event.stopPropagation(); showSectionExample('cover')">See Example</button>
+            </div>
+          </div>
+
+          <div class="report-section" data-section="executive" onclick="selectSection(this)">
+            <div class="section-header">
+              <span class="section-num">2</span>
+              <h4>Executive Summary</h4>
+            </div>
+            <div class="section-detail">
+              <p class="section-desc">Written for the CEO, not the sysadmin. No technical jargon. Summarizes overall risk, top business impacts, and recommended priorities in 150-300 words.</p>
+              <button class="btn btn-sm" onclick="event.stopPropagation(); showSectionExample('executive')">See Example</button>
+            </div>
+          </div>
+
+          <div class="report-section" data-section="scope" onclick="selectSection(this)">
+            <div class="section-header">
+              <span class="section-num">3</span>
+              <h4>Scope & Methodology</h4>
+            </div>
+            <div class="section-detail">
+              <p class="section-desc">Defines the boundaries: what IPs/domains were in scope, what was excluded, testing methodology (OWASP, PTES), tools used, and any limitations encountered.</p>
+              <button class="btn btn-sm" onclick="event.stopPropagation(); showSectionExample('scope')">See Example</button>
+            </div>
+          </div>
+
+          <div class="report-section" data-section="findings" onclick="selectSection(this)">
+            <div class="section-header">
+              <span class="section-num">4</span>
+              <h4>Technical Findings</h4>
+            </div>
+            <div class="section-detail">
+              <p class="section-desc">The heart of the report. Each vulnerability gets its own section with: title, severity (CVSS), description, proof of concept, business impact, and remediation steps.</p>
+              <button class="btn btn-sm" onclick="event.stopPropagation(); showSectionExample('findings')">See Example</button>
+            </div>
+          </div>
+
+          <div class="report-section" data-section="appendices" onclick="selectSection(this)">
+            <div class="section-header">
+              <span class="section-num">5</span>
+              <h4>Appendices</h4>
+            </div>
+            <div class="section-detail">
+              <p class="section-desc">Supporting material: raw tool output, full credentials found, additional screenshots, and vulnerability scan results that support the findings.</p>
+              <button class="btn btn-sm" onclick="event.stopPropagation(); showSectionExample('appendices')">See Example</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToRcStage(1)"><span class="btn-arrow"><-</span> Back</button>
+          <button class="btn btn-primary" onclick="goToRcStage(3)">
+            Write a Finding <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STAGE 3: Writing a Finding (the main game) ========== -->
+  <div class="rc-panel" id="rcPanel3" data-stage="3">
+    <div class="panel">
+      <div class="panel-header"><h3 class="panel-title"><span class="panel-title-icon">#</span> Writing a Finding — Interactive</h3></div>
+      <div class="panel-body">
+        <!-- Scenario -->
+        <div class="finding-scenario">
+          <h4>Scenario</h4>
+          <p>You exploited a machine via an <strong>anonymous FTP login</strong> that contained backup credentials, which you used to authenticate to an internal <strong>MSSQL instance</strong> with <strong>xp_cmdshell</strong> enabled, giving you <strong>SYSTEM</strong>.</p>
+          <p class="rc-muted">Now build the finding step by step.</p>
+        </div>
+
+        <div class="finding-builder" id="findingBuilder">
+          <!-- Field 1: Title -->
+          <div class="finding-field" id="field-title" data-field="title">
+            <h4 class="field-label">1. Finding Title</h4>
+            <p class="field-instruction">Choose the best title for this finding:</p>
+            <div class="title-options" id="titleOptions">
+              <button class="title-option" data-correct="false" onclick="selectTitle(this)">FTP misconfiguration</button>
+              <button class="title-option" data-correct="true" onclick="selectTitle(this)">Anonymous FTP Access Leading to Full System Compromise via MSSQL Code Execution</button>
+              <button class="title-option" data-correct="false" onclick="selectTitle(this)">Server was hacked via FTP</button>
+            </div>
+            <div class="field-feedback" id="titleFeedback"></div>
+          </div>
+
+          <!-- Field 2: CVSS -->
+          <div class="finding-field locked" id="field-cvss" data-field="cvss">
+            <h4 class="field-label">2. Severity Rating (CVSS 3.1)</h4>
+            <p class="field-instruction">Adjust the CVSS sliders to rate this vulnerability:</p>
+            <div class="cvss-calculator" id="cvssCalculator">
+              <div class="cvss-row">
+                <label>Attack Vector</label>
+                <select id="cvss-av" onchange="updateCvss()">
+                  <option value="N">Network (N)</option>
+                  <option value="A">Adjacent (A)</option>
+                  <option value="L">Local (L)</option>
+                  <option value="P">Physical (P)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>Attack Complexity</label>
+                <select id="cvss-ac" onchange="updateCvss()">
+                  <option value="L">Low (L)</option>
+                  <option value="H">High (H)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>Privileges Required</label>
+                <select id="cvss-pr" onchange="updateCvss()">
+                  <option value="N">None (N)</option>
+                  <option value="L">Low (L)</option>
+                  <option value="H">High (H)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>User Interaction</label>
+                <select id="cvss-ui" onchange="updateCvss()">
+                  <option value="N">None (N)</option>
+                  <option value="R">Required (R)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>Scope</label>
+                <select id="cvss-s" onchange="updateCvss()">
+                  <option value="U">Unchanged (U)</option>
+                  <option value="C">Changed (C)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>Confidentiality</label>
+                <select id="cvss-c" onchange="updateCvss()">
+                  <option value="H">High (H)</option>
+                  <option value="L">Low (L)</option>
+                  <option value="N">None (N)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>Integrity</label>
+                <select id="cvss-i" onchange="updateCvss()">
+                  <option value="H">High (H)</option>
+                  <option value="L">Low (L)</option>
+                  <option value="N">None (N)</option>
+                </select>
+              </div>
+              <div class="cvss-row">
+                <label>Availability</label>
+                <select id="cvss-a" onchange="updateCvss()">
+                  <option value="H">High (H)</option>
+                  <option value="L">Low (L)</option>
+                  <option value="N">None (N)</option>
+                </select>
+              </div>
+            </div>
+            <div class="cvss-result">
+              <span class="cvss-score" id="cvssScore">0.0</span>
+              <span class="cvss-severity" id="cvssSeverity">--</span>
+              <span class="cvss-vector" id="cvssVector">CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="cvssSubmit" onclick="submitCvss()">Submit Rating</button>
+            <div class="field-feedback" id="cvssFeedback"></div>
+          </div>
+
+          <!-- Field 3: Description -->
+          <div class="finding-field locked" id="field-desc" data-field="desc">
+            <h4 class="field-label">3. Description</h4>
+            <p class="field-instruction">Fill in the blanks:</p>
+            <div class="fill-blanks">
+              <p>An <input type="text" class="blank-input" id="blank1" placeholder="type of vulnerability"> vulnerability was identified on <input type="text" class="blank-input" id="blank2" placeholder="target/service"> which allows an unauthenticated attacker to <input type="text" class="blank-input" id="blank3" placeholder="action/impact">, resulting in <input type="text" class="blank-input" id="blank4" placeholder="final outcome">.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="submitDesc()">Submit Description</button>
+            <div class="field-feedback" id="descFeedback"></div>
+          </div>
+
+          <!-- Field 4: PoC Evidence (drag & drop) -->
+          <div class="finding-field locked" id="field-poc" data-field="poc">
+            <h4 class="field-label">4. Proof of Concept — Evidence Order</h4>
+            <p class="field-instruction">Drag the evidence screenshots into the correct chronological order:</p>
+            <div class="poc-evidence" id="pocEvidence">
+              <div class="poc-item" draggable="true" data-order="2" id="poc2">
+                <span class="poc-icon">[img]</span>
+                <span class="poc-label">xp_cmdshell execution returning SYSTEM</span>
+              </div>
+              <div class="poc-item" draggable="true" data-order="3" id="poc3">
+                <span class="poc-icon">[img]</span>
+                <span class="poc-label">SYSTEM shell with whoami output</span>
+              </div>
+              <div class="poc-item" draggable="true" data-order="1" id="poc1">
+                <span class="poc-icon">[img]</span>
+                <span class="poc-label">Anonymous FTP login with backup credentials</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="submitPoc()">Submit Order</button>
+            <div class="field-feedback" id="pocFeedback"></div>
+          </div>
+
+          <!-- Field 5: Business Impact -->
+          <div class="finding-field locked" id="field-impact" data-field="impact">
+            <h4 class="field-label">5. Business Impact</h4>
+            <p class="field-instruction">Which statement is written for a business audience?</p>
+            <div class="impact-options" id="impactOptions">
+              <button class="impact-option" data-type="technical" onclick="selectImpact(this)">
+                "The attacker used anonymous FTP to retrieve creds, then leveraged xp_cmdshell on MSSQL to gain NT AUTHORITY\SYSTEM access."
+              </button>
+              <button class="impact-option" data-type="business" onclick="selectImpact(this)">
+                "An external attacker with no credentials could gain full administrative control of the database server, exposing all customer records and potentially disrupting business operations."
+              </button>
+              <button class="impact-option" data-type="vague" onclick="selectImpact(this)">
+                "This is a bad vulnerability that should be fixed immediately."
+              </button>
+            </div>
+            <div class="field-feedback" id="impactFeedback"></div>
+          </div>
+
+          <!-- Field 6: Remediation -->
+          <div class="finding-field locked" id="field-remediation" data-field="remediation">
+            <h4 class="field-label">6. Remediation</h4>
+            <p class="field-instruction">Improve this vague remediation: <em>"Fix the FTP server."</em></p>
+            <div class="remediation-prompts">
+              <div class="rem-prompt">
+                <label>What should be disabled?</label>
+                <select id="rem1">
+                  <option value="">Select...</option>
+                  <option value="correct">Anonymous FTP access</option>
+                  <option value="wrong1">The FTP service entirely</option>
+                  <option value="wrong2">All network services</option>
+                </select>
+              </div>
+              <div class="rem-prompt">
+                <label>What configuration change?</label>
+                <select id="rem2">
+                  <option value="">Select...</option>
+                  <option value="correct">Require authenticated access with strong credentials</option>
+                  <option value="wrong1">Change the FTP port number</option>
+                  <option value="wrong2">Add a firewall rule</option>
+                </select>
+              </div>
+              <div class="rem-prompt">
+                <label>What should be disabled on MSSQL?</label>
+                <select id="rem3">
+                  <option value="">Select...</option>
+                  <option value="correct">xp_cmdshell and other dangerous stored procedures</option>
+                  <option value="wrong1">All SQL queries</option>
+                  <option value="wrong2">Remote connections</option>
+                </select>
+              </div>
+              <div class="rem-prompt">
+                <label>What should be verified?</label>
+                <select id="rem4">
+                  <option value="">Select...</option>
+                  <option value="correct">Backup credentials are rotated and stored securely</option>
+                  <option value="wrong1">The server is restarted</option>
+                  <option value="wrong2">Antivirus is installed</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="submitRemediation()">Submit Remediation</button>
+            <div class="field-feedback" id="remediationFeedback"></div>
+          </div>
+        </div>
+
+        <!-- Assembled Finding Preview -->
+        <div class="assembled-finding" id="assembledFinding" style="display:none">
+          <h4>Your Completed Finding</h4>
+          <div class="finding-preview" id="findingPreview"></div>
+          <div class="finding-score">
+            <span class="score-label">Report Quality</span>
+            <span class="score-value" id="findingScore">0</span>
+            <span class="score-suffix">/100</span>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToRcStage(2)"><span class="btn-arrow"><-</span> Back</button>
+          <button class="btn btn-primary" id="toStage4Btn" onclick="goToRcStage(4)" style="display:none">
+            Write Executive Summary <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STAGE 4: Executive Summary Writing ========== -->
+  <div class="rc-panel" id="rcPanel4" data-stage="4">
+    <div class="panel">
+      <div class="panel-header"><h3 class="panel-title"><span class="panel-title-icon">@</span> Executive Summary</h3></div>
+      <div class="panel-body">
+        <div class="exec-scenario">
+          <h4>Findings Summary</h4>
+          <div class="finding-chips">
+            <span class="finding-chip critical">Critical x1: Anonymous FTP + MSSQL RCE</span>
+            <span class="finding-chip high">High x2: Weak AD Passwords, SMB Signing Disabled</span>
+            <span class="finding-chip medium">Medium x1: Outdated Apache (CVE-2023-xxxx)</span>
+            <span class="finding-chip low">Low x1: Missing Security Headers</span>
+          </div>
+          <p class="rc-muted">Write an executive summary for these findings. Target audience: the CEO.</p>
+        </div>
+
+        <div class="exec-editor">
+          <div class="exec-toolbar">
+            <span class="word-count">Words: <span id="execWordCount">0</span>/300</span>
+            <span class="jargon-warning" id="jargonWarning" style="display:none">Jargon detected!</span>
+          </div>
+          <textarea class="exec-textarea" id="execTextarea" rows="12"
+            placeholder="Write your executive summary here. No technical jargon — write for a business audience. Must include: overall risk rating, top 3 business risks, and remediation priority."></textarea>
+          <div class="jargon-highlights" id="jargonHighlights"></div>
+        </div>
+
+        <div class="exec-checklist">
+          <h4>Requirements Checklist</h4>
+          <label class="exec-check"><input type="checkbox" id="checkRisk" disabled> Overall risk rating included</label>
+          <label class="exec-check"><input type="checkbox" id="checkBiz" disabled> Top 3 business risks in plain language</label>
+          <label class="exec-check"><input type="checkbox" id="checkPriority" disabled> Remediation priority recommendation</label>
+          <label class="exec-check"><input type="checkbox" id="checkLength" disabled> 150-300 words</label>
+          <label class="exec-check"><input type="checkbox" id="checkNoJargon" disabled> No technical jargon</label>
+        </div>
+
+        <button class="btn btn-primary" id="submitExec" onclick="submitExecSummary()">Submit Executive Summary</button>
+        <div class="field-feedback" id="execFeedback"></div>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToRcStage(3)"><span class="btn-arrow"><-</span> Back</button>
+          <button class="btn btn-primary" id="toStage5Btn" onclick="goToRcStage(5)" style="display:none">
+            Assemble the Report <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STAGE 5: Report Assembly (drag & drop) ========== -->
+  <div class="rc-panel" id="rcPanel5" data-stage="5">
+    <div class="panel">
+      <div class="panel-header"><h3 class="panel-title"><span class="panel-title-icon">%</span> Report Assembly</h3></div>
+      <div class="panel-body">
+        <p class="rc-intro">Drag the report sections into the correct order to compile your report:</p>
+
+        <div class="assembly-zone" id="assemblyZone">
+          <div class="assembly-item" draggable="true" data-order="3" id="asm3">
+            <span class="asm-handle">::</span> Scope & Methodology
+          </div>
+          <div class="assembly-item" draggable="true" data-order="5" id="asm5">
+            <span class="asm-handle">::</span> Appendices
+          </div>
+          <div class="assembly-item" draggable="true" data-order="1" id="asm1">
+            <span class="asm-handle">::</span> Cover Page
+          </div>
+          <div class="assembly-item" draggable="true" data-order="4" id="asm4">
+            <span class="asm-handle">::</span> Technical Findings
+          </div>
+          <div class="assembly-item" draggable="true" data-order="2" id="asm2">
+            <span class="asm-handle">::</span> Executive Summary
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="compileBtn" onclick="compileReport()">Compile Report</button>
+        <div class="field-feedback" id="assemblyFeedback"></div>
+
+        <div class="compile-progress" id="compileProgress" style="display:none">
+          <div class="compile-bar"><div class="compile-bar-fill" id="compileBarFill"></div></div>
+          <p class="compile-text" id="compileText">Compiling report...</p>
+        </div>
+
+        <div class="report-preview-area" id="reportPreviewArea" style="display:none">
+          <h4>Your Report Preview</h4>
+          <div class="report-preview-doc" id="reportPreviewDoc">
+            <div class="preview-page preview-cover">
+              <h2>Penetration Test Report</h2>
+              <p>Client: Acme Corp</p>
+              <p>Date: April 2026</p>
+              <p>Classification: CONFIDENTIAL</p>
+            </div>
+          </div>
+          <p class="rc-muted">Congratulations — this is the structure of a professional pentest report.</p>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToRcStage(4)"><span class="btn-arrow"><-</span> Back</button>
+          <button class="btn btn-primary" id="toStage6Btn" onclick="goToRcStage(6)" style="display:none">
+            Report Tools <span class="btn-arrow">-></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STAGE 6: Report Tool Walkthroughs ========== -->
+  <div class="rc-panel" id="rcPanel6" data-stage="6">
+    <div class="panel">
+      <div class="panel-header"><h3 class="panel-title"><span class="panel-title-icon">></span> Report Tools</h3></div>
+      <div class="panel-body">
+        <div class="tool-tabs">
+          <button class="tool-tab active" onclick="showToolTab('sysreptor', this)">SysReptor</button>
+          <button class="tool-tab" onclick="showToolTab('pwndoc', this)">Pwndoc</button>
+          <button class="tool-tab" onclick="showToolTab('markdown', this)">Markdown + Pandoc</button>
+        </div>
+
+        <div class="tool-content" id="tool-sysreptor">
+          <div class="tool-steps">
+            <div class="tool-step">
+              <span class="tool-step-num">1</span>
+              <div>
+                <h4>Create a New Project</h4>
+                <p>In SysReptor, click <strong>New Project</strong>. Select the "Pentest Report" template. Fill in client name, date range, and assessor details.</p>
+              </div>
+            </div>
+            <div class="tool-step">
+              <span class="tool-step-num">2</span>
+              <div>
+                <h4>Add Findings</h4>
+                <p>Click <strong>Add Finding</strong>. Use the finding template: fill in title, severity, description, PoC, impact, and remediation. SysReptor auto-formats CVSS scores.</p>
+              </div>
+            </div>
+            <div class="tool-step">
+              <span class="tool-step-num">3</span>
+              <div>
+                <h4>Write Executive Summary</h4>
+                <p>Navigate to the <strong>Executive Summary</strong> section. Use the rich text editor to write your summary. SysReptor includes a findings count widget automatically.</p>
+              </div>
+            </div>
+            <div class="tool-step">
+              <span class="tool-step-num">4</span>
+              <div>
+                <h4>Export PDF</h4>
+                <p>Click <strong>Export > PDF</strong>. Choose your template style. The report compiles with professional formatting, table of contents, and consistent branding.</p>
+              </div>
+            </div>
+          </div>
+          <div class="tool-tip">
+            <strong>CPTS Exam Tip:</strong> SysReptor is the most popular tool for CPTS exam reports. Set up your template before exam day.
+          </div>
+        </div>
+
+        <div class="tool-content" id="tool-pwndoc" style="display:none">
+          <div class="tool-steps">
+            <div class="tool-step"><span class="tool-step-num">1</span><div><h4>Deploy Pwndoc</h4><p>Run <code>docker-compose up -d</code> from the Pwndoc repo. Access at <code>https://localhost:8443</code>. Create your first audit.</p></div></div>
+            <div class="tool-step"><span class="tool-step-num">2</span><div><h4>Configure Templates</h4><p>Import or create a report template in the admin panel. Define sections, finding fields, and branding.</p></div></div>
+            <div class="tool-step"><span class="tool-step-num">3</span><div><h4>Add Findings</h4><p>Use the vulnerability editor. Pwndoc supports a finding library — save common findings for reuse across engagements.</p></div></div>
+            <div class="tool-step"><span class="tool-step-num">4</span><div><h4>Generate Report</h4><p>Click <strong>Generate</strong> to produce a DOCX file from your template. Convert to PDF with LibreOffice or print-to-PDF.</p></div></div>
+          </div>
+          <div class="tool-tip">
+            <strong>Tip:</strong> Pwndoc's finding library lets you pre-build common findings. Saves significant time during the exam.
+          </div>
+        </div>
+
+        <div class="tool-content" id="tool-markdown" style="display:none">
+          <div class="tool-steps">
+            <div class="tool-step"><span class="tool-step-num">1</span><div><h4>Write in Markdown</h4><p>Use your favorite editor (VS Code, Obsidian, vim). Structure sections with headers. Use code blocks for commands.</p></div></div>
+            <div class="tool-step"><span class="tool-step-num">2</span><div><h4>Add Metadata</h4><p>YAML frontmatter: <code>title</code>, <code>author</code>, <code>date</code>, <code>classification</code>. Pandoc reads this for the cover page.</p></div></div>
+            <div class="tool-step"><span class="tool-step-num">3</span><div><h4>Include Images</h4><p>Use <code>![description](screenshots/finding1.png)</code>. Keep images in a <code>screenshots/</code> folder alongside the markdown.</p></div></div>
+            <div class="tool-step">
+              <span class="tool-step-num">4</span>
+              <div>
+                <h4>Compile to PDF</h4>
+                <div class="cmd-block"><div class="cmd-block-body"><div class="cmd-line"><span class="cmd-prompt">$</span> <span class="cmd-text">pandoc report.md -o report.pdf --template=eisvogel --highlight-style=tango -V colorlinks=true</span></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="tool-tip">
+            <strong>Tip:</strong> The Eisvogel template produces professional-looking PDFs. Install with <code>pandoc-eisvogel</code>.
+          </div>
+        </div>
+
+        <!-- Course Complete -->
+        <div class="rc-complete" id="rcComplete">
+          <div class="rc-complete-badge">+</div>
+          <h3>Report Writing Course Complete!</h3>
+          <p>You've learned the structure, practiced writing findings, composed an executive summary, assembled a report, and explored professional tools.</p>
+          <div class="rc-complete-actions">
+            <a href="/modules" class="btn btn-primary">Back to Modules</a>
+            <a href="/explore" class="btn">Explore Knowledge Map</a>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn" onclick="goToRcStage(5)"><span class="btn-arrow"><-</span> Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/report-course.js"></script>

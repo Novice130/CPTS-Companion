@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome | CPTS Companion</title>
+  <meta name="description" content="Your 30-day path to HTB CPTS certification starts here. Interactive study companion with flashcards, exercises, and guided learning.">
+  <meta property="og:title" content="CPTS Companion - Your Path to HTB CPTS Certification">
+  <meta property="og:description" content="The definitive study companion for Hack The Box Certified Penetration Testing Specialist certification.">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="stylesheet" href="/css/onboarding.css">
+</head>
+<body>
+  <!-- Skip Button -->
+  <button class="skip-btn" id="skipBtn" aria-label="Skip introduction">
+    Skip intro <kbd>ESC</kbd>
+  </button>
+
+  <!-- Scene Container -->
+  <div class="onboarding-container" id="onboardingContainer">
+
+    <!-- ========== SCENE 1: THE MISSION ========== -->
+    <div class="scene scene-1 active" id="scene1">
+      <div class="scene-content">
+        <div class="terminal-window" id="terminalWindow">
+          <div class="terminal-chrome">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">root@cpts-companion:~</span>
+          </div>
+          <div class="terminal-body">
+            <div class="terminal-line">
+              <span class="prompt">$</span>
+              <span class="typed-text" id="typedTarget"></span>
+              <span class="cursor" id="cursor">_</span>
+            </div>
+            <div class="terminal-line hidden" id="progressLine">
+              <span class="prompt">[*]</span>
+              <span class="progress-label">Your current level:</span>
+              <span class="level-tag">Beginner</span>
+            </div>
+            <div class="progress-bar-container hidden" id="progressBar">
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progressFill"></div>
+              </div>
+              <span class="progress-pct" id="progressPct">0%</span>
+            </div>
+            <div class="terminal-line hidden" id="readyLine">
+              <span class="prompt" style="color: var(--node-green);">[+]</span>
+              <span style="color: var(--node-green);">Target acquired. Initiating reconnaissance...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SCENE 2: THE ROADMAP REVEAL ========== -->
+    <div class="scene scene-2" id="scene2">
+      <div class="scene-content">
+        <div class="grid-bg" id="gridBg"></div>
+        <svg class="network-map" id="networkMap" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid lines rendered by JS -->
+          <g id="gridLines"></g>
+          <!-- Connection lines -->
+          <g id="connectionLines"></g>
+          <!-- Nodes -->
+          <g id="networkNodes"></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========== SCENE 3: THE JOURNEY ========== -->
+    <div class="scene scene-3" id="scene3">
+      <div class="scene-content">
+        <svg class="journey-map" id="journeyMap" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="glowStrong">
+              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g id="journeyPath"></g>
+          <g id="journeyNodes"></g>
+          <g id="journeyMilestones"></g>
+          <g id="journeyAvatar"></g>
+          <g id="journeyTooltips"></g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========== SCENE 4: THE CALL TO ACTION ========== -->
+    <div class="scene scene-4" id="scene4">
+      <div class="scene-content cta-scene">
+        <div class="cta-terminal-bg" id="ctaBg"></div>
+        <div class="cta-content" id="ctaContent">
+          <div class="cta-badge" id="ctaBadge">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="36" stroke="var(--node-green)" stroke-width="2" fill="none" opacity="0.3"/>
+              <circle cx="40" cy="40" r="28" stroke="var(--node-green)" stroke-width="1.5" fill="none" opacity="0.5"/>
+              <path d="M40 20 L44 32 L56 32 L46 40 L50 52 L40 44 L30 52 L34 40 L24 32 L36 32 Z" fill="var(--node-green)" opacity="0.8"/>
+            </svg>
+          </div>
+          <h1 class="cta-title" id="ctaTitle">Your 30-day path to CPTS starts here.</h1>
+          <p class="cta-subtitle" id="ctaSubtitle">Interactive modules, hands-on exercises, spaced-repetition flashcards, and guided report writing — everything you need to pass the HTB CPTS exam.</p>
+          <div class="cta-buttons" id="ctaButtons">
+            <a href="/" class="cta-btn cta-btn-primary" id="ctaStart">
+              <span class="btn-icon">></span> Start My Journey
+            </a>
+            <a href="/explore" class="cta-btn cta-btn-secondary" id="ctaExplore">
+              <span class="btn-icon">#</span> Explore the Map
+            </a>
+          </div>
+          <div class="cta-stats" id="ctaStats">
+            <div class="cta-stat">
+              <span class="cta-stat-value">37+</span>
+              <span class="cta-stat-label">Modules</span>
+            </div>
+            <div class="cta-stat">
+              <span class="cta-stat-value">500+</span>
+              <span class="cta-stat-label">Flashcards</span>
+            </div>
+            <div class="cta-stat">
+              <span class="cta-stat-value">200+</span>
+              <span class="cta-stat-label">Exercises</span>
+            </div>
+            <div class="cta-stat">
+              <span class="cta-stat-value">30</span>
+              <span class="cta-stat-label">Days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene Progress Indicators -->
+  <div class="scene-indicators" id="sceneIndicators">
+    <button class="scene-dot active" data-scene="1" aria-label="Scene 1"></button>
+    <button class="scene-dot" data-scene="2" aria-label="Scene 2"></button>
+    <button class="scene-dot" data-scene="3" aria-label="Scene 3"></button>
+    <button class="scene-dot" data-scene="4" aria-label="Scene 4"></button>
+  </div>
+
+  <!-- Reduced Motion Fallback -->
+  <div class="reduced-motion-fallback" id="reducedMotionFallback">
+    <div class="rm-container">
+      <div class="rm-header">
+        <h1>CPTS Companion</h1>
+        <p>Your 30-day path to HTB CPTS certification</p>
+      </div>
+      <div class="rm-grid">
+        <div class="rm-card"><span class="rm-icon">1</span><h3>Networking & Enumeration</h3><p>Nmap, footprinting, service fingerprinting</p></div>
+        <div class="rm-card"><span class="rm-icon">2</span><h3>Web Application Attacks</h3><p>SQLi, XSS, command injection, file attacks</p></div>
+        <div class="rm-card"><span class="rm-icon">3</span><h3>Active Directory</h3><p>Enumeration, Kerberoasting, lateral movement</p></div>
+        <div class="rm-card"><span class="rm-icon">4</span><h3>Exploitation</h3><p>Shells, Metasploit, password attacks, pivoting</p></div>
+        <div class="rm-card"><span class="rm-icon">5</span><h3>Privilege Escalation</h3><p>Linux & Windows privesc, credential hunting</p></div>
+        <div class="rm-card"><span class="rm-icon">6</span><h3>Reporting</h3><p>Professional pentest report writing</p></div>
+      </div>
+      <div class="rm-buttons">
+        <a href="/" class="cta-btn cta-btn-primary"><span class="btn-icon">></span> Start My Journey</a>
+        <a href="/explore" class="cta-btn cta-btn-secondary"><span class="btn-icon">#</span> Explore the Map</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="/js/onboarding.js"></script>
+</body>
+</html>

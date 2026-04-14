@@ -27,6 +27,9 @@
           <h1><%= module.title %></h1>
           <div class="chip"><%= module.category %></div>
         </div>
+        <a href="/modules/<%= module.slug || module.id %>/learn" class="btn btn-primary" style="white-space:nowrap;">
+          > Start Learning
+        </a>
       </div>
       
       <% if (module.summary) { %>

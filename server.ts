@@ -3,6 +3,8 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
+import expressLayouts from "express-ejs-layouts";
+import { researchTopics, getTopicBySlug, getAdjacentTopics } from "./data/research-topics.ts";
 import {
   initDatabase,
   seedDatabase,
@@ -80,6 +82,8 @@ app.use('/login', rateLimiter);
 // View engine setup
 app.set("view engine", "ejs");
 app.set("views", join(__dirname, "views"));
+app.use(expressLayouts);
+app.set("layout", false); // Default to no layout, opt-in per route
 
 // ============================================
 // Initialize DB (async — start server after init)
@@ -137,9 +141,9 @@ async function startServer() {
     console.log(`[softAuth] Guest view count:`, views);
     res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true, path: "/" });
 
-    if (views >= 5) {
-      console.log(`[softAuth] Redirecting to login due to limit (views: ${views})`);
-      return res.redirect("/login?reason=limit");
+    if (views === 1) {
+      console.log(`[softAuth] Redirecting to login for initial prompt (views: ${views})`);
+      return res.redirect("/login?reason=initial");
     }
 
     (req as any).user = null; // Guest user
@@ -163,10 +167,6 @@ async function startServer() {
     const session = await getSession(req);
     if (session) return res.redirect("/");
     
-    // Clear the guest views cookie when they visit the login page 
-    // so if they login successfully, the counter is reset.
-    res.clearCookie("guest_views");
-    
     const common = await getCommonData(session?.user?.id);
     res.render("login", { ...common, currentPage: "login", user: null });
   });
@@ -189,6 +189,23 @@ async function startServer() {
   // ============================================
   // PAGE ROUTES
   // ============================================
+
+  // Onboarding — animated intro (standalone, no layout)
+  app.get("/onboarding", (req: Request, res: Response) => {
+    res.render("onboarding");
+  });
+
+  // Explore — interactive CPTS knowledge mind map
+  app.get("/explore", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("explore", {
+      ...common,
+      currentPage: "explore",
+      user,
+      title: "Explore the CPTS Knowledge Map",
+    });
+  });
 
   // Dashboard
   app.get("/", softAuth, async (req: Request, res: Response) => {
@@ -464,6 +481,48 @@ async function startServer() {
       mindmaps,
       commandExamplesHtml,
       user: (req as any).user,
+    });
+  });
+
+  // Module learn — 5-step animated learning flow
+  app.get("/modules/:id/learn", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const [common, moduleRaw, allModules] = await Promise.all([
+      getCommonData(user?.id),
+      queries.getModuleById(parseInt(req.params.id)).then(m => m || queries.getModuleBySlug(req.params.id)),
+      queries.getAllModules()
+    ]);
+    const module = moduleRaw as any;
+    if (!module) {
+      return res.status(404).render("error", { ...common, message: "Module not found", user });
+    }
+
+    const [exercises, flashcards] = await Promise.all([
+      queries.getExercisesByModule(module.id),
+      queries.getFlashcardsByModule(module.id)
+    ]);
+
+    res.render("module-learn", {
+      ...common,
+      currentPage: "modules",
+      module,
+      modules: allModules,
+      exercises,
+      flashcards,
+      user,
+      title: module.title + " — Learn",
+    });
+  });
+
+  // Report Writing Course — 6-stage interactive experience
+  app.get("/report-course", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("report-course", {
+      ...common,
+      currentPage: "modules",
+      user,
+      title: "Report Writing Course",
     });
   });
 
@@ -1076,6 +1135,260 @@ async function startServer() {
     ];
 
     res.json([...pages, ...modules, ...mindmaps, ...notes, ...exercises]);
+  });
+
+  // ============================================
+  // Task 6 — Community & Launch Pages
+  // ============================================
+
+  app.get("/exam-tips", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("exam-tips", {
+      ...common,
+      currentPage: "exam-tips",
+      user,
+      pageTitle: "Exam Tips",
+      metaDesc: "25 battle-tested CPTS exam tips from certified passers — methodology, technical tactics, and report writing strategies to help you pass HTB CPTS.",
+      ogPath: "/exam-tips",
+      layout: "layout",
+    });
+  });
+
+  app.get("/hall-of-fame", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("hall-of-fame", {
+      ...common,
+      currentPage: "hall-of-fame",
+      user,
+      pageTitle: "Hall of Fame",
+      metaDesc: "CPTS passers share their tips, timelines, and lessons learned. Learn from those who've already earned the HTB CPTS certification.",
+      ogPath: "/hall-of-fame",
+      layout: "layout",
+    });
+  });
+
+  app.get("/path", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const [common, modulesRaw, progressRaw] = await Promise.all([
+      getCommonData(user?.id),
+      queries.getAllModules(),
+      user?.id ? queries.getUserProgress(user.id) : Promise.resolve([]),
+    ]);
+    const modules = modulesRaw as any[];
+    const progress = progressRaw as any[];
+    res.render("path", {
+      ...common,
+      currentPage: "path",
+      user,
+      modules,
+      progress,
+      pageTitle: "CPTS Learning Path",
+      metaDesc: "Track your progress through all 40 CPTS modules. Shareable progress card for Twitter/LinkedIn. Complete the HTB CPTS learning path.",
+      ogPath: "/path",
+      layout: "layout",
+    });
+  });
+
+  // ============================================
+  // Task 7 — SEO: Sitemap & Robots
+  // ============================================
+
+  app.get("/sitemap.xml", async (_req: Request, res: Response) => {
+    const modules = (await queries.getAllModules()) as any[];
+    const moduleUrls = modules.map((m: any) => `
+  <url>
+    <loc>https://cpts.learnnovice.com/modules/${m.slug || m.id}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join("");
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://cpts.learnnovice.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/modules</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/exercises</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/flashcards</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/explore</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/path</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/exam-tips</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/hall-of-fame</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/report-course</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/onboarding</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/blog/cpts-30-days</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/research</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/challenges</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cpts.learnnovice.com/mock-exam</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>${researchTopics.map(t => `
+  <url>
+    <loc>https://cpts.learnnovice.com/research/${t.slug}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join("")}${moduleUrls}
+</urlset>`;
+    res.set("Content-Type", "application/xml");
+    res.send(xml);
+  });
+
+  app.get("/blog/cpts-30-days", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("blog-cpts-30-days", {
+      ...common,
+      currentPage: "blog",
+      user,
+      pageTitle: "How I'm Preparing for HTB CPTS in 30 Days",
+      metaDesc: "A practical 30-day CPTS prep guide — resources, daily schedule, tool setup, and tactics for passing the HTB Certified Penetration Testing Specialist exam.",
+      ogPath: "/blog/cpts-30-days",
+      layout: "layout",
+    });
+  });
+
+  app.get("/robots.txt", (_req: Request, res: Response) => {
+    res.set("Content-Type", "text/plain");
+    res.send(`User-agent: *
+Allow: /
+Allow: /modules
+Allow: /exercises
+Allow: /flashcards
+Allow: /explore
+Allow: /path
+Allow: /exam-tips
+Allow: /hall-of-fame
+Allow: /report-course
+Allow: /onboarding
+Allow: /research
+Allow: /challenges
+Allow: /mock-exam
+Disallow: /api/
+Disallow: /settings
+Disallow: /notes
+Disallow: /admin
+Sitemap: https://cpts.learnnovice.com/sitemap.xml`);
+  });
+
+  // ============================================
+  // TASK 4 — Research Hub Routes
+  // ============================================
+  app.get("/research", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("research", {
+      ...common,
+      pageTitle: "Deep-Dive Research Hub",
+      metaDesc: "Advanced CPTS research: BloodHound queries, AD CS ESC1-8, Ligolo-ng pivoting, RBCD, Potato attacks, Certipy, Shadow Credentials, and more.",
+      ogPath: "/research",
+      currentPage: "research",
+      user,
+      layout: "layout",
+    });
+  });
+
+  app.get("/research/:slug", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const topic = getTopicBySlug(req.params.slug);
+    if (!topic) {
+      const common = await getCommonData(user?.id);
+      return res.status(404).render("error", { ...common, message: "Research topic not found", user });
+    }
+    const common = await getCommonData(user?.id);
+    const { prev, next } = getAdjacentTopics(req.params.slug);
+    res.render("research-topic", {
+      ...common,
+      topic,
+      prev: prev ? { slug: prev.slug, title: prev.title } : null,
+      next: next ? { slug: next.slug, title: next.title } : null,
+      currentPage: "research",
+      user,
+      layout: "layout",
+    });
+  });
+
+  // ============================================
+  // TASK 5 — Gamification Routes
+  // ============================================
+  app.get("/challenges", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("boss-challenges", {
+      ...common,
+      pageTitle: "Boss Challenges",
+      metaDesc: "Test your CPTS skills with 10 boss challenge scenarios — full penetration test simulations with progressive hints and full solutions.",
+      ogPath: "/challenges",
+      currentPage: "challenges",
+      user,
+      layout: "layout",
+    });
+  });
+
+  app.get("/mock-exam", softAuth, async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const common = await getCommonData(user?.id);
+    res.render("mock-exam", {
+      ...common,
+      pageTitle: "Mock Exam Simulator",
+      metaDesc: "5 CPTS mock exam simulation days with hour-by-hour schedules, 10-machine scenarios, and timed methodology to prepare for the real 10-day exam.",
+      ogPath: "/mock-exam",
+      currentPage: "mock-exam",
+      user,
+      layout: "layout",
+    });
   });
 
   // Error handling

@@ -1,0 +1,142 @@
+<% const pageTitle = 'Deep-Dive Research Hub'; %>
+<% const metaDesc = 'Advanced CPTS research: BloodHound queries, AD CS ESC1-8, Ligolo-ng pivoting, RBCD, Potato attacks, Certipy, Shadow Credentials, and more.'; %>
+<% const ogPath = '/research'; %>
+<%- contentFor('body') %>
+
+<style>
+.research-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.research-card { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 10px; padding: 1.25rem; text-decoration: none; display: block; transition: border-color 0.2s, transform 0.15s; position: relative; overflow: hidden; }
+.research-card:hover { border-color: var(--htb-green); transform: translateY(-2px); }
+.research-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--htb-green); transform: scaleX(0); transition: transform 0.2s; transform-origin: left; }
+.research-card:hover::before { transform: scaleX(1); }
+.rc-tag { display: inline-block; font-size: 0.65rem; font-family: var(--font-mono); padding: 2px 8px; border-radius: 4px; margin-bottom: 0.75rem; }
+.rc-tag.ad { background: rgba(127,209,100,0.12); color: var(--htb-green); border: 1px solid rgba(127,209,100,0.3); }
+.rc-tag.web { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+.rc-tag.priv { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+.rc-tag.evasion { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+.rc-tag.tools { background: rgba(244,63,94,0.12); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); }
+.rc-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.4rem; font-family: var(--font-mono); }
+.rc-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+.rc-arrow { position: absolute; bottom: 1rem; right: 1rem; color: var(--htb-green); font-size: 0.85rem; opacity: 0; transition: opacity 0.2s; }
+.research-card:hover .rc-arrow { opacity: 1; }
+.research-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.filter-btn { font-size: 0.72rem; font-family: var(--font-mono); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--htb-border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+.filter-btn:hover, .filter-btn.active { border-color: var(--htb-green); color: var(--htb-green); background: rgba(127,209,100,0.08); }
+</style>
+
+<div class="page-header" style="margin-bottom: 1.5rem;">
+  <h1 class="page-title"><span style="color:var(--htb-green)">></span> Deep-Dive Research Hub</h1>
+  <p class="page-subtitle">Advanced attack chains, tool guides, and techniques beyond the standard modules. 15 topics covering the hardest CPTS exam concepts.</p>
+</div>
+
+<div class="research-filter">
+  <button class="filter-btn active" onclick="filterTopics('all')">All (15)</button>
+  <button class="filter-btn" onclick="filterTopics('ad')">Active Directory</button>
+  <button class="filter-btn" onclick="filterTopics('priv')">Privilege Escalation</button>
+  <button class="filter-btn" onclick="filterTopics('tools')">Tools & Setup</button>
+  <button class="filter-btn" onclick="filterTopics('evasion')">Evasion</button>
+  <button class="filter-btn" onclick="filterTopics('web')">Web / Infra</button>
+</div>
+
+<div class="research-grid" id="researchGrid">
+  <a href="/research/bloodhound" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">BloodHound Advanced Queries</div>
+    <div class="rc-desc">Custom Cypher queries, shortest path to DA, Kerberoastable + DCSync targets, LAPS + GPO abuse paths.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/ligolo-ng" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">Ligolo-ng Double Pivot</div>
+    <div class="rc-desc">Multi-hop tunneling through segmented AD networks. Agent chaining, route injection, and traffic routing without proxychains.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/adcs-esc" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">AD CS ESC1–ESC8 Attack Chains</div>
+    <div class="rc-desc">Complete Certipy-driven exploitation of all 8 ADCS misconfigurations — from enrollment abuse to CA key theft.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/rbcd" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">RBCD Full Walkthrough</div>
+    <div class="rc-desc">Resource-Based Constrained Delegation from WriteProperty to S4U2Self/S4U2Proxy and impersonation to DA.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/potato-attacks" class="research-card" data-cat="priv">
+    <div class="rc-tag priv">Privilege Escalation</div>
+    <div class="rc-title">Potato Attacks Comparison</div>
+    <div class="rc-desc">PrintSpoofer vs JuicyPotato vs GodPotato vs SweetPotato — when to use which, OS compatibility, and current bypass status.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/responder-ntlmrelay" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">Responder + NTLMRelayx Chain</div>
+    <div class="rc-desc">LLMNR/NBT-NS poisoning → relay → SMB signing disabled targets → shell or DA hash. Full attack chain with edge cases.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/amsi-bypass" class="research-card" data-cat="evasion">
+    <div class="rc-tag evasion">Evasion</div>
+    <div class="rc-title">AMSI Bypass Techniques (2026)</div>
+    <div class="rc-desc">Working PowerShell AMSI patches, memory patching via reflection, CLM bypass, and constrained language mode escapes.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/gpo-abuse" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">GPO Abuse for Persistence</div>
+    <div class="rc-desc">Modifying GPOs with GenericWrite — scheduled tasks, startup scripts, registry keys, and immediate policy push.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/sysreptor" class="research-card" data-cat="tools">
+    <div class="rc-tag tools">Tools & Setup</div>
+    <div class="rc-title">SysReptor Complete Setup</div>
+    <div class="rc-desc">Docker install, CPTS finding templates, CVSS calculator integration, screenshot embedding, and PDF export pipeline.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/htb-mappings" class="research-card" data-cat="tools">
+    <div class="rc-tag tools">Tools & Setup</div>
+    <div class="rc-title">HTB Machines → CPTS Modules</div>
+    <div class="rc-desc">Curated list of 30+ HTB machines mapped to specific CPTS exam objectives. Ordered by difficulty and topic coverage.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/certipy" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">Certipy Complete Guide</div>
+    <div class="rc-desc">Full Certipy workflow: find, req, auth, shadow, relay, forge — all subcommands with real-world output examples.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/shadow-credentials" class="research-card" data-cat="ad">
+    <div class="rc-tag ad">Active Directory</div>
+    <div class="rc-title">Shadow Credentials Attack</div>
+    <div class="rc-desc">msDS-KeyCredentialLink manipulation via Whisker/Certipy → PKINIT → TGT → NT hash without password reset.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/nfs-exploitation" class="research-card" data-cat="web">
+    <div class="rc-tag web">Infrastructure</div>
+    <div class="rc-title">NFS Exploitation</div>
+    <div class="rc-desc">no_root_squash UID spoofing, SUID binary planting, squashfs tricks, and NFS version fingerprinting for privesc.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/container-escape" class="research-card" data-cat="priv">
+    <div class="rc-tag priv">Privilege Escalation</div>
+    <div class="rc-title">Docker / LXD Container Escape</div>
+    <div class="rc-desc">Privileged container escapes, cgroup release_agent, LXD image trick, socket mounts, and cap_sys_admin abuse.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+  <a href="/research/credential-hunting" class="research-card" data-cat="tools">
+    <div class="rc-tag tools">Tools & Setup</div>
+    <div class="rc-title">Credential Hunting Scripts</div>
+    <div class="rc-desc">Automated one-liners for Linux/Windows credential discovery — config files, env vars, history, browsers, keyrings.</div>
+    <span class="rc-arrow">→</span>
+  </a>
+</div>
+
+<script>
+function filterTopics(cat) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.research-card').forEach(card => {
+    card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'block' : 'none';
+  });
+}
+</script>

@@ -1,0 +1,103 @@
+<% const pageTitle = topic.title + ' — Deep Dive'; %>
+<% const metaDesc = topic.summary; %>
+<% const ogPath = '/research/' + topic.slug; %>
+<%- contentFor('body') %>
+
+<style>
+.rt-layout { display: grid; grid-template-columns: 1fr 260px; gap: 2rem; align-items: start; }
+.rt-main {}
+.rt-sidebar { position: sticky; top: 1.5rem; }
+.rt-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--htb-border); }
+.rt-back { font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 1rem; }
+.rt-back:hover { color: var(--htb-green); }
+.rt-tag { display: inline-block; font-size: 0.65rem; font-family: var(--font-mono); padding: 2px 8px; border-radius: 4px; background: rgba(127,209,100,0.12); color: var(--htb-green); border: 1px solid rgba(127,209,100,0.3); margin-bottom: 0.75rem; }
+.rt-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); margin-bottom: 0.5rem; }
+.rt-summary { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; }
+.rt-body { font-size: 0.875rem; line-height: 1.8; color: var(--text-secondary); }
+.rt-body h2 { font-size: 1.05rem; color: var(--text-primary); margin: 2rem 0 0.75rem; padding-left: 0.75rem; border-left: 3px solid var(--htb-green); font-family: var(--font-mono); }
+.rt-body h3 { font-size: 0.9rem; color: var(--htb-green); margin: 1.25rem 0 0.5rem; font-family: var(--font-mono); }
+.rt-body p { margin-bottom: 1rem; }
+.rt-body ul, .rt-body ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+.rt-body li { margin-bottom: 0.4rem; }
+.rt-body strong { color: var(--text-primary); }
+.rt-body code { background: var(--htb-surface); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--htb-green); border: 1px solid var(--htb-border); }
+.rt-body pre { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; position: relative; }
+.rt-body pre code { background: none; border: none; padding: 0; font-size: 0.78rem; color: var(--text-secondary); display: block; line-height: 1.6; }
+.copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; font-size: 0.65rem; padding: 3px 8px; border: 1px solid var(--htb-border); border-radius: 4px; background: var(--htb-bg); color: var(--text-muted); cursor: pointer; font-family: var(--font-mono); }
+.copy-btn:hover { border-color: var(--htb-green); color: var(--htb-green); }
+.tip-box { background: rgba(127,209,100,0.06); border: 1px solid rgba(127,209,100,0.4); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+.tip-box strong { color: var(--htb-green); }
+.warn-box { background: rgba(251,146,60,0.06); border: 1px solid rgba(251,146,60,0.4); border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; }
+.warn-box strong { color: #fb923c; }
+.rt-toc { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+.rt-toc-title { font-family: var(--font-mono); font-size: 0.75rem; color: var(--htb-green); margin-bottom: 0.75rem; }
+.rt-toc a { display: block; font-size: 0.78rem; color: var(--text-muted); text-decoration: none; padding: 3px 0; border-left: 2px solid transparent; padding-left: 0.5rem; transition: all 0.15s; }
+.rt-toc a:hover, .rt-toc a.active { color: var(--htb-green); border-left-color: var(--htb-green); }
+.rt-nav { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.rt-nav a { font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.5rem; border-radius: 4px; transition: all 0.15s; }
+.rt-nav a:hover { background: rgba(127,209,100,0.08); color: var(--htb-green); }
+.data-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.8rem; }
+.data-table th { background: var(--htb-surface); color: var(--htb-green); font-family: var(--font-mono); padding: 0.5rem 0.75rem; text-align: left; border: 1px solid var(--htb-border); }
+.data-table td { padding: 0.5rem 0.75rem; border: 1px solid var(--htb-border); color: var(--text-secondary); vertical-align: top; }
+.data-table tr:hover td { background: rgba(127,209,100,0.03); }
+@media (max-width: 900px) { .rt-layout { grid-template-columns: 1fr; } .rt-sidebar { position: static; } }
+</style>
+
+<div class="rt-layout">
+  <div class="rt-main">
+    <div class="rt-header">
+      <a href="/research" class="rt-back">← Research Hub</a>
+      <div class="rt-tag"><%= topic.category %></div>
+      <h1 class="rt-title"><%= topic.title %></h1>
+      <p class="rt-summary"><%= topic.summary %></p>
+    </div>
+
+    <div class="rt-body">
+      <%- topic.content %>
+    </div>
+  </div>
+
+  <div class="rt-sidebar">
+    <div class="rt-toc">
+      <div class="rt-toc-title">// CONTENTS</div>
+      <% topic.toc.forEach(item => { %>
+        <a href="#<%= item.anchor %>"><%= item.label %></a>
+      <% }) %>
+    </div>
+
+    <div class="rt-nav">
+      <% if (prev) { %><a href="/research/<%= prev.slug %>">← <%= prev.title %></a><% } %>
+      <% if (next) { %><a href="/research/<%= next.slug %>"><%= next.title %> →</a><% } %>
+      <a href="/research" style="margin-top:0.25rem; border-top: 1px solid var(--htb-border); padding-top: 0.5rem;">↩ Back to Hub</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Copy code buttons
+document.querySelectorAll('pre').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'copy';
+  btn.onclick = () => {
+    navigator.clipboard.writeText(pre.querySelector('code').textContent);
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  };
+  pre.appendChild(btn);
+});
+
+// TOC scroll highlight
+const headings = document.querySelectorAll('.rt-body h2, .rt-body h3');
+const tocLinks = document.querySelectorAll('.rt-toc a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector('.rt-toc a[href="#' + e.target.id + '"]');
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+headings.forEach(h => observer.observe(h));
+</script>

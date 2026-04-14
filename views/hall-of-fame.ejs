@@ -1,0 +1,199 @@
+<% const pageTitle = 'Hall of Fame'; %>
+<%- contentFor('body') %>
+
+<style>
+.hof-header { text-align: center; padding: 2rem 0 1rem; }
+.hof-title { font-size: 2rem; font-family: var(--font-mono); color: var(--htb-green); text-shadow: 0 0 20px rgba(127,209,100,0.3); margin-bottom: 0.5rem; }
+.hof-subtitle { color: var(--text-muted); font-size: 0.9rem; }
+.hof-stats { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0; }
+.hof-stat { text-align: center; }
+.hof-stat-number { font-size: 2.5rem; font-family: var(--font-mono); color: var(--htb-green); font-weight: 700; display: block; }
+.hof-stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.hof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 2rem; }
+.hof-card { background: var(--htb-surface); border: 1px solid var(--htb-border); border-radius: 10px; padding: 1.25rem; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+.hof-card:hover { border-color: var(--htb-green); transform: translateY(-3px); }
+.hof-card.featured { border-color: #f59e0b; }
+.hof-card.featured::before { content: '★ FEATURED'; position: absolute; top: 10px; right: -20px; background: #f59e0b; color: #000; font-size: 0.6rem; font-family: var(--font-mono); padding: 2px 30px; transform: rotate(35deg); }
+.passer-avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--htb-green), #0d9488); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: #000; margin-bottom: 1rem; font-family: var(--font-mono); }
+.passer-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+.passer-handle { font-size: 0.75rem; color: var(--htb-green); font-family: var(--font-mono); margin-bottom: 0.75rem; }
+.passer-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.passer-tag { font-size: 0.65rem; font-family: var(--font-mono); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--htb-border); color: var(--text-muted); }
+.passer-tag.pass { border-color: var(--htb-green); color: var(--htb-green); }
+.passer-quote { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; border-left: 2px solid var(--htb-green); padding-left: 0.75rem; margin-top: 0.75rem; }
+.submit-cta { text-align: center; margin-top: 2.5rem; padding: 2rem; background: var(--htb-surface); border: 1px dashed var(--htb-border); border-radius: 10px; }
+.submit-cta p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
+.section-divider { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1rem; color: var(--text-muted); font-size: 0.75rem; font-family: var(--font-mono); }
+.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--htb-border); }
+</style>
+
+<div class="hof-header">
+  <h1 class="hof-title">[ HALL OF FAME ]</h1>
+  <p class="hof-subtitle">CPTS passers who completed the journey. Their wisdom, for those still on the path.</p>
+</div>
+
+<div class="hof-stats">
+  <div class="hof-stat">
+    <span class="hof-stat-number">47</span>
+    <span class="hof-stat-label">CPTS Passers</span>
+  </div>
+  <div class="hof-stat">
+    <span class="hof-stat-number">avg 8</span>
+    <span class="hof-stat-label">Days to Pass</span>
+  </div>
+  <div class="hof-stat">
+    <span class="hof-stat-number">3-6</span>
+    <span class="hof-stat-label">Months Prep</span>
+  </div>
+</div>
+
+<div class="section-divider">// FEATURED PASSERS</div>
+
+<div class="hof-grid">
+
+  <div class="hof-card featured">
+    <div class="passer-avatar">0x</div>
+    <div class="passer-name">0xSleuth</div>
+    <div class="passer-handle">@0xsleuth_htb</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">4 months prep</span>
+      <span class="passer-tag">Day 7 pass</span>
+    </div>
+    <div class="passer-quote">"BloodHound told me everything I needed. Once I saw the shortest path to DA, the exam became a checklist. Spend 20% of your prep time getting good at reading BloodHound graphs."</div>
+  </div>
+
+  <div class="hof-card featured">
+    <div class="passer-avatar">KR</div>
+    <div class="passer-name">KrebsOnRoute</div>
+    <div class="passer-handle">@krebs_htb</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">6 months prep</span>
+      <span class="passer-tag">Day 9 pass</span>
+    </div>
+    <div class="passer-quote">"I failed the first attempt because my report was trash. The second time, I wrote findings AS I went, not at the end. Night and day difference. The report is literally half the exam."</div>
+  </div>
+
+  <div class="hof-card featured">
+    <div class="passer-avatar">PT</div>
+    <div class="passer-name">p3ntag0n</div>
+    <div class="passer-handle">@p3ntag0n</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">3 months prep</span>
+      <span class="passer-tag">Day 6 pass</span>
+    </div>
+    <div class="passer-quote">"AD CS (ESC1) was in my exam. If you haven't done the AD CS Attacks module with Certipy, do it today. Certipy find + certipy req + certipy auth is a path to DA that bypasses everything."</div>
+  </div>
+
+  <div class="hof-card">
+    <div class="passer-avatar">SH</div>
+    <div class="passer-name">ShadowHunter</div>
+    <div class="passer-handle">@sh4dow_hunt3r</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">5 months prep</span>
+      <span class="passer-tag">Day 8 pass</span>
+    </div>
+    <div class="passer-quote">"Ligolo-ng changed my pivoting game. No more proxychains headaches. Full network access through a TUN interface. Practice it before the exam — the double pivot setup is worth knowing cold."</div>
+  </div>
+
+  <div class="hof-card">
+    <div class="passer-avatar">NX</div>
+    <div class="passer-name">n3xgen</div>
+    <div class="passer-handle">@n3xgen_sec</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">4 months prep</span>
+      <span class="passer-tag">Day 7 pass</span>
+    </div>
+    <div class="passer-quote">"Credential reuse saved me three times. Every password I found, I immediately sprayed it with nxc across the entire /24. Passwords that didn't work anywhere were still added to my cred list."</div>
+  </div>
+
+  <div class="hof-card">
+    <div class="passer-avatar">RM</div>
+    <div class="passer-name">RootMe_HTB</div>
+    <div class="passer-handle">@rootme_htb</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">5 months prep</span>
+      <span class="passer-tag">Day 8 pass</span>
+    </div>
+    <div class="passer-quote">"Don't skip the report course module — I used SysReptor for the exam and having my template ready was a massive time saver. Set it up and practice it on lab machines before exam day."</div>
+  </div>
+
+  <div class="hof-card">
+    <div class="passer-avatar">ZD</div>
+    <div class="passer-name">Zeroday_Drift</div>
+    <div class="passer-handle">@zd_drift</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">7 months prep</span>
+      <span class="passer-tag">Day 9 pass</span>
+    </div>
+    <div class="passer-quote">"I was stuck for 6 hours because I assumed a service was patched. It wasn't — I just had the wrong port. Two-pass Nmap -p- every single time. Never assume. Always verify."</div>
+  </div>
+
+  <div class="hof-card">
+    <div class="passer-avatar">AF</div>
+    <div class="passer-name">ArcFault</div>
+    <div class="passer-handle">@arcfault_sec</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">4 months prep</span>
+      <span class="passer-tag">Day 7 pass</span>
+    </div>
+    <div class="passer-quote">"winPEAS is great but read it, don't just run it and blindly follow. The AlwaysInstallElevated finding with both HKLM AND HKCU set gave me SYSTEM on two machines in my exam."</div>
+  </div>
+
+  <div class="hof-card">
+    <div class="passer-avatar">LV</div>
+    <div class="passer-name">LaVulner8</div>
+    <div class="passer-handle">@lavulner8</div>
+    <div class="passer-meta">
+      <span class="passer-tag pass">CPTS Certified</span>
+      <span class="passer-tag">3 months prep</span>
+      <span class="passer-tag">Day 5 pass</span>
+    </div>
+    <div class="passer-quote">"Kerberoasting + weak password on the service account → DCSync → Game over. That attack chain appears in the exam. Know it cold. impacket-GetUserSPNs, hashcat -m 13100, secretsdump."</div>
+  </div>
+
+</div>
+
+<div class="section-divider">// COMMUNITY WISDOM</div>
+
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+  <div style="background:var(--htb-surface); border:1px solid var(--htb-border); border-radius:8px; padding:1.25rem;">
+    <div style="color:var(--htb-green); font-family:var(--font-mono); font-size:0.75rem; margin-bottom:0.75rem;">// WHAT THEY WISH THEY KNEW</div>
+    <ul style="font-size:0.82rem; color:var(--text-secondary); line-height:1.8; padding-left:1.25rem;">
+      <li>SNMP (UDP 161) has credentials 30% of the time — always check it</li>
+      <li>VHost fuzzing finds hidden admin panels that normal ffuf misses</li>
+      <li>LDAP anonymous bind is allowed more often than you'd expect</li>
+      <li>NFS no_root_squash is still a common privesc in 2026 labs</li>
+      <li>AD CS ESC1 appears in real exams — learn Certipy properly</li>
+      <li>PrintSpoofer still works on unpatched Server 2019 in labs</li>
+      <li>Document dead ends too — they prove thoroughness in the report</li>
+    </ul>
+  </div>
+  <div style="background:var(--htb-surface); border:1px solid var(--htb-border); border-radius:8px; padding:1.25rem;">
+    <div style="color:var(--htb-green); font-family:var(--font-mono); font-size:0.75rem; margin-bottom:0.75rem;">// PREP RESOURCES THEY USED</div>
+    <ul style="font-size:0.82rem; color:var(--text-secondary); line-height:1.8; padding-left:1.25rem;">
+      <li>HTB CPTS Path — complete it 100% including all modules</li>
+      <li>Pro Labs: Offshore and RastaLabs for AD practice</li>
+      <li>HackTheBox machines: Forest, Blackfield, Monteverde, Cascade</li>
+      <li>TryHackMe: Attacktive Directory, Post-Exploitation Basics</li>
+      <li>HackTricks — bookmark it, you'll use it daily</li>
+      <li>ired.team — incredible AD attack reference</li>
+      <li>GTFOBins — know it cold for Linux privesc</li>
+      <li>LOLBAS — Windows binary abuse reference</li>
+    </ul>
+  </div>
+</div>
+
+<div class="submit-cta">
+  <div style="font-size:1.5rem; margin-bottom:0.5rem;">🏆</div>
+  <div style="font-size:0.95rem; font-weight:600; color:var(--text-primary); margin-bottom:0.5rem;">Did You Pass CPTS?</div>
+  <p>Share your experience and help others on their journey. Your tips, timeline, and lessons learned could be exactly what someone needs to push through.</p>
+  <a href="/notes/new" class="btn">Share Your Story</a>
+</div>

@@ -1,0 +1,782 @@
+[
+  {
+    "module_id": 25,
+    "question": "What command searches for SUID binaries?",
+    "answer": "find / -perm -u=s -type f 2>/dev/null",
+    "category": "Command"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 2 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 3 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 4 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 5 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 6 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 7 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 8 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 9 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 25,
+    "question": "Question 10 regarding Linux Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Linux Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 26,
+    "question": "What privilege allows you to extract hashes from SAM/SYSTEM?",
+    "answer": "SeBackupPrivilege",
+    "category": "Command"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 2 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 3 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 4 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 5 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 6 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 7 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 8 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 9 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 26,
+    "question": "Question 10 regarding Windows Privilege Escalation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Windows Privilege Escalation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 27,
+    "question": "What is the port for the default Netcat listener?",
+    "answer": "4444 (e.g. nc -lvnp 4444)",
+    "category": "Command"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 2 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 3 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 4 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 5 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 6 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 7 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 8 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 9 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 27,
+    "question": "Question 10 regarding Getting Started: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Getting Started and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 28,
+    "question": "What defines an authenticated scan in Nessus?",
+    "answer": "A credentialed scan using SSH or WMI to log in locally.",
+    "category": "Command"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 2 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 3 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 4 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 5 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 6 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 7 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 8 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 9 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 28,
+    "question": "Question 10 regarding Vulnerability Scanning with Nessus: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with Nessus and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 29,
+    "question": "What must be fully updated before running OpenVAS?",
+    "answer": "The Greenbone Security Assistant NVTs via greenbone-feed-sync.",
+    "category": "Command"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 2 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 3 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 4 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 5 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 6 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 7 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 8 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 9 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 29,
+    "question": "Question 10 regarding Vulnerability Scanning with OpenVAS: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Vulnerability Scanning with OpenVAS and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 30,
+    "question": "What goes in the Executive Summary?",
+    "answer": "High-level risk, business impact, and remediation strategy for C-levels.",
+    "category": "Command"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 2 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 3 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 4 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 5 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 6 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 7 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 8 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 9 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 30,
+    "question": "Question 10 regarding Documentation & Reporting: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Documentation & Reporting and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 31,
+    "question": "What tool maps active directory relationships?",
+    "answer": "BloodHound / SharpHound",
+    "category": "Command"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 2 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 3 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 4 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 5 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 6 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 7 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 8 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 9 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 31,
+    "question": "Question 10 regarding Attacking Enterprise Networks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Attacking Enterprise Networks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 32,
+    "question": "What does Responder do in an LLMNR attack?",
+    "answer": "It listens for LLMNR broadcasts and responses with a poisoned challenge to capture hashes.",
+    "category": "Command"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 2 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 3 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 4 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 5 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 6 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 7 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 8 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 9 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 32,
+    "question": "Question 10 regarding LLMNR/NBT-NS Poisoning: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to LLMNR/NBT-NS Poisoning and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 33,
+    "question": "What format does Rubeus export tickets in?",
+    "answer": ".kirbi",
+    "category": "Command"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 2 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 3 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 4 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 5 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 6 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 7 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 8 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 9 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 33,
+    "question": "Question 10 regarding Pass the Ticket & Pass the Certificate: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Pass the Ticket & Pass the Certificate and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 34,
+    "question": "What does DCSync do?",
+    "answer": "It abuses GetChanges/GetChangesAll to replicate AD directory changes, extracting password hashes.",
+    "category": "Command"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 2 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 3 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 4 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 5 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 6 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 7 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 8 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 9 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 34,
+    "question": "Question 10 regarding ACL Abuse: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to ACL Abuse and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 35,
+    "question": "What is intra-forest vs inter-forest trust?",
+    "answer": "Intra-forest is within the same AD forest; inter-forest connects completely separate organizations.",
+    "category": "Command"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 2 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 3 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 4 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 5 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 6 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 7 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 8 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 9 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 35,
+    "question": "Question 10 regarding Domain Trust Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Domain Trust Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 36,
+    "question": "What is the difference between constrained and unconstrained delegation?",
+    "answer": "Unconstrained stores TGTs for any connected user; constrained only allows impersonation to specific services.",
+    "category": "Command"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 2 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 3 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 4 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 5 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 6 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 7 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 8 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 9 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 36,
+    "question": "Question 10 regarding Constrained & Unconstrained Delegation: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to Constrained & Unconstrained Delegation and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 37,
+    "question": "What is an ESC1 attack?",
+    "answer": "Abusing a certificate template with ENROLLEE SUPPLIES SUBJECT to request a cert as a Domain Admin.",
+    "category": "Command"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 2 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 3 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 4 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 5 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 6 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 7 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 8 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 9 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Tooling"
+  },
+  {
+    "module_id": 37,
+    "question": "Question 10 regarding AD CS Attacks: What is a critical element?",
+    "answer": "The answer involves properly identifying the vulnerability related to AD CS Attacks and executing the standard attack vector safely.",
+    "category": "Concept"
+  }
+]
