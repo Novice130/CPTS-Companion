@@ -178,16 +178,10 @@
               </span>
               <a href="/logout" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; padding: 4px 10px; border: 1px solid var(--htb-border); border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--htb-red)';this.style.color='var(--htb-red)'" onmouseout="this.style.borderColor='var(--htb-border)';this.style.color='var(--text-muted)'" >Logout</a>
             </div>
-          <% } else { %>
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 1px solid var(--htb-border);">
-              <span style="color: var(--htb-red); font-size: 0.85rem; font-weight: 500;">
-                ⚠️ Login to save your work
-              </span>
-              <a href="/login" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; padding: 4px 10px; border: 1px solid var(--htb-border); border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--htb-green)';this.style.color='var(--htb-green)'" onmouseout="this.style.borderColor='var(--htb-border)';this.style.color='var(--text-muted)'" >Login</a>
-            </div>
           <% } %>
         </div>
       </header>
+      <%- include('partials/login-prompt', { user: typeof user !== 'undefined' ? user : null }) %>
       
       <!-- Page Content -->
       <main class="main-content">

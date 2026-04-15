@@ -447,8 +447,9 @@
     graphData = buildGraphData();
 
     const container = document.getElementById('graphViewport');
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    // Use fallback dimensions if layout hasn't settled yet
+    const width = container.clientWidth || window.innerWidth - 260;
+    const height = container.clientHeight || window.innerHeight - 60;
 
     svg = d3.select('#graphSvg');
     graphGroup = d3.select('#graphGroup');
@@ -463,25 +464,25 @@
 
     svg.call(zoom);
 
-    // Force simulation
+    // Force simulation — strong repulsion to fill available space
     simulation = d3.forceSimulation(graphData.nodes)
       .force('link', d3.forceLink(graphData.links).id(d => d.id).distance(d => {
-        if (d.type === 'branch') return 200;
-        if (d.type === 'child') return 100;
-        return 150;
+        if (d.type === 'branch') return 220;
+        if (d.type === 'child') return 110;
+        return 160;
       }).strength(d => {
         if (d.type === 'branch') return 0.5;
         if (d.type === 'child') return 0.7;
         return 0.2;
       }))
       .force('charge', d3.forceManyBody().strength(d => {
-        if (d.type === 'center') return -800;
-        if (d.type === 'branch') return -400;
-        return -150;
+        if (d.type === 'center') return -1200;
+        if (d.type === 'branch') return -600;
+        return -250;
       }))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => d.radius + 20))
-      .alphaDecay(0.02);
+      .force('collision', d3.forceCollide().radius(d => d.radius + 25))
+      .alphaDecay(0.028);
 
     // Render links
     linkElements = d3.select('#linksGroup')
@@ -558,8 +559,20 @@
       nodeElements.attr('transform', d => `translate(${d.x}, ${d.y})`);
     });
 
-    // Initial zoom to fit
+    // Zoom to fit early (don't wait for simulation end — it takes too long)
+    // Fire several times as nodes settle into position
+    setTimeout(() => { zoomToFit(); updateMinimap(); }, 800);
+    setTimeout(() => { zoomToFit(); updateMinimap(); }, 2000);
     simulation.on('end', () => {
+      zoomToFit();
+      updateMinimap();
+    });
+
+    // Re-center when container resizes
+    window.addEventListener('resize', () => {
+      const w = container.clientWidth || window.innerWidth - 260;
+      const h = container.clientHeight || window.innerHeight - 60;
+      simulation.force('center', d3.forceCenter(w / 2, h / 2));
       zoomToFit();
       updateMinimap();
     });
@@ -821,21 +834,26 @@
 
   function zoomToFit() {
     const container = document.getElementById('graphViewport');
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = container.clientWidth || window.innerWidth - 260;
+    const height = container.clientHeight || window.innerHeight - 60;
+
+    if (width < 50 || height < 50) return; // Layout not ready yet
 
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     graphData.nodes.forEach(d => {
+      if (d.x == null || d.y == null) return;
       if (d.x < minX) minX = d.x;
       if (d.x > maxX) maxX = d.x;
       if (d.y < minY) minY = d.y;
       if (d.y > maxY) maxY = d.y;
     });
 
-    const padding = 80;
+    if (!isFinite(minX)) return; // No positioned nodes yet
+
+    const padding = 100;
     const dx = maxX - minX + padding * 2;
     const dy = maxY - minY + padding * 2;
-    const scale = Math.min(width / dx, height / dy, 1.5);
+    const scale = Math.min(width / dx, height / dy, 1.2);
     const tx = width / 2 - (minX + maxX) / 2 * scale;
     const ty = height / 2 - (minY + maxY) / 2 * scale;
 
@@ -957,12 +975,19 @@
   }
 
   // ============================================
-  // Boot
+  // Boot — delay slightly so flex layout computes dimensions
   // ============================================
 
+  function boot() {
+    // Wait one frame for the browser to compute flex layout
+    requestAnimationFrame(() => {
+      requestAnimationFrame(initGraph);
+    });
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGraph);
+    document.addEventListener('DOMContentLoaded', boot);
   } else {
-    initGraph();
+    boot();
   }
 })();

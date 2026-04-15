@@ -5,7 +5,8 @@
 .explore-container {
   position: relative;
   width: 100%;
-  height: calc(100vh - var(--topbar-height));
+  flex: 1;
+  min-height: 0;          /* critical for flex child height */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -160,6 +161,7 @@
    ============================================ */
 .graph-viewport {
   flex: 1;
+  min-height: 0;          /* allow flex shrink below content */
   position: relative;
   overflow: hidden;
   cursor: grab;

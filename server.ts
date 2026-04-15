@@ -136,17 +136,7 @@ async function startServer() {
       console.error(`[softAuth] ERROR getting session:`, e);
     }
 
-    // Track unauthenticated page views using a cookie
-    let views = parseInt(req.cookies?.guest_views || "0") + 1;
-    console.log(`[softAuth] Guest view count:`, views);
-    res.cookie("guest_views", views.toString(), { maxAge: 900000, httpOnly: true, path: "/" });
-
-    if (views === 1) {
-      console.log(`[softAuth] Redirecting to login for initial prompt (views: ${views})`);
-      return res.redirect("/login?reason=initial");
-    }
-
-    (req as any).user = null; // Guest user
+    (req as any).user = null; // Guest user — popup handled client-side
     next();
   }
 

