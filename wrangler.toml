@@ -1,0 +1,16 @@
+name = "cpts-companion"
+main = "dist/_worker.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "dist"
+
+[vars]
+# Non-sensitive vars here. Secrets go via: wrangler secret put SECRET_NAME
+# Required secrets to set before deploying:
+#   wrangler secret put DATABASE_URL
+#   wrangler secret put BETTER_AUTH_SECRET
+#   wrangler secret put BETTER_AUTH_URL
+#   wrangler secret put RESEND_API_KEY   (optional)
+

@@ -7,7 +7,12 @@
   "scripts": {
     "start": "node --experimental-strip-types server.ts",
     "dev": "node --experimental-strip-types --watch server.ts",
-    "validate:seed": "node scripts/validate-seed.mjs"
+    "validate:seed": "node scripts/validate-seed.mjs",
+    "bundle:views": "node scripts/bundle-views.mjs",
+    "bundle:seed": "node scripts/bundle-seed-data.mjs",
+    "build:worker": "npm run bundle:views && npm run bundle:seed && node scripts/build-worker.mjs",
+    "deploy": "npm run build:worker && wrangler deploy",
+    "dev:worker": "npm run build:worker && wrangler dev dist/_worker.js"
   },
   "keywords": [
     "cpts",
@@ -19,17 +24,23 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "better-auth": "^1.2.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
+    "eta": "^4.5.1",
     "express": "^4.21.0",
     "express-ejs-layouts": "^2.5.1",
     "pg": "^8.13.0",
-    "resend": "^4.0.0"
+    "resend": "^4.0.0",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260418.1",
     "@types/cookie-parser": "^1.4.10",
-    "@types/express-ejs-layouts": "^2.5.4"
+    "@types/express-ejs-layouts": "^2.5.4",
+    "esbuild": "^0.25.12",
+    "wrangler": "^4.83.0"
   }
 }

@@ -22,6 +22,19 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+.dev.vars
+
+# Cloudflare
+.wrangler/
+wrangler_output.txt
+
+# Generated manifests (rebuilt on deploy)
+views-manifest.ts
+seed-data.ts
+
+# Misc generated
+topics.html
+test-http.mjs
 
 # Build
 dist/

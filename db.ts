@@ -1,35 +1,41 @@
-import pg from "pg";
-import { readFileSync, existsSync } from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { Pool, neonConfig } from "@neondatabase/serverless";
 import "dotenv/config";
+import ws from "ws";
+import * as seedData from "./seed-data.ts";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Initialize Postgres connection pool (Neon)
-if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL not set. Create a .env file (see .env.example)");
-  process.exit(1);
+// Set up WebSocket for Neon in Node environments (like local dev)
+if (typeof window === "undefined" && typeof globalThis.WebSocket === "undefined") {
+  neonConfig.webSocketConstructor = ws;
 }
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  max: 10,
-});
 
-// Test connection on startup
-pool.on("error", (err) => {
-  console.error("Unexpected Postgres error:", err);
-});
+let pool: Pool | null = null;
+
+export function getPool(): Pool {
+  if (!pool) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL not set in process.env");
+    }
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 10,
+    });
+    
+    pool.on("error", (err) => {
+      console.error("Unexpected Postgres error:", err);
+    });
+  }
+  return pool;
+}
+
 
 // ============================================
 // Schema Initialization
 // ============================================
 
 export async function initDatabase(): Promise<void> {
-  const client = await pool.connect();
+  const client = await getPool().connect();
   try {
     // ── Better Auth required tables ──────────────────────────────────
     await client.query(`
@@ -234,102 +240,82 @@ export async function seedDatabase(): Promise<void> {
   console.log("Seeding database...");
 
   // Seed modules
-  const modulesPath = join(__dirname, "seed", "modules.json");
-  if (existsSync(modulesPath)) {
-    const modules = JSON.parse(readFileSync(modulesPath, "utf-8"));
-    for (const mod of modules) {
-      await pool.query(
-        `INSERT INTO modules (title, slug, category, summary, cheatsheet_md, pitfalls_md, exam_tips_md, order_index)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [mod.title, mod.slug, mod.category, mod.summary, mod.cheatsheet_md, mod.pitfalls_md, mod.exam_tips_md, mod.order_index]
-      );
-    }
-    console.log(`Seeded ${modules.length} modules`);
+  const modules = seedData.modulesData;
+  for (const mod of modules) {
+    await pool.query(
+      `INSERT INTO modules (title, slug, category, summary, cheatsheet_md, pitfalls_md, exam_tips_md, order_index)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [mod.title, mod.slug, mod.category, mod.summary, mod.cheatsheet_md, mod.pitfalls_md, mod.exam_tips_md, mod.order_index]
+    );
   }
+  console.log(`Seeded ${modules.length} modules`);
 
   // Seed exercises
-  const exercisesPath = join(__dirname, "seed", "exercises.json");
-  if (existsSync(exercisesPath)) {
-    const exercises = JSON.parse(readFileSync(exercisesPath, "utf-8"));
-    for (const ex of exercises) {
-      await pool.query(
-        `INSERT INTO exercises (module_id, type, difficulty, prompt, options, answer, explanation, validation_regex, hints)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-        [ex.module_id, ex.type, ex.difficulty, ex.prompt,
-         ex.options ? JSON.stringify(ex.options) : null,
-         ex.answer, ex.explanation, ex.validation_regex,
-         ex.hints ? JSON.stringify(ex.hints) : null]
-      );
-    }
-    console.log(`Seeded ${exercises.length} exercises`);
+  const exercises = seedData.exercisesData;
+  for (const ex of exercises) {
+    await pool.query(
+      `INSERT INTO exercises (module_id, type, difficulty, prompt, options, answer, explanation, validation_regex, hints)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [ex.module_id, ex.type, ex.difficulty, ex.prompt,
+       ex.options ? JSON.stringify(ex.options) : null,
+       ex.answer, ex.explanation, ex.validation_regex,
+       ex.hints ? JSON.stringify(ex.hints) : null]
+    );
   }
+  console.log(`Seeded ${exercises.length} exercises`);
 
   // Seed flashcards
-  const flashcardsPath = join(__dirname, "seed", "flashcards.json");
-  if (existsSync(flashcardsPath)) {
-    const flashcards = JSON.parse(readFileSync(flashcardsPath, "utf-8"));
-    for (const fc of flashcards) {
-      await pool.query(
-        `INSERT INTO flashcards (module_id, question, answer, tags) VALUES ($1, $2, $3, $4)`,
-        [fc.module_id, fc.question, fc.answer, fc.tags ? JSON.stringify(fc.tags) : null]
-      );
-    }
-    console.log(`Seeded ${flashcards.length} flashcards`);
+  const flashcards = seedData.flashcardsData;
+  for (const fc of flashcards) {
+    await pool.query(
+      `INSERT INTO flashcards (module_id, question, answer, tags) VALUES ($1, $2, $3, $4)`,
+      [fc.module_id, fc.question, fc.answer, fc.tags ? JSON.stringify(fc.tags) : null]
+    );
   }
+  console.log(`Seeded ${flashcards.length} flashcards`);
 
   // Seed mindmaps
-  const mindmapsPath = join(__dirname, "seed", "mindmaps.json");
-  if (existsSync(mindmapsPath)) {
-    const mindmaps = JSON.parse(readFileSync(mindmapsPath, "utf-8"));
-    for (const mm of mindmaps) {
-      await pool.query(
-        `INSERT INTO mindmaps (module_id, title, description, mermaid_code) VALUES ($1, $2, $3, $4)`,
-        [mm.module_id, mm.title, mm.description, mm.mermaid_code]
-      );
-    }
-    console.log(`Seeded ${mindmaps.length} mindmaps`);
+  const mindmaps = seedData.mindmapsData;
+  for (const mm of mindmaps) {
+    await pool.query(
+      `INSERT INTO mindmaps (module_id, title, description, mermaid_code) VALUES ($1, $2, $3, $4)`,
+      [mm.module_id, mm.title, mm.description, mm.mermaid_code]
+    );
   }
+  console.log(`Seeded ${mindmaps.length} mindmaps`);
 
   // Seed plan
-  const planPath = join(__dirname, "seed", "plan.json");
-  if (existsSync(planPath)) {
-    const plan = JSON.parse(readFileSync(planPath, "utf-8"));
-    for (const day of plan) {
-      await pool.query(
-        `INSERT INTO plan_days (day_number, title, topics, estimated_hours, exercises, lab_focus, review_topics)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [day.day_number, day.title,
-         day.topics ? JSON.stringify(day.topics) : null,
-         day.estimated_hours,
-         day.exercises ? JSON.stringify(day.exercises) : null,
-         day.lab_focus,
-         day.review_topics ? JSON.stringify(day.review_topics) : null]
-      );
-    }
-    console.log(`Seeded ${plan.length} plan days`);
+  const plan = seedData.planData;
+  for (const day of plan) {
+    await pool.query(
+      `INSERT INTO plan_days (day_number, title, topics, estimated_hours, exercises, lab_focus, review_topics)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [day.day_number, day.title,
+       day.topics ? JSON.stringify(day.topics) : null,
+       day.estimated_hours,
+       day.exercises ? JSON.stringify(day.exercises) : null,
+       day.lab_focus,
+       day.review_topics ? JSON.stringify(day.review_topics) : null]
+    );
   }
+  console.log(`Seeded ${plan.length} plan days`);
 
   // Seed templates
-  const templatesPath = join(__dirname, "seed", "templates.json");
-  if (existsSync(templatesPath)) {
-    const templates = JSON.parse(readFileSync(templatesPath, "utf-8"));
-    for (const tmpl of templates) {
-      await pool.query(
-        `INSERT INTO templates (name, type, content_md) VALUES ($1, $2, $3)`,
-        [tmpl.name, tmpl.type, tmpl.content_md]
-      );
-    }
-    console.log(`Seeded ${templates.length} templates`);
+  const templates = seedData.templatesData;
+  for (const tmpl of templates) {
+    await pool.query(
+      `INSERT INTO templates (name, type, content_md) VALUES ($1, $2, $3)`,
+      [tmpl.name, tmpl.type, tmpl.content_md]
+    );
   }
+  console.log(`Seeded ${templates.length} templates`);
 
   // Build search index
   await buildSearchIndex();
 
-  // Generate initial activities for day 1
-  // Disabled global activity generation on boot; it's now per-user on demand.
-
   console.log("Database seeding complete!");
 }
+
 
 // ============================================
 // Activity Generation

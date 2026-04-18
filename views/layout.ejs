@@ -181,11 +181,11 @@
           <% } %>
         </div>
       </header>
-      <%- include('partials/login-prompt', { user: typeof user !== 'undefined' ? user : null }) %>
+      <%~ include('partials/login-prompt', { user: typeof user !== 'undefined' ? user : null }) %>
       
       <!-- Page Content -->
       <main class="main-content">
-        <%- body %>
+        <%~ body %>
       </main>
     </div>
   </div>

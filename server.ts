@@ -1,9 +1,10 @@
 import express from "express";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, relative } from "path";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import expressLayouts from "express-ejs-layouts";
+import { Eta } from "eta";
+import { viewsManifest } from "./views-manifest.ts";
 import { researchTopics, getTopicBySlug, getAdjacentTopics } from "./data/research-topics.ts";
 import {
   initDatabase,
@@ -14,6 +15,7 @@ import {
   generateActivitiesForDay,
   regenerateAllActivities,
 } from "./db.ts";
+
 import { auth, getSession } from "./auth.ts";
 import { toNodeHandler } from "better-auth/node";
 import { sendWelcomeEmail } from "./email.ts";
@@ -21,12 +23,21 @@ import { sendWelcomeEmail } from "./email.ts";
 type Request = express.Request;
 type Response = express.Response;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = 'index.js';
+const __dirname = '.';
 
-const app = express();
+const eta = new Eta({
+  views: join(__dirname, "views"),
+  useWith: true, // Use ejs-style scoping (e.g. <%= title %> instead of <%= it.title %>)
+  tags: ["<%", "%>"]
+});
+
+console.log('Initializing Express app...');
+export const app = express();
+console.log('Express app initialized.');
 app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
+
 
 // ============================================
 // Better Auth handler — MUST be before body parsers!
@@ -37,7 +48,11 @@ app.all("/api/auth/*", toNodeHandler(auth));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(join(__dirname, "public")));
+
+if (!process.env.CF_PAGES) {
+  app.use(express.static(join(__dirname, "public")));
+}
+
 
 // Basic native XSS Sanitizer to strip script tags and onload handlers
 function sanitizeHtml(html: string | null | undefined): string {
@@ -79,16 +94,64 @@ function rateLimiter(req: express.Request, res: express.Response, next: express.
 app.use('/api/', rateLimiter);
 app.use('/login', rateLimiter);
 
-// View engine setup
+// View engine setup with virtual loader for Cloudflare Workers
+app.engine("ejs", (path: string, options: any, callback: any) => {
+  // Convert absolute path back to relative view key
+  const viewsDir = join(__dirname, "views");
+  let key = relative(viewsDir, path).replace(/\\/g, "/");
+  if (key.endsWith(".ejs")) key = key.slice(0, -4);
+  
+  const template = viewsManifest[key];
+  if (!template) {
+    return callback(new Error(`Template not found in manifest: ${key}`));
+  }
+
+  try {
+    // Inject include helper for nested partials
+    const renderOptions = {
+      ...options,
+      include: (name: string, includeOptions?: any) => {
+        const partialKey = name.replace(/\.ejs$/, "");
+        const partial = viewsManifest[partialKey];
+        if (!partial) {
+          console.warn(`Partial not found: ${partialKey}`);
+          return `<!-- Partial not found: ${partialKey} -->`;
+        }
+        return eta.renderString(partial, { ...options, ...includeOptions });
+      }
+    };
+
+    // Eta uses 'render' for strings/paths depending on configuration
+    // We use renderString since we have the template in memory
+    let html = eta.renderString(template, renderOptions);
+
+    // Support for basic layouts (replaces express-ejs-layouts)
+    const layout = options.layout;
+    if (layout !== false) {
+      const layoutKey = typeof layout === 'string' ? layout : 'layout';
+      const layoutTemplate = viewsManifest[layoutKey];
+      if (layoutTemplate) {
+        html = eta.renderString(layoutTemplate, { ...renderOptions, body: html });
+      }
+    }
+
+    callback(null, html);
+  } catch (err) {
+    console.error(`Render error for ${key}:`, err);
+    callback(err);
+  }
+});
+
 app.set("view engine", "ejs");
 app.set("views", join(__dirname, "views"));
-app.use(expressLayouts);
-app.set("layout", false); // Default to no layout, opt-in per route
+// expressLayouts removed for Workers compatibility (using manual layout in engine above)
+
 
 // ============================================
 // Initialize DB (async — start server after init)
 // ============================================
-async function startServer() {
+export async function startServer() {
+
   await initDatabase();
   await seedDatabase();
   await queries.clearAllSessions();
@@ -1381,38 +1444,37 @@ Sitemap: https://cpts.learnnovice.com/sitemap.xml`);
     });
   });
 
-  // Error handling
-  app.use(async (req: Request, res: Response) => {
-    const user = (req as any).user;
-    const common = await getCommonData(user?.id);
-    res.status(404).render("error", { ...common, message: "Page not found", user });
-  });
+  // Start server (only if PORT is defined, typically Node environment)
+  if (process.env.PORT && !process.env.CF_PAGES) {
+    app.listen(PORT, () => {
+      console.log(`
+  ╔═══════════════════════════════════════════════════════════╗
+  ║                                                           ║
+  ║   ██████╗██████╗ ████████╗███████╗                        ║
+  ║  ██╔════╝██╔══██╗╚══██╔══╝██╔════╝                        ║
+  ║  ██║     ██████╔╝   ██║   ███████╗                        ║
+  ║  ██║     ██╔═══╝    ██║   ╚════██║                        ║
+  ║  ╚██████╗██║        ██║   ███████║                        ║
+  ║   ╚═════╝╚═╝        ╚═╝   ╚══════╝                        ║
+  ║                                                           ║
+  ║   CPTS Companion v2.0.0                                   ║
+  ║   Server running at http://localhost:${PORT}                 ║
+  ║   Auth: Better Auth + Google Sign-in                      ║
+  ║   DB: Neon Postgres                                       ║
+  ║                                                           ║
+  ║   Educational use only - Authorized labs only!            ║
+  ╚═══════════════════════════════════════════════════════════╝
+      `);
+    });
+  }
+}
 
-  // Start server
-  app.listen(PORT, () => {
-    console.log(`
-╔═══════════════════════════════════════════════════════════╗
-║                                                           ║
-║   ██████╗██████╗ ████████╗███████╗                        ║
-║  ██╔════╝██╔══██╗╚══██╔══╝██╔════╝                        ║
-║  ██║     ██████╔╝   ██║   ███████╗                        ║
-║  ██║     ██╔═══╝    ██║   ╚════██║                        ║
-║  ╚██████╗██║        ██║   ███████║                        ║
-║   ╚═════╝╚═╝        ╚═╝   ╚══════╝                        ║
-║                                                           ║
-║   CPTS Companion v2.0.0                                   ║
-║   Server running at http://localhost:${PORT}                 ║
-║   Auth: Better Auth + Google Sign-in                      ║
-║   DB: Neon Postgres                                       ║
-║                                                           ║
-║   Educational use only - Authorized labs only!            ║
-╚═══════════════════════════════════════════════════════════╝
-    `);
+// Start the server if this file is run directly (Node)
+if (typeof process !== "undefined" && process.env && process.env.PORT && !process.env.CF_PAGES) {
+  startServer().catch((err) => {
+    console.error("Failed to start server:", err);
+    process.exit(1);
   });
 }
 
-// Start the server
-startServer().catch((err) => {
-  console.error("Failed to start server:", err);
-  process.exit(1);
-});
+
