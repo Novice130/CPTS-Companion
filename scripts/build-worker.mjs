@@ -16,10 +16,8 @@ async function build() {
   console.log('Building Worker with CJS onLoad Shims...');
   
   const distDir = path.resolve(__dirname, '../dist');
-  const publicDir = path.resolve(__dirname, '../public');
-  
+
   if (!fs.existsSync(distDir)) fs.mkdirSync(distDir);
-  copyDir(publicDir, distDir);
 
   const nodeShimPlugin = {
     name: 'node-shim',
@@ -184,21 +182,6 @@ globalThis.require = (id) => {
   } catch (err) {
     console.error('Build failed:', err);
     process.exit(1);
-  }
-}
-
-function copyDir(src, dest) {
-  if (!fs.existsSync(dest)) fs.mkdirSync(dest);
-  if (!fs.existsSync(src)) return;
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-  for (let entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
   }
 }
 

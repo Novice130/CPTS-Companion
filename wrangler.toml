@@ -4,7 +4,7 @@ compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]
-directory = "dist"
+directory = "public"
 
 [vars]
 # Non-sensitive vars here. Secrets go via: wrangler secret put SECRET_NAME
