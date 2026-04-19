@@ -21,8 +21,27 @@ export function encodingExists(encoding: string) {
   }
 }
 
+export function getDecoder(encoding: string) {
+  const dec = new TextDecoder(encoding || 'utf-8');
+  let chunks: Uint8Array[] = [];
+  return {
+    write(buf: Uint8Array | Buffer) {
+      chunks.push(buf instanceof Uint8Array ? buf : new Uint8Array(buf));
+      return '';
+    },
+    end() {
+      const merged = new Uint8Array(chunks.reduce((a, b) => a + b.length, 0));
+      let offset = 0;
+      for (const c of chunks) { merged.set(c, offset); offset += c.length; }
+      chunks = [];
+      return dec.decode(merged);
+    }
+  };
+}
+
 export default {
   decode,
   encode,
-  encodingExists
+  encodingExists,
+  getDecoder,
 };

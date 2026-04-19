@@ -94,44 +94,38 @@ function rateLimiter(req: express.Request, res: express.Response, next: express.
 app.use('/api/', rateLimiter);
 app.use('/login', rateLimiter);
 
-// View engine setup with virtual loader for Cloudflare Workers
+// Override eta.render so include() calls inside precompiled templates hit the manifest
+// instead of calling new Function() for runtime compilation (banned in CF Workers)
+const _etaRender = (eta as any).render.bind(eta);
+(eta as any).render = (template: string, data: any, opts?: any) => {
+  const key = template.replace(/\.ejs$/, '').replace(/^\.?\//, '');
+  const manifest = viewsManifest as any;
+  const fn = manifest[key] ?? manifest[`partials/${key}`];
+  if (typeof fn === 'function') return (fn as Function).call(eta, data, opts);
+  return _etaRender(template, data, opts);
+};
+
+// View engine — calls precompiled template functions (no new Function / eval at runtime)
 app.engine("ejs", (path: string, options: any, callback: any) => {
-  // Convert absolute path back to relative view key
   const viewsDir = join(__dirname, "views");
   let key = relative(viewsDir, path).replace(/\\/g, "/");
   if (key.endsWith(".ejs")) key = key.slice(0, -4);
-  
-  const template = viewsManifest[key];
-  if (!template) {
+
+  const fn = (viewsManifest as any)[key];
+  if (typeof fn !== 'function') {
     return callback(new Error(`Template not found in manifest: ${key}`));
   }
 
   try {
-    // Inject include helper for nested partials
-    const renderOptions = {
-      ...options,
-      include: (name: string, includeOptions?: any) => {
-        const partialKey = name.replace(/\.ejs$/, "");
-        const partial = viewsManifest[partialKey];
-        if (!partial) {
-          console.warn(`Partial not found: ${partialKey}`);
-          return `<!-- Partial not found: ${partialKey} -->`;
-        }
-        return eta.renderString(partial, { ...options, ...includeOptions });
-      }
-    };
+    let html = (fn as Function).call(eta, options);
 
-    // Eta uses 'render' for strings/paths depending on configuration
-    // We use renderString since we have the template in memory
-    let html = eta.renderString(template, renderOptions);
-
-    // Support for basic layouts (replaces express-ejs-layouts)
+    // Layout wrapping (replaces express-ejs-layouts)
     const layout = options.layout;
     if (layout !== false) {
       const layoutKey = typeof layout === 'string' ? layout : 'layout';
-      const layoutTemplate = viewsManifest[layoutKey];
-      if (layoutTemplate) {
-        html = eta.renderString(layoutTemplate, { ...renderOptions, body: html });
+      const layoutFn = (viewsManifest as any)[layoutKey];
+      if (typeof layoutFn === 'function') {
+        html = (layoutFn as Function).call(eta, { ...options, body: html });
       }
     }
 
@@ -144,7 +138,22 @@ app.engine("ejs", (path: string, options: any, callback: any) => {
 
 app.set("view engine", "ejs");
 app.set("views", join(__dirname, "views"));
-// expressLayouts removed for Workers compatibility (using manual layout in engine above)
+
+// CF Workers have no filesystem — override Express's View class to skip fs.stat lookup
+if (process.env.CF_PAGES) {
+  class ManifestView {
+    name: string; path: string; ext: string; engine: Function;
+    constructor(name: string, opts: any) {
+      this.name = name;
+      this.ext = '.' + (opts.defaultEngine || 'ejs');
+      const root = Array.isArray(opts.root) ? opts.root[0] : opts.root;
+      this.path = join(root, name.includes('.') ? name : name + this.ext);
+      this.engine = opts.engines[this.ext];
+    }
+    render(options: any, fn: Function) { this.engine(this.path, options, fn); }
+  }
+  app.set('view', ManifestView);
+}
 
 
 // ============================================
@@ -402,7 +411,7 @@ export async function startServer() {
     const user = (req as any).user;
     const [common, moduleRaw] = await Promise.all([
       getCommonData(user?.id),
-      queries.getModuleById(parseInt(req.params.id)).then(m => m || queries.getModuleBySlug(req.params.id))
+      (/^\d+$/.test(req.params.id) ? queries.getModuleById(parseInt(req.params.id)) : queries.getModuleBySlug(req.params.id))
     ]);
     const module = moduleRaw as any;
 
@@ -542,7 +551,7 @@ export async function startServer() {
     const user = (req as any).user;
     const [common, moduleRaw, allModules] = await Promise.all([
       getCommonData(user?.id),
-      queries.getModuleById(parseInt(req.params.id)).then(m => m || queries.getModuleBySlug(req.params.id)),
+      (/^\d+$/.test(req.params.id) ? queries.getModuleById(parseInt(req.params.id)) : queries.getModuleBySlug(req.params.id)),
       queries.getAllModules()
     ]);
     const module = moduleRaw as any;

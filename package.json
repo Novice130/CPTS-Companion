@@ -32,6 +32,7 @@
     "eta": "^4.5.1",
     "express": "^4.21.0",
     "express-ejs-layouts": "^2.5.1",
+    "kysely-neon": "^2.0.2",
     "pg": "^8.13.0",
     "resend": "^4.0.0",
     "serverless-http": "^4.0.0"

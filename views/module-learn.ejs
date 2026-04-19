@@ -299,7 +299,7 @@
   window.__learnData = {
     moduleId: <%= module.id %>,
     moduleSlug: '<%= module.slug || '' %>',
-    moduleTitle: '<%= module.title.replace(/'/g, "\\'") %>',
+    moduleTitle: <%- JSON.stringify(module.title) %>,
     moduleCategory: '<%= module.category %>',
     exercises: <%- JSON.stringify(exercises.slice(0, 5).map(e => ({
       id: e.id,

@@ -125,6 +125,7 @@ async function build() {
       inject: [path.join(__dirname, 'node-globals.ts')],
       define: {
         'process.env.NODE_ENV': '"production"',
+        'process.env.CF_PAGES': '"1"',
         'global': 'globalThis',
       },
       keepNames: true,

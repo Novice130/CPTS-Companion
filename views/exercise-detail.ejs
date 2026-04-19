@@ -147,7 +147,7 @@
   <script class="exercise-config">
     window.basePath = '';
     window.exerciseId = <%= exercise.id %>;
-    window.correctAnswer = "<%= exercise.answer.replace(/"/g, '\\"') %>";
+    window.correctAnswer = <%- JSON.stringify(exercise.answer) %>;
     window.hints = <%- exercise.hints ? JSON.stringify(exercise.hints) : '[]' %>;
     window.hintIndex = 0;
     window.selectedAnswer = null;

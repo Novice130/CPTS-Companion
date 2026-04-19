@@ -1,33 +1,50 @@
-import { Pool, neonConfig } from "@neondatabase/serverless";
+import { Pool, neon, neonConfig } from "@neondatabase/serverless";
 import "dotenv/config";
 import ws from "ws";
 import * as seedData from "./seed-data.ts";
 
-// Set up WebSocket for Neon in Node environments (like local dev)
 if (typeof window === "undefined" && typeof globalThis.WebSocket === "undefined") {
   neonConfig.webSocketConstructor = ws;
 }
 
+type Client = { query(text: string, params?: any[]): Promise<{ rows: any[] }>; connect?(): Promise<any>; on?(e: string, cb: any): void };
 
-let pool: Pool | null = null;
+let _client: Client | null = null;
 
-export function getPool(): Pool {
-  if (!pool) {
-    if (!process.env.DATABASE_URL) {
-      throw new Error("DATABASE_URL not set in process.env");
-    }
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-      max: 10,
-    });
-    
-    pool.on("error", (err) => {
-      console.error("Unexpected Postgres error:", err);
-    });
+function makeClient(): Client {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL not set in process.env");
+
+  // Workers: stateless HTTP client — no cross-request I/O issue
+  if (process.env.CF_PAGES) {
+    const sql: any = neon(url);
+    return {
+      async query(text: string, params: any[] = []) {
+        const rows = await sql.query(text, params);
+        return { rows: Array.isArray(rows) ? rows : rows?.rows || [] };
+      },
+    };
   }
-  return pool;
+
+  // Node: WebSocket Pool
+  const p = new Pool({ connectionString: url, ssl: { rejectUnauthorized: false }, max: 10 });
+  p.on("error", (err: any) => console.error("Unexpected Postgres error:", err));
+  return p as any;
 }
+
+export function getPool(): Client {
+  if (!_client) _client = makeClient();
+  return _client;
+}
+
+// Proxy preserves `pool.query(...)` / `pool.connect()` call sites
+const pool: any = new Proxy({}, {
+  get(_t, prop: any) {
+    const c = getPool() as any;
+    const v = c[prop];
+    return typeof v === "function" ? v.bind(c) : v;
+  },
+});
 
 
 // ============================================
@@ -35,7 +52,8 @@ export function getPool(): Pool {
 // ============================================
 
 export async function initDatabase(): Promise<void> {
-  const client = await getPool().connect();
+  if (process.env.CF_PAGES) return; // Workers: DB already provisioned
+  const client = await (getPool() as any).connect();
   try {
     // ── Better Auth required tables ──────────────────────────────────
     await client.query(`
@@ -231,6 +249,7 @@ export async function initDatabase(): Promise<void> {
 // ============================================
 
 export async function seedDatabase(): Promise<void> {
+  if (process.env.CF_PAGES) return; // Workers: DB already seeded
   const { rows } = await pool.query("SELECT COUNT(*)::int as count FROM modules");
   if (rows[0].count > 0) {
     console.log("Database already seeded, skipping...");

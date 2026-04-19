@@ -1,25 +1,51 @@
 import { betterAuth } from "better-auth";
-import { Pool } from "@neondatabase/serverless";
+import { Pool, neon } from "@neondatabase/serverless";
+import { NeonDialect } from "kysely-neon";
 
-let authPool: Pool | null = null;
 let authInstance: any = null;
+
+// Lightweight PBKDF2 hasher via Web Crypto — stays under CF Workers free-tier CPU budget
+// (default better-auth scrypt is too expensive for 10ms CPU limit)
+const b64 = (u: Uint8Array) => Buffer.from(u).toString("base64");
+const ub64 = (s: string) => new Uint8Array(Buffer.from(s, "base64"));
+const PBKDF2_ITER = 100_000;
+
+async function pbkdf2Hash(password: string): Promise<string> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: PBKDF2_ITER, hash: "SHA-256" }, key, 256);
+  return `pbkdf2$${PBKDF2_ITER}$${b64(salt)}$${b64(new Uint8Array(bits))}`;
+}
+
+async function pbkdf2Verify({ password, hash }: { password: string; hash: string }): Promise<boolean> {
+  const parts = hash.split("$");
+  if (parts[0] !== "pbkdf2") return false;
+  const iter = parseInt(parts[1]);
+  const salt = ub64(parts[2]);
+  const expected = ub64(parts[3]);
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = new Uint8Array(await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: iter, hash: "SHA-256" }, key, expected.length * 8));
+  if (bits.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < bits.length; i++) diff |= bits[i] ^ expected[i];
+  return diff === 0;
+}
 
 export function getAuth() {
   if (!authInstance) {
-    if (!process.env.DATABASE_URL) {
-      throw new Error("DATABASE_URL not set for auth");
-    }
-    
-    authPool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-      max: 5,
-    });
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error("DATABASE_URL not set for auth");
+
+    // Workers: HTTP dialect (stateless). Node: WebSocket Pool.
+    const database: any = process.env.CF_PAGES
+      ? { dialect: new NeonDialect({ neon: neon(url) }), type: "postgres" }
+      : new Pool({ connectionString: url, ssl: { rejectUnauthorized: false }, max: 5 });
 
     authInstance = betterAuth({
-      database: authPool,
+      database,
       emailAndPassword: {
         enabled: true,
+        password: { hash: pbkdf2Hash, verify: pbkdf2Verify },
       },
       session: {
         expiresIn: 60 * 60 * 24 * 7, // 7 days
