@@ -714,3 +714,46 @@
   .rem-prompt label { min-width: auto; }
   .finding-chips { flex-direction: column; }
 }
+
+/* ============================================
+   Context Modal (See Example Popup)
+   ============================================ */
+.context-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.context-modal {
+  background: var(--htb-dark);
+  border: 1px solid var(--htb-border);
+  border-radius: 10px;
+  width: min(700px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.context-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--htb-border);
+}
+.context-modal-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.context-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.context-modal-body {
+  padding: 1.5rem;
+}

@@ -249,6 +249,21 @@ p {
   gap: 2rem;
 }
 
+.mobile-menu-btn {
+  display: none; /* Hidden on desktop */
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-btn:hover {
+  color: var(--htb-green);
+}
+
 .stat-item {
   display: flex;
   align-items: center;

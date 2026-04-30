@@ -61,9 +61,11 @@ export function getAuth() {
       },
       trustedOrigins: [
         "http://localhost:3000",
+        "http://localhost:8788",
+        "https://cpts.learnnovice.com",
         ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [])
       ],
-      baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+      baseURL: process.env.BETTER_AUTH_URL || (process.env.CF_PAGES ? "https://cpts.learnnovice.com" : "http://localhost:3000"),
     });
   }
   return authInstance;

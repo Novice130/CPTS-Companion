@@ -5,38 +5,59 @@ A comprehensive learning dashboard to help you prepare for the **Hack The Box CP
 ![HTB Dark Theme](https://img.shields.io/badge/Theme-HTB%20Dark-1a2332?style=flat&logo=hackthebox&logoColor=9FEF00)
 ![Node.js](https://img.shields.io/badge/Node.js-23-339933?style=flat&logo=node.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-No%20Build-3178C6?style=flat&logo=typescript)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)
+![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=flat&logo=cloudflare&logoColor=white)
 
 ## ⚡ Quick Start
 
 ### Deployed Application
 
-CPTS Companion is now accessible at [cpts.learnnovice.com](https://cpts.learnnovice.com).
+CPTS Companion is deployed on **Cloudflare Workers** and accessible at [cpts.learnnovice.com](https://cpts.learnnovice.com).
 
-### Running Locally (With Docker)
-
-```bash
-# Build the image
-docker build -t cpts-companion .
-
-# Run the container
-docker run -p 3000:3000 cpts-companion
-
-# Open http://localhost:3000
-```
-
-### Without Docker
+### Running Locally (Node.js)
 
 ```bash
 # Install dependencies
 npm install
 
-# Run the app
+# Run the app (standard Node.js / Express)
 npm start
 
 # Or with watch mode for development
 npm run dev
 ```
+
+The local dev path preserves the full Express runtime — WebSocket Pool, live template rendering, scrypt hashing — everything you expect from Node.
+
+### Deploying to Cloudflare Workers
+
+```bash
+# Set secrets once
+npx wrangler secret put DATABASE_URL
+npx wrangler secret put BETTER_AUTH_SECRET
+npx wrangler secret put BETTER_AUTH_URL
+
+# Bundle worker + views and deploy
+npm run deploy
+```
+
+## 🚚 Migration: Dokploy/Docker → Cloudflare Workers
+
+The app originally ran on a self-hosted **Dokploy** VPS (Docker + Traefik reverse proxy). We migrated to **Cloudflare Workers** for:
+
+- **Cost**: Workers free tier (100k requests/day) eliminated VPS hosting fees.
+- **Global edge**: Requests terminate at the nearest CF data center instead of a single region.
+- **Zero infra**: No Docker images, no Traefik labels, no container restarts, no SSL renewal — Wrangler handles it.
+- **Simpler deploys**: `npm run deploy` replaces Git push → Dokploy webhook → Docker build → Traefik reload.
+
+The migration was non-trivial because Workers is **not Node.js** — it's a V8 isolate with different constraints (no `new Function()`, no long-lived TCP, 10ms CPU on free tier, no filesystem). The architecture was adapted rather than rewritten — see [deployment_lessons_learned.md](deployment_lessons_learned.md) for the full breakdown.
+
+Key architectural changes:
+
+- **Templates**: Eta templates are **pre-compiled** at build time (`scripts/bundle-views.mjs`) into a manifest because Workers bans runtime `new Function()`.
+- **Database**: Neon Postgres uses the **HTTP** client (`neon()`) on Workers instead of the **WebSocket Pool** — Workers forbids I/O that crosses request boundaries.
+- **Password hashing**: Swapped Better Auth's default scrypt for **PBKDF2 via Web Crypto** (100k iterations) to fit the 10ms CPU budget.
+- **Express shim**: `worker.ts` adapts the Fetch API `Request`/`Response` to Express's `IncomingMessage`/`ServerResponse`. Auth routes bypass the shim and call `auth.handler(req)` directly.
+- **Dual-mode**: All the above is gated on `process.env.CF_PAGES` so local Node.js development still uses the original Pool + scrypt path.
 
 ## 🎯 Features
 
@@ -111,34 +132,44 @@ The app features a custom dark terminal theme inspired by Hack The Box:
 
 ```
 cpts-companion/
-├── Dockerfile          # Docker configuration
-├── package.json        # Dependencies
-├── server.ts           # Express server
-├── db.ts               # SQLite + queries
-├── seed/               # Learning content
-│   ├── modules.json    # 26 modules
-│   ├── exercises.json  # 50+ exercises
-│   ├── flashcards.json # 60 flashcards
-│   ├── mindmaps.json   # 19 mind maps
-│   ├── plan.json       # 30-day plan
-│   └── templates.json  # Note templates
-├── views/              # EJS templates
-│   ├── partials/       # Shared components
-│   └── *.ejs           # Page templates
-└── public/
-    ├── css/style.css   # HTB theme
-    └── js/app.js       # Client JS
+├── wrangler.toml              # Cloudflare Workers config
+├── worker.ts                  # Fetch-API entry (Express shim + auth bypass)
+├── server.ts                  # Express app (runs on Node locally, shimmed on Workers)
+├── auth.ts                    # Better Auth (PBKDF2 on Workers, scrypt on Node)
+├── db.ts                      # Neon client (HTTP on Workers, Pool on Node)
+├── package.json               # Dependencies & scripts
+├── scripts/
+│   ├── build-worker.mjs       # esbuild bundler → dist/_worker.js
+│   └── bundle-views.mjs       # Pre-compiles Eta templates → views-manifest.ts
+├── views-manifest.ts          # Auto-generated compiled templates
+├── seed/                      # Learning content
+│   ├── modules.json           # 26 modules
+│   ├── exercises.json         # 50+ exercises
+│   ├── flashcards.json        # 60 flashcards
+│   ├── mindmaps.json          # 19 mind maps
+│   ├── plan.json              # 30-day plan
+│   └── templates.json         # Note templates
+├── views/                     # EJS/Eta source templates
+│   ├── partials/
+│   └── *.ejs
+├── public/                    # Static assets (served by CF [assets])
+│   ├── css/style.css
+│   └── js/app.js
+└── dist/                      # Build output (gitignored)
+    └── _worker.js
 ```
 
 ## 🛠️ Tech Stack
 
-- **Runtime**: Node.js 23 with `--experimental-strip-types`
-- **Server**: Express.js
-- **Database**: Neon Postgres (Serverless) + Drizzle ORM
-- **Authentication**: Better Auth (Google Sign-in)
+- **Runtime (prod)**: Cloudflare Workers (V8 isolate, `nodejs_compat`)
+- **Runtime (local)**: Node.js 23 with `--experimental-strip-types`
+- **Server**: Express.js (via Fetch-API shim on Workers)
+- **Bundler**: esbuild (`scripts/build-worker.mjs`)
+- **Database**: Neon Postgres — `@neondatabase/serverless` HTTP (Workers) / WebSocket Pool (Node)
+- **ORM**: Drizzle + Kysely (via `kysely-neon` for Better Auth on Workers)
+- **Authentication**: Better Auth — PBKDF2 via Web Crypto on Workers, scrypt on Node
 - **Emails**: Resend API
-- **Deployment**: Dokploy (GitHub integrated, HTTPS)
-- **Templates**: EJS
+- **Templates**: Eta (pre-compiled at build time for Workers)
 - **Styling**: Vanilla CSS (no build required)
 - **Diagrams**: Mermaid.js (client-side)
 

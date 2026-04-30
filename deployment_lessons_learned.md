@@ -216,3 +216,168 @@ baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 - [ ] Ensure `user_id` Foreign Keys are scoped on all non-global entity tables.
 - [ ] Validate unhandled Promise Rejections are caught in POST routes to prevent hard server crashing.
 - [ ] Do not condition Better Auth's `baseURL` strictly on `NODE_ENV`; fallback gracefully.
+
+---
+
+# Part 2: Migrating from Dokploy/Docker to Cloudflare Workers
+
+Lessons 1–11 above describe the Dokploy era. After stabilizing on a self-hosted VPS, the app was migrated to **Cloudflare Workers** for cost (free tier), global edge, and zero infra overhead. The migration surfaced a different class of problem: Workers is not Node.js, and several architectural assumptions the Express app relied on had to be replaced. Lessons 12–15 below cover those.
+
+---
+
+## 12. The `new Function()` Ban (Template Engine Runtime Compilation)
+**The Problem:** First deploy to Workers crashed immediately with `EvalError: Code generation from strings disallowed` whenever any route rendered a view. Eta's default behavior is to compile `.ejs` templates into functions via `new Function(...)` at request time.
+**The Cause:** Cloudflare Workers runs on V8 isolates with a strict CSP-like policy — `eval`, `new Function()`, and `Function()` constructors are banned. Any template engine, JIT evaluator, or runtime code-gen library fails at first use.
+**The Fix:**
+Pre-compile **every** template at build time into a manifest object, then have Eta look up the compiled function by name instead of re-parsing source.
+
+```js
+// scripts/bundle-views.mjs (runs before wrangler deploy)
+import { Eta } from "eta";
+const eta = new Eta({ views: "./views" });
+// Walk views/*.ejs, compile each with eta.compile(src), emit views-manifest.ts
+```
+
+```ts
+// server.ts — override eta.render to use the manifest
+const _etaRender = (eta as any).render.bind(eta);
+(eta as any).render = (template: string, data: any, opts?: any) => {
+  const key = template.replace(/\.ejs$/, '').replace(/^\.?\//, '');
+  const fn = manifest[key] ?? manifest[`partials/${key}`]; // fallback for include('login-prompt')
+  if (typeof fn === 'function') return (fn as Function).call(eta, data, opts);
+  return _etaRender(template, data, opts);
+};
+```
+**Lesson:** Anything that advertises "just-in-time" or "runtime compilation" is suspect on Workers. Audit dependencies before porting — Eta, EJS, Pug, Handlebars-with-compile, and any JS-in-string evaluator will all need the same pre-compile treatment.
+
+---
+
+## 13. Cross-Request I/O Forbidden (`Cannot perform I/O on behalf of a different request`)
+**The Problem:** After fixing templates, the first DB-bound route 500'd with `Cannot perform I/O on behalf of a different request`. Better Auth sign-in hung forever. The error was non-deterministic — sometimes requests succeeded, sometimes they failed.
+**The Cause:** Neon's `Pool` client uses **WebSockets** and keeps long-lived connections. On Workers, every request runs in its own I/O context — a WebSocket opened during request A cannot be reused by request B, even within the same isolate. Because the `Pool` is module-scoped, the first request "wins" it, and every subsequent request crashes.
+**The Fix:**
+Swap `Pool` (WebSocket, stateful) for `neon()` (HTTP, stateless) on Workers. Gate on `process.env.CF_PAGES` so local Node keeps the faster Pool:
+
+```ts
+// db.ts
+function makeClient(): Client {
+  const url = process.env.DATABASE_URL!;
+  if (process.env.CF_PAGES) {
+    const sql: any = neon(url);                       // HTTP — one-shot per query
+    return {
+      async query(text: string, params: any[] = []) {
+        const rows = await sql.query(text, params);
+        return { rows: Array.isArray(rows) ? rows : rows?.rows || [] };
+      },
+    };
+  }
+  return new Pool({ connectionString: url, ssl: { rejectUnauthorized: false }, max: 10 });
+}
+```
+
+Better Auth needs the same dual-mode treatment. Its Kysely adapter expects a real dialect, so use `kysely-neon`'s `NeonDialect` with the HTTP client:
+
+```ts
+// auth.ts
+const database: any = process.env.CF_PAGES
+  ? { dialect: new NeonDialect({ neon: neon(url) }), type: "postgres" }
+  : new Pool({ connectionString: url, ssl: { rejectUnauthorized: false }, max: 5 });
+```
+**Side note:** `neon()` HTTP silently returns an empty result if you pass `NaN` as a bind parameter. One route had `parseInt(req.params.id)` — for slug-style IDs like `nmap`, this became `NaN` and the query returned nothing instead of erroring. Fix with a regex guard: `/^\d+$/.test(req.params.id) ? getById(parseInt(...)) : getBySlug(...)`.
+**Lesson:** Workers is the anti-pattern for stateful clients. Any library that says "pool", "keep-alive", or "persistent connection" needs to be replaced with its HTTP/stateless counterpart on Workers.
+
+---
+
+## 14. The 10ms CPU Budget (Scrypt Kills Sign-In)
+**The Problem:** Sign-up worked. Sign-in returned `exceededCpu` 503 errors. Only sign-in failed, and only on Workers.
+**The Cause:** Better Auth's default password hasher is **scrypt** with parameters tuned for modern Node servers (dozens of ms of CPU time). Cloudflare Workers free tier allows **10ms** of CPU per request. Scrypt hash **verification** (computed on every sign-in) blew the budget instantly. Hash generation during sign-up also pushed the limit but sometimes squeaked through.
+**The Fix:**
+Replace scrypt with PBKDF2-SHA256 via Web Crypto (100k iterations — still cryptographically sound, but ~20x faster on Workers because it runs in native code instead of a WASM-style polyfill):
+
+```ts
+// auth.ts
+async function pbkdf2Hash(password: string): Promise<string> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: 100_000, hash: "SHA-256" }, key, 256);
+  return `pbkdf2$100000$${b64(salt)}$${b64(new Uint8Array(bits))}`;
+}
+// + constant-time pbkdf2Verify
+
+betterAuth({
+  emailAndPassword: {
+    enabled: true,
+    password: { hash: pbkdf2Hash, verify: pbkdf2Verify },   // override default scrypt
+  },
+  // ...
+});
+```
+**Caveat:** Existing users in the DB who signed up with scrypt-hashed passwords can no longer log in — the hash prefix won't match `pbkdf2$`. Accept this migration cost or implement a rehash-on-login path if user data is load-bearing.
+**`wrangler.toml` `[limits] cpu_ms = 30000` does not work on the free plan.** Wrangler will deploy but the runtime silently ignores it. Upgrade to paid or optimize the code.
+**Lesson:** Before porting any auth/crypto code to Workers, audit for scrypt, bcrypt, argon2, and anything else that deliberately burns CPU. Web Crypto's PBKDF2 is the pragmatic choice. Also: don't trust config options that silently no-op on the free tier.
+
+---
+
+## 15. Express-on-Workers: The Fetch ↔ Node Req/Res Shim
+**The Problem:** Express was the bulk of the codebase and a full rewrite was out of scope. Workers provides a Fetch API (`Request`/`Response`), not Node's `IncomingMessage`/`ServerResponse`. Directly calling `app(req, res)` exploded because `req` lacks `.socket`, `.headers` is a `Headers` object, and `res.end()` doesn't exist.
+**The Cause:** Express couples tightly to Node's HTTP internals. It reads `req.socket.remoteAddress`, expects `req.headers` as a plain object, and drives responses through `writeHead`/`write`/`end` on a writable stream.
+**The Fix:**
+Write a minimal shim in `worker.ts` that translates between the two APIs — enough for Express to function without patching Express itself:
+
+```ts
+// worker.ts (abridged — see full file)
+async function fetchToExpress(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const readable = new Readable({ read() {} });
+  const req: any = readable;
+  req.method = request.method;
+  req.url = url.pathname + url.search;
+  req.headers = Object.fromEntries(request.headers.entries());
+  req.socket = { remoteAddress: '127.0.0.1', encrypted: url.protocol === 'https:' };
+  // ... push body bytes into readable
+
+  return new Promise<Response>((resolve) => {
+    const chunks: Buffer[] = [];
+    const res: any = {
+      setHeader, writeHead, getHeader, getHeaders, removeHeader, hasHeader,
+      write(chunk) { chunks.push(Buffer.from(chunk)); return true; },
+      end(chunk) {
+        if (chunk) chunks.push(Buffer.from(chunk));
+        resolve(new Response(Buffer.concat(chunks), { status: statusCode, headers }));
+      },
+      on() { return this; }, once() { return this; }, emit() { return false; },
+    };
+    (app as any)(req, res);
+  });
+}
+```
+
+**The auth route gotcha:** Better Auth's native `auth.handler(request)` already speaks Fetch API. Putting it behind the Express shim double-processed bodies and caused sign-in POSTs to hang. Bypass the shim for auth:
+
+```ts
+// worker.ts
+export default {
+  async fetch(req: Request, env: any, _ctx: any) {
+    await ensureInitialized(env);
+    if (new URL(req.url).pathname.startsWith('/api/auth/')) {
+      return auth.handler(req);                  // <-- native Fetch, no shim
+    }
+    return fetchToExpress(req);                  // <-- everything else
+  }
+};
+```
+**Lesson:** A thin shim can take Express most of the way — but anything that already speaks the native Fetch API (Better Auth, Hono routers, raw streaming handlers) should bypass the shim. Mixing the two wastes CPU and breaks streaming semantics.
+
+---
+
+## Summary Checklist for Cloudflare Workers Ports:
+- [ ] Pre-compile **all** templates at build time — no `new Function()` / `eval` at runtime.
+- [ ] Replace stateful DB clients (WebSocket `Pool`, Redis clients, etc.) with stateless HTTP equivalents.
+- [ ] Gate everything Workers-specific on `process.env.CF_PAGES` (or similar) so local Node still works.
+- [ ] Audit auth for scrypt/bcrypt/argon2 — replace with PBKDF2 via Web Crypto on the free tier.
+- [ ] Guard integer-bound query params — `neon()` HTTP silently returns empty for `NaN`.
+- [ ] Bypass any Express/Fetch shim for handlers that are already Fetch-native (Better Auth, etc.).
+- [ ] Set secrets via `wrangler secret put`, not `[vars]` in `wrangler.toml`.
+- [ ] Don't trust `[limits]` options — some (like `cpu_ms`) silently no-op on the free plan.
+- [ ] Remember Workers has no filesystem — anything that reads `fs.readFile` at runtime must be bundled at build time.
+- [ ] Gate all DDL (`initDatabase`, seed runs) behind `if (process.env.CF_PAGES) return;` — migrations belong in a separate local/CI job, not the request path.

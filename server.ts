@@ -119,11 +119,9 @@ app.engine("ejs", (path: string, options: any, callback: any) => {
   try {
     let html = (fn as Function).call(eta, options);
 
-    // Layout wrapping (replaces express-ejs-layouts)
-    const layout = options.layout;
-    if (layout !== false) {
-      const layoutKey = typeof layout === 'string' ? layout : 'layout';
-      const layoutFn = (viewsManifest as any)[layoutKey];
+    // Smart layout wrapping: only wrap if the view doesn't already contain the full layout boilerplate.
+    if (!html.includes('<!DOCTYPE html>')) {
+      const layoutFn = (viewsManifest as any)['layout'];
       if (typeof layoutFn === 'function') {
         html = (layoutFn as Function).call(eta, { ...options, body: html });
       }

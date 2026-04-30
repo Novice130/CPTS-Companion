@@ -61,7 +61,9 @@ const ejsFiles = getAllFiles(VIEWS_DIR).filter(f => extname(f) === ".ejs");
 const compiled = {};
 
 for (const file of ejsFiles) {
-  const content = readFileSync(file, "utf8");
+  let content = readFileSync(file, "utf8");
+  // Convert EJS raw output tag `<%-` to Eta raw output tag `<%~`
+  content = content.replace(/<%-/g, "<%~");
   const key = relative(VIEWS_DIR, file).replace(/\\/g, "/").replace(".ejs", "");
   try {
     const body = eta.compileToString(content);
