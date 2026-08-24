@@ -316,47 +316,56 @@ export async function startServer() {
   // Study Plan
   app.get("/plan", softAuth, async (req: Request, res: Response) => {
     const user = (req as any).user;
-    const [common, modulesRaw] = await Promise.all([
+    const [common, modulesRaw, allUserActivities] = await Promise.all([
       getCommonData(user?.id),
-      queries.getAllModules()
+      queries.getAllModules(),
+      user ? queries.getAllActivities(user.id) : Promise.resolve([])
     ]);
     const settings = common.settings || { plan_duration: 30, current_day: 1 };
     const planDuration = settings.plan_duration || 30;
     const currentDay = settings.current_day || 1;
     const modules = modulesRaw as any[];
 
+    // Group activities by day in memory for O(1) lookup
+    const activitiesByDay = new Map<number, any[]>();
+    for (const act of (allUserActivities as any[])) {
+      const list = activitiesByDay.get(act.day_number) || [];
+      list.push(act);
+      activitiesByDay.set(act.day_number, list);
+    }
+
     const totalModules = modules.length;
     const modulesPerDay = Math.max(1, Math.ceil(totalModules / planDuration));
 
-    const dayPromises = [];
+    const dynamicPlanDays = [];
     for (let day = 1; day <= planDuration; day++) {
-      dayPromises.push((async () => {
-        const startModuleIndex = Math.min((day - 1) * modulesPerDay, totalModules - 1);
-        const endModuleIndex = Math.min(startModuleIndex + modulesPerDay, totalModules);
-        const todayModules = modules.slice(startModuleIndex, endModuleIndex);
+      const startModuleIndex = Math.min((day - 1) * modulesPerDay, totalModules - 1);
+      const endModuleIndex = Math.min(startModuleIndex + modulesPerDay, totalModules);
+      const todayModules = modules.slice(startModuleIndex, endModuleIndex);
 
-        const [activities, dayProgress] = user ? await Promise.all([
-          queries.getActivitiesForDay(user.id, day),
-          queries.getDayProgress(user.id, day)
-        ]) : [ [], { total: 0, completed: 0, percentage: 0 } ];
+      const activities = activitiesByDay.get(day) || [];
+      const total = activities.length;
+      const completed = activities.filter((a: any) => a.completed === 1 || a.completed === true).length;
+      const dayProgress = {
+        total,
+        completed,
+        percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+      };
 
-        return {
-          id: day,
-          day_number: day,
-          title: todayModules.map((m: any) => m.title).join(" & ") || `Day ${day}`,
-          topics: todayModules.map((m: any) => m.title),
-          category: todayModules[0]?.category || "General",
-          estimated_hours: planDuration <= 30 ? 4 : planDuration <= 60 ? 2.5 : 1.5,
-          activities: activities,
-          progress: dayProgress,
-          isComplete: dayProgress.percentage === 100,
-          isLocked: day > currentDay,
-          isCurrent: day === currentDay,
-        };
-      })());
+      dynamicPlanDays.push({
+        id: day,
+        day_number: day,
+        title: todayModules.map((m: any) => m.title).join(" & ") || `Day ${day}`,
+        topics: todayModules.map((m: any) => m.title),
+        category: todayModules[0]?.category || "General",
+        estimated_hours: planDuration <= 30 ? 4 : planDuration <= 60 ? 2.5 : 1.5,
+        activities: activities,
+        progress: dayProgress,
+        isComplete: dayProgress.percentage === 100,
+        isLocked: day > currentDay,
+        isCurrent: day === currentDay,
+      });
     }
-
-    const dynamicPlanDays = await Promise.all(dayPromises);
 
     res.render("plan", {
       ...common,
