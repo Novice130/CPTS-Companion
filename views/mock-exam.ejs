@@ -65,25 +65,39 @@
 </div>
 
 <div class="exam-hero">
-  <div class="exam-hero-title">⚠ SIMULATION RULES & TARGET MACHINE GUIDE — Read Before Starting</div>
+  <div class="exam-hero-title">🎯 MOCK EXAM LAB GUIDE — How to Practice with Real HTB & TryHackMe Rooms</div>
   <div class="exam-hero-text">
-    Treat each simulation day as a real exam. This simulator provides an hour-by-hour methodology blueprint and scenario topology simulating the real 10-day CPTS environment.
+    <strong>💡 How This Simulator Works:</strong>
+    CPTS is a hands-on, multi-subnet penetration testing exam. Our platform provides the <strong>5-day methodology framework, hour-by-hour schedules, timing benchmarks, and attack flowcharts</strong>.
     <br><br>
-    <strong>🎯 Which Machines to Use for Hands-On Practice:</strong>
-    The IPs (e.g. <code>10.10.10.x</code>) represent the network architecture of the exam. To practice against live machines, spawn the following recommended <strong>Hack The Box machines & HTB Academy Labs</strong> for each day:
-    <ul style="margin: 0.5rem 0 0.5rem 1.25rem; font-size: 0.8rem; color: var(--text-secondary);">
-      <li><strong>Day 1 (Web Foothold & Linux PrivEsc):</strong> HTB <em>Sau</em>, HTB <em>Pilgrimage</em>, HTB <em>Keeper</em>, HTB <em>Delivery</em></li>
-      <li><strong>Day 2 (Active Directory & Kerberoasting):</strong> HTB <em>Forest</em>, HTB <em>Active</em>, HTB <em>Resolute</em>, HTB <em>Cascade</em></li>
-      <li><strong>Day 3 (Pivoting, Tunneling & MSSQL):</strong> HTB <em>Dante</em> ProLab or HTB Academy <em>Pivoting & Port Forwarding</em> Skills Assessment</li>
-      <li><strong>Day 4 (Lateral Movement & Hybrid Chains):</strong> HTB <em>Zephyr</em> ProLab or HTB Academy <em>CPTS Skills Assessment</em></li>
-      <li><strong>Day 5 (Exam Report Writing):</strong> Complete a 20+ page pentest report using our built-in <a href="/report-course" style="color:var(--htb-green); text-decoration:underline;">Report Course & Template</a></li>
-    </ul>
+    For live, hands-on target practice, connect your Kali to <strong>Hack The Box (HTB)</strong> and <strong>TryHackMe (THM)</strong> to spawn the recommended rooms mapped below:
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+      <div style="background: var(--htb-bg); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1rem;">
+        <div style="color: var(--htb-green); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem;">🟢 Hack The Box (HTB) Boxes & Labs</div>
+        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6;">
+          <li><strong>Web & Footholds:</strong> <em>Sau</em>, <em>Pilgrimage</em>, <em>Keeper</em>, <em>Delivery</em></li>
+          <li><strong>Active Directory:</strong> <em>Forest</em>, <em>Active</em>, <em>Resolute</em>, <em>Cascade</em>, <em>Monteverde</em></li>
+          <li><strong>ProLabs & Skills Assessments:</strong> <em>Dante ProLab</em>, <em>Zephyr ProLab</em>, <em>HTB Academy CPTS Assessment</em></li>
+        </ul>
+      </div>
+
+      <div style="background: var(--htb-bg); border: 1px solid var(--htb-border); border-radius: 8px; padding: 1rem;">
+        <div style="color: #60a5fa; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem;">🔵 TryHackMe (THM) Networks & Rooms</div>
+        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6;">
+          <li><strong>Multi-Hop Pivoting:</strong> <em>Wreath Network</em> (Chisel, Socat, Proxychains, Pivoting)</li>
+          <li><strong>Active Directory:</strong> <em>Attacktive Directory</em>, <em>Holo Network</em>, <em>Throwback</em></li>
+          <li><strong>Privilege Escalation:</strong> <em>Linux/Windows PrivEsc Arena</em>, <em>Buffer Overflow Prep</em></li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="exam-rules">
+
+  <div class="exam-rules" style="margin-top: 1.25rem;">
     <div class="rule-item"><strong>// Duration</strong>Each sim day = 8 focused hours. Take 1 hour off after hour 4.</div>
     <div class="rule-item"><strong>// Documentation</strong>Screenshot every compromise. Note timestamps. Write findings as you go, not at the end.</div>
-    <div class="rule-item"><strong>// Tools Allowed</strong>Same as real exam: Kali tools, custom scripts, HTB VPN access.</div>
-    <div class="rule-item"><strong>// After Each Day</strong>Write a 1-page debrief: what worked, what didn't, what you'd do differently.</div>
+    <div class="rule-item"><strong>// Tools Allowed</strong>Same as real exam: Kali tools, custom scripts, HTB/THM VPN access.</div>
+    <div class="rule-item"><strong>// Reporting Course</strong>Draft your final 20+ page exam report using our built-in <a href="/report-course" style="color:var(--htb-green); text-decoration:underline;">Report Course</a>.</div>
   </div>
 </div>
 
