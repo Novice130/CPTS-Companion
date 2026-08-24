@@ -9,11 +9,11 @@ const OUTPUT_FILE = "./views-manifest.ts";
 const TEMPLATE_VARS = [
   'user', 'title', 'stats', 'dueCount', 'nextReview', 'settings',
   'currentPage', 'body', 'layout', 'pageTitle', 'metaDesc', 'ogPath',
-  'modules', 'exercises', 'flashcards', 'notes', 'mindmaps', 'templates', 'categories',
+  'modules', 'exercises', 'flashcards', 'notes', 'mindmaps', 'templates', 'categories', 'categoryFilter',
   'module', 'exercise', 'flashcard', 'note', 'mindmap',
   'plan', 'planDays', 'dayProgress', 'todayActivities', 'reflection', 'recentNotes',
   'progress', 'allModules', 'relatedModules', 'nodeDataMap', 'nodeInfo',
-  'dueFlashcards', 'commandExamplesHtml',
+  'dueFlashcards', 'commandExamplesHtml', 'message',
   'topic', 'prev', 'next', 'query', 'results', 'types', 'filters',
   'currentDay', 'planDuration', 'template', 'sanitize',
 ];
@@ -38,8 +38,9 @@ function transformBody(body) {
     while ((r = fnRe.exec(src)) !== null) alreadyDeclared.add(r[1]);
   }
 
-  const safeVars = TEMPLATE_VARS.filter(v => !alreadyDeclared.has(v));
-  const destruct = safeVars.length ? `const {${safeVars.join(', ')}} = it || {};` : '';
+  const safeVars = TEMPLATE_VARS.filter(v => v !== 'sanitize' && !alreadyDeclared.has(v));
+  const destruct = (safeVars.length ? `const {${safeVars.join(', ')}} = it || {};\n` : '') +
+    `const sanitize = (it && typeof it.sanitize === 'function') ? it.sanitize : ((h) => h || "");`;
   return `${before}\n${destruct}\n${content}\n${after}`;
 }
 

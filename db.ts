@@ -461,8 +461,7 @@ export async function regenerateAllActivities(userId: string, planDuration: numb
 // ============================================
 
 export async function buildSearchIndex(): Promise<void> {
-  // For Postgres, we'll use simple ILIKE search instead of FTS5
-  // The search_index table stores denormalized content for fast search
+  // Fast bulk insertion for Postgres text search index
   await pool.query(`
     CREATE TABLE IF NOT EXISTS search_index (
       id SERIAL PRIMARY KEY,
@@ -474,37 +473,16 @@ export async function buildSearchIndex(): Promise<void> {
   `);
   await pool.query("DELETE FROM search_index");
 
-  const modules = (await pool.query("SELECT id, title, summary, cheatsheet_md FROM modules")).rows;
-  for (const mod of modules) {
-    await pool.query(
-      "INSERT INTO search_index (title, content, type, item_id) VALUES ($1, $2, $3, $4)",
-      [mod.title, `${mod.summary || ""} ${mod.cheatsheet_md || ""}`, "module", mod.id]
-    );
-  }
-
-  const exercises = (await pool.query("SELECT id, prompt, explanation FROM exercises")).rows;
-  for (const ex of exercises) {
-    await pool.query(
-      "INSERT INTO search_index (title, content, type, item_id) VALUES ($1, $2, $3, $4)",
-      [ex.prompt.substring(0, 100), `${ex.prompt} ${ex.explanation || ""}`, "exercise", ex.id]
-    );
-  }
-
-  const flashcards = (await pool.query("SELECT id, question, answer FROM flashcards")).rows;
-  for (const fc of flashcards) {
-    await pool.query(
-      "INSERT INTO search_index (title, content, type, item_id) VALUES ($1, $2, $3, $4)",
-      [fc.question.substring(0, 100), `${fc.question} ${fc.answer}`, "flashcard", fc.id]
-    );
-  }
-
-  const notes = (await pool.query("SELECT id, title, body_md FROM notes")).rows;
-  for (const note of notes) {
-    await pool.query(
-      "INSERT INTO search_index (title, content, type, item_id) VALUES ($1, $2, $3, $4)",
-      [note.title, note.body_md || "", "note", note.id]
-    );
-  }
+  await pool.query(`
+    INSERT INTO search_index (title, content, type, item_id)
+    SELECT title, COALESCE(summary, '') || ' ' || COALESCE(cheatsheet_md, ''), 'module', id FROM modules
+    UNION ALL
+    SELECT SUBSTRING(prompt, 1, 100), prompt || ' ' || COALESCE(explanation, ''), 'exercise', id FROM exercises
+    UNION ALL
+    SELECT SUBSTRING(question, 1, 100), question || ' ' || COALESCE(answer, ''), 'flashcard', id FROM flashcards
+    UNION ALL
+    SELECT title, COALESCE(body_md, ''), 'note', id FROM notes
+  `);
 
   console.log("Search index built");
 }
@@ -592,6 +570,8 @@ export const queries = {
     (await pool.query("SELECT * FROM progress WHERE user_id = $1 AND item_type = $2 AND item_id = $3", [userId, itemType, itemId])).rows[0],
   getAllProgress: async (userId: string) =>
     (await pool.query("SELECT * FROM progress WHERE user_id = $1", [userId])).rows,
+  getUserProgress: async (userId: string) =>
+    (await pool.query("SELECT * FROM progress WHERE user_id = $1", [userId])).rows,
   upsertProgress: async (userId: string, params: any) =>
     await pool.query(
       `INSERT INTO progress (user_id, item_type, item_id, status, completed_at, score, last_seen)
@@ -641,6 +621,7 @@ export const queries = {
         (SELECT COUNT(*)::int FROM modules) as total_modules,
         (SELECT COUNT(*)::int FROM exercises) as total_exercises,
         (SELECT COUNT(*)::int FROM flashcards) as total_flashcards,
+        (SELECT COUNT(*)::int FROM progress WHERE user_id = $1 AND item_type = 'module' AND status = 'completed') as completed_modules,
         (SELECT COUNT(*)::int FROM progress WHERE user_id = $1 AND item_type = 'exercise' AND status = 'completed') as completed_exercises,
         (SELECT COUNT(*)::int FROM progress WHERE user_id = $1 AND item_type = 'plan_day' AND status = 'completed') as completed_days,
         (SELECT COUNT(*)::int FROM flashcards WHERE next_review IS NULL OR next_review <= CURRENT_DATE::text) as due_flashcards
@@ -651,6 +632,7 @@ export const queries = {
     const totalModules = row.total_modules || 0;
     const totalExercises = row.total_exercises || 0;
     const totalFlashcards = row.total_flashcards || 0;
+    const completedModules = row.completed_modules || 0;
     const completedExercises = row.completed_exercises || 0;
     const completedDays = row.completed_days || 0;
     const dueFlashcards = row.due_flashcards || 0;
@@ -659,6 +641,7 @@ export const queries = {
       totalModules,
       totalExercises,
       totalFlashcards,
+      completedModules,
       completedExercises,
       completedDays,
       dueFlashcards,

@@ -47,6 +47,16 @@ export function getAuth() {
         enabled: true,
         password: { hash: pbkdf2Hash, verify: pbkdf2Verify },
       },
+      socialProviders: {
+        ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+          ? {
+              google: {
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+              },
+            }
+          : {}),
+      },
       session: {
         expiresIn: 60 * 60 * 24 * 7, // 7 days
         updateAge: 60 * 60 * 24,     // refresh every 24h
@@ -54,17 +64,37 @@ export function getAuth() {
       advanced: {
         defaultCookieAttributes: {
           sameSite: "lax",
-          secure: !!process.env.BETTER_AUTH_URL && process.env.BETTER_AUTH_URL.startsWith("https"),
+          secure: process.env.NODE_ENV === "production" || !!process.env.CF_PAGES,
           path: "/",
         },
-        useSecureCookies: !!process.env.BETTER_AUTH_URL && process.env.BETTER_AUTH_URL.startsWith("https"),
+        useSecureCookies: process.env.NODE_ENV === "production" || !!process.env.CF_PAGES,
       },
-      trustedOrigins: [
-        "http://localhost:3000",
-        "http://localhost:8788",
-        "https://cpts.learnnovice.com",
-        ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",") : [])
-      ],
+      trustedOrigins: async (request?: any) => {
+        const defaultOrigins = [
+          "http://localhost:3000",
+          "http://127.0.0.1:3000",
+          "http://localhost:8788",
+          "http://127.0.0.1:8788",
+          "https://cpts.learnnovice.com",
+          "http://cpts.learnnovice.com",
+          ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+          ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",").map((s: string) => s.trim()) : [])
+        ];
+        let origin = "";
+        try {
+          if (request?.headers?.get) origin = request.headers.get("origin") || "";
+          else if (request?.headers?.origin) origin = request.headers.origin;
+          else if (request?.origin) origin = request.origin;
+        } catch {}
+
+        if (origin) {
+          if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+              /^https?:\/\/([a-zA-Z0-9-]+\.)*learnnovice\.com$/.test(origin)) {
+            return [origin, ...defaultOrigins];
+          }
+        }
+        return defaultOrigins;
+      },
       baseURL: process.env.BETTER_AUTH_URL || (process.env.CF_PAGES ? "https://cpts.learnnovice.com" : "http://localhost:3000"),
     });
   }

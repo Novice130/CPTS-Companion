@@ -94,7 +94,7 @@ if (progress) {
 <% categoryOrder.forEach(cat => {
   if (!grouped[cat]) return;
   const catMods = grouped[cat];
-  const completed = catMods.filter(m => progressMap[m.id] && progressMap[m.id].completed).length;
+  const completed = catMods.filter(m => progressMap[m.id] && (progressMap[m.id].completed || progressMap[m.id].status === 'completed')).length;
   const pct = catMods.length ? Math.round(completed / catMods.length * 100) : 0;
 %>
 <div class="path-category">
@@ -108,8 +108,8 @@ if (progress) {
   <div class="path-modules">
     <% catMods.sort((a,b) => (a.order_index||0) - (b.order_index||0)).forEach(m => {
       const prog = progressMap[m.id];
-      const isComplete = prog && prog.completed;
-      const isStarted = prog && !prog.completed;
+      const isComplete = prog && (prog.completed || prog.status === 'completed');
+      const isStarted = prog && !isComplete;
     %>
     <a href="/modules/<%= m.slug || m.id %>" class="path-module <%= isComplete ? 'completed' : isStarted ? 'in-progress' : '' %>">
       <div class="path-module-icon <%= isComplete ? 'done' : isStarted ? 'active' : 'todo' %>">

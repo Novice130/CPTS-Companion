@@ -16,7 +16,7 @@ import {
   regenerateAllActivities,
 } from "./db.ts";
 
-import { auth, getSession } from "./auth.ts";
+import { auth, getAuth, getSession } from "./auth.ts";
 import { toNodeHandler } from "better-auth/node";
 import { sendWelcomeEmail } from "./email.ts";
 
@@ -42,7 +42,9 @@ const PORT = process.env.PORT || 3000;
 // ============================================
 // Better Auth handler — MUST be before body parsers!
 // ============================================
-app.all("/api/auth/*", toNodeHandler(auth));
+app.all("/api/auth/*", (req: Request, res: Response) => {
+  return toNodeHandler(getAuth().handler)(req, res);
+});
 
 // Middleware (after auth handler to avoid conflicts)
 app.use(cookieParser());
@@ -62,6 +64,8 @@ function sanitizeHtml(html: string | null | undefined): string {
     .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
     .replace(/javascript\s*:/gi, "disabled-js:");
 }
+
+app.locals.sanitize = sanitizeHtml;
 
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.locals.sanitize = sanitizeHtml;
@@ -101,8 +105,9 @@ const _etaRender = (eta as any).render.bind(eta);
   const key = template.replace(/\.ejs$/, '').replace(/^\.?\//, '');
   const manifest = viewsManifest as any;
   const fn = manifest[key] ?? manifest[`partials/${key}`];
-  if (typeof fn === 'function') return (fn as Function).call(eta, data, opts);
-  return _etaRender(template, data, opts);
+  const renderData = { sanitize: sanitizeHtml, ...(data || {}) };
+  if (typeof fn === 'function') return (fn as Function).call(eta, renderData, opts);
+  return _etaRender(template, renderData, opts);
 };
 
 // View engine — calls precompiled template functions (no new Function / eval at runtime)
@@ -117,13 +122,14 @@ app.engine("ejs", (path: string, options: any, callback: any) => {
   }
 
   try {
-    let html = (fn as Function).call(eta, options);
+    const renderOptions = { sanitize: sanitizeHtml, ...app.locals, ...options };
+    let html = (fn as Function).call(eta, renderOptions);
 
     // Smart layout wrapping: only wrap if the view doesn't already contain the full layout boilerplate.
     if (!html.includes('<!DOCTYPE html>')) {
       const layoutFn = (viewsManifest as any)['layout'];
       if (typeof layoutFn === 'function') {
-        html = (layoutFn as Function).call(eta, { ...options, body: html });
+        html = (layoutFn as Function).call(eta, { ...renderOptions, body: html });
       }
     }
 
@@ -161,7 +167,6 @@ export async function startServer() {
 
   await initDatabase();
   await seedDatabase();
-  await queries.clearAllSessions();
 
   // Helper to get common template data
   async function getCommonData(userId?: string) {
@@ -191,13 +196,8 @@ export async function startServer() {
   // ============================================
 
   async function softAuth(req: Request, res: Response, next: express.NextFunction) {
-    console.log(`\n[softAuth] --- Checking session for ${req.path} ---`);
-    console.log(`[softAuth] Raw Cookie Header:`, req.headers.cookie);
-    
     try {
       const session = await getSession(req);
-      console.log(`[softAuth] getSession() Result:`, session ? `Valid for ${session.user.email}` : "NULL returned");
-      
       if (session) {
         (req as any).user = session.user;
         return next();
@@ -210,10 +210,15 @@ export async function startServer() {
     next();
   }
 
-  // Keep requireAuth for API routes that strict require it (like POSTs)
+  // Keep requireAuth for API routes and protected page GETs
   async function requireAuth(req: Request, res: Response, next: express.NextFunction) {
     const session = await getSession(req);
-    if (!session) return res.status(401).json({ error: "Unauthorized" });
+    if (!session) {
+      if (req.accepts("html") && req.method === "GET") {
+        return res.redirect("/login");
+      }
+      return res.status(401).json({ error: "Unauthorized" });
+    }
     (req as any).user = session.user;
     next();
   }
@@ -240,9 +245,11 @@ export async function startServer() {
     } catch (error) {
       console.error("Error during sign out:", error);
     }
-    // Clear the Better Auth session cookie
-    res.clearCookie("better-auth.session_token");
-    res.clearCookie("better-auth.session_token.sig");
+    // Clear the Better Auth session cookies across all scopes
+    res.clearCookie("better-auth.session_token", { path: "/" });
+    res.clearCookie("better-auth.session_token.sig", { path: "/" });
+    res.clearCookie("__Secure-better-auth.session_token", { path: "/", secure: true });
+    res.clearCookie("__Secure-better-auth.session_token.sig", { path: "/", secure: true });
     res.redirect("/login");
   });
 
@@ -1154,7 +1161,7 @@ export async function startServer() {
   });
 
   // API: Searchable items for command palette
-  app.get("/api/search-items", requireAuth, async (req: Request, res: Response) => {
+  app.get("/api/search-items", softAuth, async (req: Request, res: Response) => {
     const user = (req as any).user;
     const modules = (await queries.getAllModules()).map((m: any) => ({
       type: "module",
@@ -1176,11 +1183,11 @@ export async function startServer() {
       url: `/mindmaps/${m.id}`,
     }));
 
-    const notes = (await queries.getAllNotes(user.id)).map((n: any) => ({
+    const notes = user ? (await queries.getAllNotes(user.id)).map((n: any) => ({
       type: "note",
       title: n.title,
       url: `/notes/${n.id}`,
-    }));
+    })) : [];
 
     const pages = [
       { type: "page", title: "Dashboard", url: `/` },
@@ -1234,7 +1241,7 @@ export async function startServer() {
     const [common, modulesRaw, progressRaw] = await Promise.all([
       getCommonData(user?.id),
       queries.getAllModules(),
-      user?.id ? queries.getUserProgress(user.id) : Promise.resolve([]),
+      user?.id ? queries.getAllProgress(user.id) : Promise.resolve([]),
     ]);
     const modules = modulesRaw as any[];
     const progress = progressRaw as any[];
@@ -1478,10 +1485,13 @@ Sitemap: https://cpts.learnnovice.com/sitemap.xml`);
 
 // Start the server if this file is run directly (Node)
 if (typeof process !== "undefined" && process.env && process.env.PORT && !process.env.CF_PAGES) {
-  startServer().catch((err) => {
-    console.error("Failed to start server:", err);
-    process.exit(1);
-  });
+  const isMain = process.argv[1] && (process.argv[1].endsWith("server.ts") || process.argv[1].endsWith("server.js"));
+  if (isMain) {
+    startServer().catch((err) => {
+      console.error("Failed to start server:", err);
+      process.exit(1);
+    });
+  }
 }
 
 
