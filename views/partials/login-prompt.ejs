@@ -89,38 +89,63 @@
       You're exploring as a guest. Log in to save your study plan, flashcard reviews, exercise progress, and notes — all synced across devices.
     </p>
 
-    <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
-      <button onclick="lpDismiss()" style="
-        background: transparent;
-        color: rgba(255,255,255,0.45);
-        border: 1px solid rgba(255,255,255,0.12);
-        padding: 0.65rem 1.4rem;
+    <div style="display:flex; flex-direction:column; gap:0.75rem; align-items:center; margin-bottom:1rem;">
+      <a href="#" onclick="lpGoogleSignIn(event)" id="lp-google-btn" style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        width: 100%;
+        background: #ffffff;
+        color: #1a1a1a;
+        padding: 0.7rem 1.4rem;
         border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.83rem;
-        transition: all 0.2s;
-        font-family: inherit;
-      " onmouseover="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.45)'">
-        Continue as Guest
-      </button>
-      <a href="/login" style="
-        background: #7fd164;
-        color: #0a0a0a;
         text-decoration: none;
-        padding: 0.65rem 1.6rem;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.83rem;
-        letter-spacing: 0.01em;
+        font-weight: 600;
+        font-size: 0.88rem;
         transition: all 0.2s;
-        box-shadow: 0 0 20px rgba(127,209,100,0.3), 0 4px 12px rgba(0,0,0,0.3);
-        display: inline-block;
-      " onmouseover="this.style.background='#8fe873';this.style.boxShadow='0 0 28px rgba(127,209,100,0.45), 0 4px 12px rgba(0,0,0,0.3)'" onmouseout="this.style.background='#7fd164';this.style.boxShadow='0 0 20px rgba(127,209,100,0.3), 0 4px 12px rgba(0,0,0,0.3)'">
-        Sign In
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      " onmouseover="this.style.background='#f1f1f1'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#ffffff'; this.style.transform='none';">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        <span id="lpGoogleText">Sign in with Google</span>
       </a>
+
+      <div style="display:flex; gap:0.6rem; justify-content:center; width:100%;">
+        <button onclick="lpDismiss()" style="
+          flex: 1;
+          background: transparent;
+          color: rgba(255,255,255,0.45);
+          border: 1px solid rgba(255,255,255,0.12);
+          padding: 0.6rem 0.8rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.8rem;
+          transition: all 0.2s;
+          font-family: inherit;
+        " onmouseover="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='rgba(255,255,255,0.45)'">
+          Continue as Guest
+        </button>
+        <a href="/login" style="
+          flex: 1;
+          background: rgba(127,209,100,0.12);
+          color: #7fd164;
+          border: 1px solid rgba(127,209,100,0.3);
+          text-decoration: none;
+          padding: 0.6rem 0.8rem;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.8rem;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        " onmouseover="this.style.background='rgba(127,209,100,0.2)';this.style.borderColor='rgba(127,209,100,0.6)'" onmouseout="this.style.background='rgba(127,209,100,0.12)';this.style.borderColor='rgba(127,209,100,0.3)'">
+          Email Sign In
+        </a>
+      </div>
     </div>
 
-    <p style="margin:1.5rem 0 0; font-size:0.72rem; color:rgba(255,255,255,0.22); font-family:var(--font-mono, monospace);">
+    <p style="margin:1.25rem 0 0; font-size:0.72rem; color:rgba(255,255,255,0.22); font-family:var(--font-mono, monospace);">
       // No account required to explore content
     </p>
   </div>
@@ -129,6 +154,34 @@
 <script>
 (function() {
   var STORAGE_KEY = 'cpts_login_prompt_seen';
+
+  window.lpGoogleSignIn = async function(e) {
+    if (e) e.preventDefault();
+    var text = document.getElementById('lpGoogleText');
+    if (text) text.textContent = 'Redirecting to Google...';
+    try {
+      var res = await fetch('/api/auth/sign-in/social', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
+        },
+        body: JSON.stringify({
+          provider: 'google',
+          callbackURL: window.location.href
+        })
+      });
+      var data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        if (text) text.textContent = 'Sign in with Google';
+        window.location.href = '/login';
+      }
+    } catch(err) {
+      window.location.href = '/login';
+    }
+  };
 
   function lpShowBadge() {
     var badge = document.getElementById('lp-badge');
