@@ -5,8 +5,10 @@
   "main": "server.ts",
   "type": "module",
   "scripts": {
+    "prestart": "npm run bundle:views",
     "start": "node --experimental-strip-types server.ts",
-    "dev": "node --experimental-strip-types --watch server.ts",
+    "build": "npm run bundle:views && npm run bundle:seed",
+    "dev": "npm run bundle:views && node --experimental-strip-types --watch server.ts",
     "validate:seed": "node scripts/validate-seed.mjs",
     "bundle:views": "node scripts/bundle-views.mjs",
     "bundle:seed": "node scripts/bundle-seed-data.mjs",

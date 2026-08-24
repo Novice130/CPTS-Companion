@@ -39,6 +39,10 @@ fi
 echo "Installing dependencies..."
 npm install
 
+# Bundle pre-compiled views
+echo "Bundling views..."
+npm run bundle:views
+
 # Start or restart the app with PM2
 echo "Starting application..."
 pm2 delete cpts-companion 2>/dev/null || true

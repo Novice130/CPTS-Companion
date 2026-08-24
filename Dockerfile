@@ -11,6 +11,9 @@ RUN npm install
 # Copy app source
 COPY . .
 
+# Build precompiled templates manifest
+RUN npm run bundle:views
+
 # Expose port
 EXPOSE 3000
 

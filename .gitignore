@@ -29,7 +29,6 @@ npm-debug.log*
 wrangler_output.txt
 
 # Generated manifests (rebuilt on deploy)
-views-manifest.ts
 seed-data.ts
 
 # Misc generated
