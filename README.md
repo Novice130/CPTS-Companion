@@ -13,120 +13,50 @@ A comprehensive learning dashboard to help you prepare for the **Hack The Box CP
 
 CPTS Companion is deployed on **Cloudflare Workers** and accessible at [cpts.learnnovice.com](https://cpts.learnnovice.com).
 
-### Running Locally (Node.js)
+### Running Locally (Linux / macOS / Windows)
 
 ```bash
-# Install dependencies
+# 1. Clone the repository
+git clone https://github.com/Novice130/CPTS-Companion.git
+cd CPTS-Companion
+
+# 2. Install dependencies
 npm install
 
-# Run the app (standard Node.js / Express)
+# 3. Create .env (or use existing Neon Postgres connection)
+# Optional: Set DATABASE_URL, BETTER_AUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+
+# 4. Start the application
 npm start
-
-# Or with watch mode for development
-npm run dev
 ```
+The app will automatically compile the views and launch on `http://localhost:3000`.
 
-The local dev path preserves the full Express runtime — WebSocket Pool, live template rendering, scrypt hashing — everything you expect from Node.
+---
 
-### Deploying to Cloudflare Workers
+## 🎯 Features & Navigation Hub
 
-```bash
-# Set secrets once
-npx wrangler secret put DATABASE_URL
-npx wrangler secret put BETTER_AUTH_SECRET
-npx wrangler secret put BETTER_AUTH_URL
+- **📅 30-Day / 60-Day / 90-Day Plan** (`/plan`): Dynamic day-by-day roadmap with automated activity tracking and progress metrics.
+- **📚 40 Comprehensive Modules** (`/modules`): In-depth cheatsheets, syntax examples, and Reader Mode (`/modules/:id/learn`).
+- **🎯 200+ Interactive Exercises** (`/exercises`): MCQs, command puzzles, and case file evaluations with real-time feedback.
+- **🃏 Spaced Repetition Flashcards** (`/flashcards`): Powered by the SM-2 algorithm to optimize memory retention for the exam.
+- **🗺️ Interactive Mind Maps & Explorer** (`/mindmaps`, `/explore`): Interactive kill-chain diagrams and conceptual visualizers.
+- **⚔️ Boss Challenges** (`/challenges`): Real-world multi-step scenario challenges to test attack chains.
+- **🎓 Mock Exam Simulator** (`/mock-exam`): 5-day methodology timetable, pacing benchmarks, and curated **Hack The Box** & **TryHackMe** lab mappings.
+- **📝 Pentest Report Course** (`/report-course`): Full guide and interactive template for writing the official 20+ page CPTS exam report.
+- **🔬 Research Hub** (`/research`): Deep dives on BloodHound, ADCS, Kerberoasting, and lateral movement.
+- **💡 Exam Tips & Hall of Fame** (`/exam-tips`, `/hall-of-fame`): Practical survival strategies and student debriefs.
+- **📝 Notes System** (`/notes`): Markdown note editor with pre-built engagement and methodology templates.
+- **🔐 Modern Authentication**: Email/Password + **Sign in with Google** via Better Auth.
 
-# Bundle worker + views and deploy
-npm run deploy
-```
+---
 
-## 🚚 Migration: Dokploy/Docker → Cloudflare Workers
+## 🧪 Mock Exam vs. Live Hands-On Labs
 
-The app originally ran on a self-hosted **Dokploy** VPS (Docker + Traefik reverse proxy). We migrated to **Cloudflare Workers** for:
+The **Mock Exam Simulator** (`/mock-exam`) provides the **5-day methodology framework, hour-by-hour schedules, timing benchmarks, and attack flowcharts** simulating the 10-day exam environment.
 
-- **Cost**: Workers free tier (100k requests/day) eliminated VPS hosting fees.
-- **Global edge**: Requests terminate at the nearest CF data center instead of a single region.
-- **Zero infra**: No Docker images, no Traefik labels, no container restarts, no SSL renewal — Wrangler handles it.
-- **Simpler deploys**: `npm run deploy` replaces Git push → Dokploy webhook → Docker build → Traefik reload.
-
-The migration was non-trivial because Workers is **not Node.js** — it's a V8 isolate with different constraints (no `new Function()`, no long-lived TCP, 10ms CPU on free tier, no filesystem). The architecture was adapted rather than rewritten — see [deployment_lessons_learned.md](deployment_lessons_learned.md) for the full breakdown.
-
-Key architectural changes:
-
-- **Templates**: Eta templates are **pre-compiled** at build time (`scripts/bundle-views.mjs`) into a manifest because Workers bans runtime `new Function()`.
-- **Database**: Neon Postgres uses the **HTTP** client (`neon()`) on Workers instead of the **WebSocket Pool** — Workers forbids I/O that crosses request boundaries.
-- **Password hashing**: Swapped Better Auth's default scrypt for **PBKDF2 via Web Crypto** (100k iterations) to fit the 10ms CPU budget.
-- **Express shim**: `worker.ts` adapts the Fetch API `Request`/`Response` to Express's `IncomingMessage`/`ServerResponse`. Auth routes bypass the shim and call `auth.handler(req)` directly.
-- **Dual-mode**: All the above is gated on `process.env.CF_PAGES` so local Node.js development still uses the original Pool + scrypt path.
-
-## 🎯 Features
-
-### 📅 30-Day Study Plan
-
-- Structured daily schedule covering all CPTS modules
-- Track completion and progress
-- Estimated time per day
-- Lab focus and review tasks
-
-### 📚 Module Library
-
-- 26 comprehensive modules
-- Cheatsheets with commands
-- Common pitfalls
-- Exam survival tips
-
-### 🎯 Interactive Exercises
-
-- **200+ exercises** including:
-  - Multiple choice questions
-  - Fill-in-the-command
-  - Decision trees
-  - Case file analysis
-- Automatic validation
-- Explanations for each answer
-
-### 🃏 Flashcards with Spaced Repetition
-
-- 60+ Q&A flashcards
-- SM-2 algorithm for optimal review scheduling
-- Track learning progress
-
-### 🗺️ Mind Maps
-
-- 19 Mermaid.js diagrams
-- CPTS Kill Chain overview
-- Attack flow visualizations
-- Module-specific concept maps
-
-### 📝 Notes System
-
-- Personal note-taking
-- Pre-built templates:
-  - Enumeration template
-  - Web testing checklist
-  - AD attack flow
-  - Linux/Windows privesc checklists
-  - Reporting template
-
-### 🔍 Full-Text Search
-
-- Search across all content
-- Find commands, concepts, techniques
-
-### ⌨️ Command Palette
-
-- Quick navigation with `Ctrl+K`
-- Search pages, modules, exercises
-
-## 🎨 HTB Dark Terminal Theme
-
-The app features a custom dark terminal theme inspired by Hack The Box:
-
-- Dark backgrounds (`#111927`, `#1a2332`)
-- Neon green accent (`#9FEF00`)
-- Monospace fonts
-- Terminal-styled components
-- Subtle scanline effects
+For live hands-on practice, connect your Kali machine to **Hack The Box (HTB)** and **TryHackMe (THM)** to practice against the mapped labs:
+- **🟢 Hack The Box**: *Sau*, *Pilgrimage*, *Keeper*, *Delivery*, *Forest*, *Active*, *Resolute*, *Cascade*, *Dante ProLab*, *Zephyr ProLab*.
+- **🔵 TryHackMe**: *Wreath Network* (Pivoting), *Attacktive Directory*, *Holo Network*, *Linux/Windows PrivEsc Arena*.
 
 ## 📁 Project Structure
 
